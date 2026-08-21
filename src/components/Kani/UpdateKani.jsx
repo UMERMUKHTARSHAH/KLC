@@ -504,6 +504,7 @@ const UpdateKani = () => {
                           onChange={(e) => setFieldValue("value", e.target.value)}
                           className="w-full bg-white dark:bg-form-input rounded-lg border border-gray-300 dark:border-strokedark py-2.5 px-4 text-gray-800 dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                           placeholder="Enter Value"
+                          readOnly
                         />
                       </FormField>
 
@@ -546,6 +547,7 @@ const UpdateKani = () => {
                                     name={`productSuppliers[${index}].supplierOrderQty`}
                                     type="number"
                                     className="w-full bg-white dark:bg-form-input rounded-lg border border-gray-300 dark:border-strokedark py-2 px-3 text-gray-800 dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                    readOnly
                                   />
                                 </td>
                                 <Field
