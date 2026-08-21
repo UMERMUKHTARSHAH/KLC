@@ -1829,75 +1829,115 @@ const ProductGroupDetails = () => {
     const actualImages = selectedImages.filter(img => img?.actualImage);
 
     return (
-      <div className="fixed inset-0 bg-gray-500 bg-opacity-95 flex justify-center items-center z-50">
-        <div className="bg-slate-100 border border-b-1 rounded p-6 shadow-lg w-[90%] max-w-[900px] max-h-[75vh] overflow-auto dark:bg-slate-600">
-          <div className="text-right">
-            <button onClick={closeModal} className="text-red-500 text-xl font-bold hover:text-red-700">&times;</button>
-          </div>
-          <h2 className="text-2xl text-center mb-4 font-extrabold">LIST OF IMAGES - {selectedProduct?.orderNo}</h2>
+  <div className="fixed inset-0 bg-gray-500 bg-opacity-95 flex justify-center items-center z-50">
 
-          <div className="mb-8">
-            <h3 className="text-xl font-semibold mb-3 text-green-700 dark:text-green-400">Reference Images ({referenceImages.length})</h3>
-            <div className="flex flex-wrap gap-4 py-2">
-              {referenceImages.map((image, index) => (
-                <div key={`ref-${index}`} className="relative group">
-                  <img
-                    className="h-[180px] w-[180px] rounded-lg object-cover border shadow-md transition-transform duration-300 ease-in-out group-hover:scale-105 cursor-pointer"
-                    crossOrigin="use-credentials"
-                    src={getImageUrl(image.referenceImage)}
-                    alt={`Reference ${index + 1}`}
-                    onClick={() => window.open(getImageUrl(image.referenceImage), '_blank')}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = getPlaceholder("Ref");
-                    }}
-                  />
-                  <div className="absolute bottom-1 right-1 bg-black/60 text-white text-[9px] px-1 py-[1px] rounded-sm">Ref {index + 1}</div>
-                </div>
-              ))}
-              {referenceImages.length === 0 && (
-                <div className="w-full text-center py-8">
-                  <p className="text-gray-500 dark:text-gray-400">No reference images available</p>
-                </div>
-              )}
-            </div>
-          </div>
+    <div className="bg-slate-100 border rounded p-6 shadow-lg w-[90%] max-w-[900px] max-h-[75vh] relative overflow-hidden dark:bg-slate-600">
 
-          <div className="mb-4">
-            <h3 className="text-xl font-semibold mb-3 text-blue-700 dark:text-blue-400">Actual Images ({actualImages.length})</h3>
-            <div className="flex flex-wrap gap-4 py-2">
-              {actualImages.map((image, index) => (
-                <div key={`act-${index}`} className="relative group">
-                  <img
-                    className="h-[180px] w-[180px] rounded-lg object-cover border shadow-md transition-transform duration-300 ease-in-out group-hover:scale-105 cursor-pointer"
-                    crossOrigin="use-credentials"
-                    src={getImageUrl(image.actualImage)}
-                    alt={`Actual ${index + 1}`}
-                    onClick={() => window.open(getImageUrl(image.actualImage), '_blank')}
-                    onError={(e) => {
-                      e.target.onerror = null;
-                      e.target.src = getPlaceholder("Act");
-                    }}
-                  />
-                  <div className="absolute bottom-1 right-1 bg-black/60 text-white text-[9px] px-1 py-[1px] rounded-sm">Act {index + 1}</div>
-                </div>
-              ))}
-              {actualImages.length === 0 && (
-                <div className="w-full text-center py-8">
-                  <p className="text-gray-500 dark:text-gray-400">No actual images available</p>
-                </div>
-              )}
-            </div>
-          </div>
+      {/* Close Button */}
+      <div className="absolute top-3 right-4 z-50">
+        <button
+          onClick={closeModal}
+          className="text-red-500 text-3xl font-bold hover:text-red-700"
+        >
+          &times;
+        </button>
+      </div>
 
-          <div className="mt-6 pt-4 border-t border-gray-300 dark:border-gray-700">
-            <p className="text-center text-gray-600 dark:text-gray-400">
-              Total Images: {selectedImages.length} (Reference: {referenceImages.length}, Actual: {actualImages.length})
-            </p>
+      {/* Fixed Header */}
+      <h2 className="text-2xl text-center mb-4 font-extrabold">
+        LIST OF IMAGES - {selectedProduct?.orderNo}
+      </h2>
+
+      {/* ONLY THIS PART SCROLLS */}
+      <div className="overflow-y-auto max-h-[calc(75vh-80px)] pr-2">
+
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-3 text-green-700 dark:text-green-400">
+            Reference Images ({referenceImages.length})
+          </h3>
+
+          <div className="flex flex-wrap gap-4 py-2">
+            {referenceImages.map((image, index) => (
+              <div key={`ref-${index}`} className="relative group">
+                <img
+                  className="h-[180px] w-[180px] rounded-lg object-cover border shadow-md transition-transform duration-300 ease-in-out group-hover:scale-105 cursor-pointer"
+                  crossOrigin="use-credentials"
+                  src={getImageUrl(image.referenceImage)}
+                  alt={`Reference ${index + 1}`}
+                  onClick={() =>
+                    window.open(getImageUrl(image.referenceImage), "_blank")
+                  }
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = getPlaceholder("Ref");
+                  }}
+                />
+
+                <div className="absolute bottom-1 right-1 bg-black/60 text-white text-[9px] px-1 py-[1px] rounded-sm">
+                  Ref {index + 1}
+                </div>
+              </div>
+            ))}
+
+            {referenceImages.length === 0 && (
+              <div className="w-full text-center py-8">
+                <p className="text-gray-500 dark:text-gray-400">
+                  No reference images available
+                </p>
+              </div>
+            )}
           </div>
         </div>
+
+        <div className="mb-4">
+          <h3 className="text-xl font-semibold mb-3 text-blue-700 dark:text-blue-400">
+            Actual Images ({actualImages.length})
+          </h3>
+
+          <div className="flex flex-wrap gap-4 py-2">
+            {actualImages.map((image, index) => (
+              <div key={`act-${index}`} className="relative group">
+                <img
+                  className="h-[180px] w-[180px] rounded-lg object-cover border shadow-md transition-transform duration-300 ease-in-out group-hover:scale-105 cursor-pointer"
+                  crossOrigin="use-credentials"
+                  src={getImageUrl(image.actualImage)}
+                  alt={`Actual ${index + 1}`}
+                  onClick={() =>
+                    window.open(getImageUrl(image.actualImage), "_blank")
+                  }
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = getPlaceholder("Act");
+                  }}
+                />
+
+                <div className="absolute bottom-1 right-1 bg-black/60 text-white text-[9px] px-1 py-[1px] rounded-sm">
+                  Act {index + 1}
+                </div>
+              </div>
+            ))}
+
+            {actualImages.length === 0 && (
+              <div className="w-full text-center py-8">
+                <p className="text-gray-500 dark:text-gray-400">
+                  No actual images available
+                </p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-6 pt-4 border-t border-gray-300 dark:border-gray-700">
+          <p className="text-center text-gray-600 dark:text-gray-400">
+            Total Images: {selectedImages.length} (Reference:{" "}
+            {referenceImages.length}, Actual: {actualImages.length})
+          </p>
+        </div>
+
       </div>
-    );
+    </div>
+  </div>
+);
   };
 
   if (loading) {
