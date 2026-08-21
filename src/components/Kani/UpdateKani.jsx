@@ -411,7 +411,7 @@ const UpdateKani = () => {
 
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Order / Update Order Product" />
+      <Breadcrumb pageName="Order / View Order Product" />
       
       <div className="max-w-7xl mx-auto">
         {/* ===== UPDATE ORDER PRODUCT SECTION ===== */}
