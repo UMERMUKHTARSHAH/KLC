@@ -363,7 +363,7 @@ const RetailOrderProforma = () => {
 
     return (
         <DefaultLayout>
-            <Breadcrumb pageName="Order/Update Order" />
+            <Breadcrumb pageName="Order/Update Ordesr" />
             <div>
                 <Formik
                     onSubmit={handleSubmit}

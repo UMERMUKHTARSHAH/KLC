@@ -1957,14 +1957,22 @@ const ProductGroupDetails = () => {
 
       <div className="mb-6">
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
+          {/* <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
             {productGroupName} {
               activeView === 'orders' ? 'ORDERS' : 
               activeView === 'inProgress' ? 'IN PROGRESS ORDERS' : 
               activeView === 'category' ? `${getDisplayOrderType(selectedOrderType)} ORDERS` : 
               'SUPPLIERS'
             }
-          </h2>
+          </h2> */}
+          <h2 className="uppercase font-bold text-2xl leading-tight tracking-[9px] text-gray-800 dark:text-white">
+  {productGroupName} {
+    activeView === 'orders' ? 'ORDERS' : 
+    activeView === 'inProgress' ? 'IN PROGRESS ORDERS' : 
+    activeView === 'category' ? `${getDisplayOrderType(selectedOrderType)} ORDERS` : 
+    'SUPPLIERS'
+  }
+</h2>
           <div className="flex gap-3">
             {activeView === 'suppliers' && supplierDetailView && (
               <button
