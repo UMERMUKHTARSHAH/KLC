@@ -275,8 +275,7 @@ const DropdownNotification = () => {
     };
   }, [dropdownOpen]);
 
-  // =========================================================
-  // FETCH UNREAD COUNT
+
   // =========================================================
   const fetchUnreadCount = async () => {
     try {
