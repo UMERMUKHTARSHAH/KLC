@@ -11,7 +11,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { customStyles as createCustomStyles } from '../../Constants/utils';
-import { MdCreateNewFolder } from 'react-icons/md';
+import { MdCreateNewFolder, MdEditDocument } from 'react-icons/md';
 import { HiViewfinderCircle } from "react-icons/hi2";
 
 
@@ -332,7 +332,7 @@ const ViewOrderApproved = () => {
                             ) : null
                         ) : (
                             // If proforma is created, show the Edit icon based on orderType
-                            <MdCreateNewFolder
+                            <MdEditDocument
                                 size={17}
                                 className="text-teal-500 hover:text-teal-700 mx-2"
                                 onClick={() => {
@@ -342,7 +342,7 @@ const ViewOrderApproved = () => {
                                         navigate(`/Order/updateRetailProforma/${item?.id}`);
                                     }
                                 }}
-                                title="Edit Order"
+                                title="Edit Proforma"
                             />
                         )}
                     </p>

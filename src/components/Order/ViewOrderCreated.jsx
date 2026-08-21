@@ -264,6 +264,10 @@ const ViewOrderCreated = () => {
 
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">{item?.orderDate}</p>
+
+                </td>
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
                     <p className="text-gray-900 whitespace-no-wrap">{item.customerName}</p>
                 </td>
                 <td className="px-5 py-5 border-b border-gray-200 text-sm">
@@ -292,7 +296,7 @@ const ViewOrderCreated = () => {
 
 
 
-            <td className="px-5 py-5 border-b border-gray-200 text-sm whitespace-noWrap tracking-wider">
+            <td className="px-5 py-5 border-b border-gray-200 text-sm whitespace-noWrap tracking-wider w-[230px]">
   <div className="flex items-center gap-2 flex-wrap">
     <FiEdit3
       color='blue'
@@ -525,6 +529,7 @@ const ViewOrderCreated = () => {
                                     <tr className='bg-slate-300 dark:bg-slate-700 dark:text-white'>
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider" >SNO</th>
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Order No</th>
+                                        <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Order Date</th>
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Product Id</th>
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>

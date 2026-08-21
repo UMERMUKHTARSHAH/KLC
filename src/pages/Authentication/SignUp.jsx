@@ -55,131 +55,116 @@ const Signup = () => {
                 >
                     {({ values, setFieldValue }) => (
                         <Form>
-                            <div className="flex gap-9">
-                                <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-                                    <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
-                                        <h3 className="font-medium text-slate-500 text-center text-xl dark:text-slate-400">
-                                            Add User
-                                        </h3>
-                                    </div>
+    <div className="flex gap-9">
+        <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark w-full">
+            <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+                <h3 className="font-medium text-slate-500 text-center text-xl dark:text-slate-400">
+                    Add User
+                </h3>
+            </div>
 
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-6.5">
-                                        <div className="mb-4.5 flex flex-wrap gap-6">
-                                            <div className="w-full">
-                                                <label className="mb-2.5 block text-black dark:text-white"> Name</label>
-                                                <Field
-                                                    type="text"
-                                                    name="name"
-                                                    placeholder="Enter Name"
-                                                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
-                                                />
-                                                <ErrorMessage name="name" component="div" className="text-red-500" />
-                                            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6.5">
+                {/* Row 1: Name */}
+                <div className="w-full">
+                    <label className="mb-2.5 block text-black dark:text-white">Name</label>
+                    <Field
+                        type="text"
+                        name="name"
+                        placeholder="Enter Name"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
+                    />
+                    <ErrorMessage name="name" component="div" className="text-red-500" />
+                </div>
 
-                                            <div className="flex-1 min-w-[300px]">
-                                                <label className="mb-2.5 block text-black dark:text-white">Role</label>
-                                                <ReactSelect
-                                                    name="role"
-                                                    styles={customStyles}
-                                                    value={values.role} 
-                                                    onChange={(option) => setFieldValue('role', option)} 
-                                                    options={RoleOptions}
-                                                    className="bg-white dark:bg-form-Field"
-                                                    classNamePrefix="react-select"
-                                                    placeholder="Select Role"
-                                                />
-                                                <ErrorMessage name="role" component="div" className="text-red-600 text-sm" />
-                                            </div>
+                {/* Row 1: Role */}
+                <div className="w-full">
+                    <label className="mb-2.5 block text-black dark:text-white">Role</label>
+                    <ReactSelect
+                        name="role"
+                        styles={customStyles}
+                        value={values.role}
+                        onChange={(option) => setFieldValue('role', option)}
+                        options={RoleOptions}
+                        className="bg-white dark:bg-form-Field"
+                        classNamePrefix="react-select"
+                        placeholder="Select Role"
+                    />
+                    <ErrorMessage name="role" component="div" className="text-red-600 text-sm" />
+                </div>
 
-                                            <div className="flex-1 min-w-[300px]">
-                                                <label className="mb-2.5 block text-black dark:text-white"> Email</label>
-                                                <Field
-                                                    type="email"
-                                                    name="email"
-                                                    placeholder="Enter Name"
-                                                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
-                                                />
-                                                <ErrorMessage name="email" component="div" className="text-red-500" />
-                                            </div>
-                                      
+                {/* Row 1: Email */}
+                <div className="w-full">
+                    <label className="mb-2.5 block text-black dark:text-white">Email</label>
+                    <Field
+                        type="email"
+                        name="email"
+                        placeholder="Enter Email"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
+                    />
+                    <ErrorMessage name="email" component="div" className="text-red-500" />
+                </div>
 
+                {/* Row 2: Phone Number */}
+                <div className="w-full">
+                    <label className="mb-2.5 block text-black dark:text-white">Phone Number</label>
+                    <Field
+                        type="text"
+                        name="phoneNumber"
+                        placeholder="Enter Phone Number"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
+                    />
+                    <ErrorMessage name="phoneNumber" component="div" className="text-red-500" />
+                </div>
 
-                                            <div className="w-full">
-                                                <label className="mb-2.5 block text-black dark:text-white"> Phone Number</label>
-                                                <Field
-                                                    type="text"
-                                                    name="phoneNumber"
-                                                    placeholder="Enter Phone Number"
-                                                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
-                                                />
-                                                <ErrorMessage name="phoneNumber" component="div" className="text-red-500" />
+                {/* Row 2: Address */}
+                <div className="w-full">
+                    <label className="mb-2.5 block text-black dark:text-white">Address</label>
+                    <Field
+                        type="text"
+                        name="address"
+                        placeholder="Enter Address"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
+                    />
+                    <ErrorMessage name="address" component="div" className="text-red-500" />
+                </div>
 
-                                            </div>
-                                        </div>
+                {/* Row 2: Username */}
+                <div className="w-full">
+                    <label className="mb-2.5 block text-black dark:text-white">Username</label>
+                    <Field
+                        type="text"
+                        name="username"
+                        placeholder="Enter Username"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
+                    />
+                    <ErrorMessage name="username" component="div" className="text-red-500" />
+                </div>
 
+                {/* Row 3: Password - spans full width */}
+                <div className="col-span-1 md:col-span-3">
+                    <label className="mb-2.5 block text-black dark:text-white">Password</label>
+                    <Field
+                        type="password"
+                        name="password"
+                        placeholder="Enter Password"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
+                    />
+                    <ErrorMessage name="password" component="div" className="text-red-500" />
+                </div>
 
-                                        <div className="mb-4.5 flex flex-wrap gap-6">
-
-                                            <div className="     w-full">
-                                                <label className="mb-2.5 block text-black dark:text-white"> Address</label>
-                                                <Field
-                                                    type="text"
-                                                    name="address"
-                                                    placeholder="Enter Address"
-                                                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
-                                                />
-                                                <ErrorMessage name="address" component="div" className="text-red-500" />
-
-                                            </div>
-
-
-                                            <div className="     w-full">
-                                                <label className="mb-2.5 block text-black dark:text-white"> Username</label>
-                                                <Field
-                                                    type="text"
-                                                    name="username"
-                                                    placeholder="Enter Username "
-                                                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
-                                                />
-                                                <ErrorMessage name="username" component="div" className="text-red-500" />
-
-                                            </div>
-                                            <div className="w-full ">
-                                                <label className="mb-2.5 block text-black dark:text-white"> Password</label>
-                                                <Field
-                                                    type="password"
-                                                    name="password"
-                                                    placeholder="Enter Password"
-                                                    className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
-                                                />
-                                                <ErrorMessage name="password" component="div" className="text-red-500" />
-
-                                            </div>
-                                        </div>
-
-
-
-                                        <div className="mb-4.5 flex flex-wrap gap-6 ">
-
-
-
-
-                                        </div>
-
-
-                                        <button type="submit" className="flex w-full justify-center rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90 mt-4">
-                                            Add User
-                                        </button>
-                                    </div>
-
-
-
-
-
-                                </div>
-
-                            </div>
-                        </Form>
+                {/* Row 4: Submit Button - spans full width */}
+                <div className=" flex items-center justify-center col-span-1 md:col-span-1">
+                    <button 
+                        type="submit" 
+                        className="w-full rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
+                    >
+                        Add User
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</Form>
                     )}
 
 
