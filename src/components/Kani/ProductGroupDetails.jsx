@@ -1927,13 +1927,6 @@ const ProductGroupDetails = () => {
           </div>
         </div>
 
-        <div className="mt-6 pt-4 border-t border-gray-300 dark:border-gray-700">
-          <p className="text-center text-gray-600 dark:text-gray-400">
-            Total Images: {selectedImages.length} (Reference:{" "}
-            {referenceImages.length}, Actual: {actualImages.length})
-          </p>
-        </div>
-
       </div>
     </div>
   </div>
