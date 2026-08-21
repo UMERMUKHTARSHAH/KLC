@@ -13,6 +13,7 @@ import { toast } from 'react-toastify';
 import { customStyles as createCustomStyles } from '../../Constants/utils';
 import { MdCreateNewFolder } from 'react-icons/md';
 import { HiViewfinderCircle } from "react-icons/hi2";
+import { FaFilePdf } from "react-icons/fa";
 
 
 
@@ -371,9 +372,9 @@ const ViewOrderApproved = () => {
                             // ) : null
                         ) : (
                             // If proforma is created, show the Edit icon based on orderType
-                            <HiViewfinderCircle
+                            <FaFilePdf
                                 size={17}
-                                className="text-teal-500 hover:text-teal-700 mx-2"
+                                className="text-red-500 hover:text-red-700 mx-2 cursor-pointer"
                                 onClick={() => {
                                     if (item.orderTypeName === "WSClients") {
                                         navigate(`/Order/orderPerformaws/${item?.id}`);
