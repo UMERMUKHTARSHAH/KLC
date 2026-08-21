@@ -411,7 +411,7 @@ const UpdateKani = () => {
 
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Order / Update Order Product" />
+      <Breadcrumb pageName="Order / View Order Product" />
       
       <div className="max-w-7xl mx-auto">
         {/* ===== UPDATE ORDER PRODUCT SECTION ===== */}
@@ -504,6 +504,7 @@ const UpdateKani = () => {
                           onChange={(e) => setFieldValue("value", e.target.value)}
                           className="w-full bg-white dark:bg-form-input rounded-lg border border-gray-300 dark:border-strokedark py-2.5 px-4 text-gray-800 dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
                           placeholder="Enter Value"
+                          readOnly
                         />
                       </FormField>
 
@@ -546,6 +547,7 @@ const UpdateKani = () => {
                                     name={`productSuppliers[${index}].supplierOrderQty`}
                                     type="number"
                                     className="w-full bg-white dark:bg-form-input rounded-lg border border-gray-300 dark:border-strokedark py-2 px-3 text-gray-800 dark:text-white outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                                    readOnly
                                   />
                                 </td>
                                 <Field
@@ -844,7 +846,7 @@ const UpdateKani = () => {
                               </div>
                               
                               {/* GST RATE DETAILS - Second Column */}
-                              <div>
+                              {/* <div>
                                 <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">GST RATE DETAILS</label>
                                 <ReactSelect
                                   name="gstratedetails"
@@ -856,7 +858,7 @@ const UpdateKani = () => {
                                   placeholder="Enter GST Rate Details"
                                   isDisabled={true}
                                 />
-                              </div>
+                              </div> */}
                             </div>
 
                             {/* Conditional Fields based on gstratedetails */}
