@@ -369,11 +369,11 @@ const ViewOrderCreated = () => {
 
     return (
         <DefaultLayout>
-            <Breadcrumb pageName="Order/ View Order" />
+            <Breadcrumb pageName="Order/View Created Orders" />
             <div className="container mx-auto px-4 sm:px-8 bg-white dark:bg-slate-800">
                 <div className="pt-5">
                     <div className='flex justify-between'>
-                        <h2 className="text-xl font-semibold leading-tight">View Order</h2>
+                        <h2 className="text-xl font-semibold leading-tight">View Created Order</h2>
                         {/* <p className={`inline-flex rounded-full bg-opacity-10 py-1 px-3 text-sm font-medium bg-success text-success dark:bg-white dark:text-slate-800`}>
                             TOTAL PRODUCTS: {pagination.totalItems}
                         </p> */}
@@ -397,7 +397,7 @@ const ViewOrderCreated = () => {
                                 <Form>
                                     <div className="mb-4.5 flex flex-wrap gap-6 mt-12">
 
-                                        <div className="flex-1 min-w-[200px]">
+                                        <div className="flex-1 min-w-[200px] mt-3">
                                             <label className="mb-2.5 block text-black dark:text-white">Order No</label>
                                             <ReactSelect
                                                 name="orderNo"

@@ -420,11 +420,11 @@ const ViewOrderPartiallyApproved = () => {
 
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Order/ View Order" />
+      <Breadcrumb pageName="Order/ View Order Partially Approved" />
       <div className="container mx-auto px-4 sm:px-8 bg-white dark:bg-slate-800">
         <div className="pt-5">
           <div className='flex justify-between'>
-            <h2 className="text-xl font-semibold leading-tight">View Order</h2>
+            <h2 className="text-xl font-semibold leading-tight">View Orders that are Partially Approved</h2>
           </div>
 
           <div className='items-center justify-center'>

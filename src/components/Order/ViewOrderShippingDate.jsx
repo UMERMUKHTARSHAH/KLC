@@ -331,7 +331,7 @@ const ViewOrderShippingDate = () => {
             <div className="container mx-auto px-4 sm:px-8 bg-white dark:bg-slate-800">
                 <div className="pt-5">
                     <div className='flex justify-between'>
-                        <h2 className="text-xl font-semibold leading-tight">View Order Shipping Date</h2>
+                        <h2 className="text-xl font-semibold leading-tight">Update Order Shipping Date</h2>
                         {/* <p className={`inline-flex rounded-full bg-opacity-10 py-1 px-3 text-sm font-medium bg-success text-success dark:bg-white dark:text-slate-800`}>
                             TOTAL PRODUCTS: {pagination.totalItems}
                         </p> */}
