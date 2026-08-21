@@ -844,7 +844,7 @@ const UpdateKani = () => {
                               </div>
                               
                               {/* GST RATE DETAILS - Second Column */}
-                              <div>
+                              {/* <div>
                                 <label className="mb-2.5 block text-sm font-medium text-black dark:text-white">GST RATE DETAILS</label>
                                 <ReactSelect
                                   name="gstratedetails"
@@ -856,7 +856,7 @@ const UpdateKani = () => {
                                   placeholder="Enter GST Rate Details"
                                   isDisabled={true}
                                 />
-                              </div>
+                              </div> */}
                             </div>
 
                             {/* Conditional Fields based on gstratedetails */}
