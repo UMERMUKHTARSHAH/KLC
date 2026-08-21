@@ -14,6 +14,7 @@ import { customStyles as createCustomStyles } from '../../Constants/utils';
 import { MdCreateNewFolder } from 'react-icons/md';
 import { HiViewfinderCircle } from "react-icons/hi2";
 import { FaFilePdf } from "react-icons/fa";
+import { MdEdit } from "react-icons/md";
 
 
 
@@ -333,7 +334,7 @@ const ViewOrderApproved = () => {
                             ) : null
                         ) : (
                             // If proforma is created, show the Edit icon based on orderType
-                            <MdCreateNewFolder
+                            <MdEdit
                                 size={17}
                                 className="text-teal-500 hover:text-teal-700 mx-2"
                                 onClick={() => {
@@ -343,7 +344,7 @@ const ViewOrderApproved = () => {
                                         navigate(`/Order/updateRetailProforma/${item?.id}`);
                                     }
                                 }}
-                                title="Edit Order"
+                                title="Edit Profarma"
                             />
                         )}
                     </p>
@@ -410,15 +411,14 @@ const ViewOrderApproved = () => {
 
     return (
         <DefaultLayout>
-            <Breadcrumb pageName="Order/ View Order" />
+            <Breadcrumb pageName="Order/ View Proforma" />
             <div className="container mx-auto px-4 sm:px-8 bg-white dark:bg-slate-800">
                 <div className="pt-5">
-                    <div className='flex justify-between'>
-                        <h2 className="text-xl font-semibold leading-tight">Search ProForma</h2>
-                        {/* <p className={`inline-flex rounded-full bg-opacity-10 py-1 px-3 text-sm font-medium bg-success text-success dark:bg-white dark:text-slate-800`}>
-                            TOTAL PRODUCTS: {pagination.totalItems}
-                        </p> */}
-                    </div>
+                   <div className="flex justify-between">
+    <h2 className="text-xl font-semibold leading-tight uppercase tracking-widest">
+        Search ProForma
+    </h2>
+</div>
 
 
                     <div className='items-center justify-center'>
