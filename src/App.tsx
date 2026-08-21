@@ -374,7 +374,7 @@ import KaniInProgress from './components/Kani/KaniInProgress.jsx';
 import UpdateKaniProducts from './components/Kani/UpdateKaniProducts.jsx';
 import UpdatePashminaProducts from './components/Kani/UpdatePashminaProducts.jsx';
 
-import 'react-toastify/dist/ReactToastify.css';
+// import 'react-toastify/dist/ReactToastify.css';
 
 // import { useDispatch } from 'react-redux';
 // import { toast } from 'react-toastify';

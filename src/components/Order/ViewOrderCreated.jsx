@@ -292,7 +292,7 @@ const ViewOrderCreated = () => {
 
 
 
-            <td className="px-5 py-5 border-b border-gray-200 text-sm">
+            <td className="px-5 py-5 border-b border-gray-200 text-sm whitespace-noWrap tracking-wider">
   <div className="flex items-center gap-2 flex-wrap">
     <FiEdit3
       color='blue'
@@ -302,7 +302,7 @@ const ViewOrderCreated = () => {
       title="Edit Order"
     />
     
-    <span className="text-gray-300">|</span>
+   
     
     <button
       onClick={() => navigate(`/Order/updateorderCreated/${item?.id}`)}
@@ -313,7 +313,7 @@ const ViewOrderCreated = () => {
       Edit Status
     </button>
     
-    <span className="text-gray-300">|</span>
+    
     
     {item.orderTypeName === "WSClients" ? (
       <MdCreateNewFolder
@@ -331,7 +331,7 @@ const ViewOrderCreated = () => {
       />
     ) : null}
     
-    <span className="text-gray-300">|</span>
+   
     
     <FiTrash2
       size={17}
