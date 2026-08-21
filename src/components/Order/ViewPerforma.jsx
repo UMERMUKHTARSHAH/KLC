@@ -410,116 +410,137 @@ const ViewOrderApproved = () => {
     };
 
     return (
-        <DefaultLayout>
-            <Breadcrumb pageName="Order/ View Proforma" />
-            <div className="container mx-auto px-4 sm:px-8 bg-white dark:bg-slate-800">
-                <div className="pt-5">
-                   <div className="flex justify-between">
-    <h2 className="text-xl font-semibold leading-tight uppercase tracking-widest">
-        Search ProForma
-    </h2>
-</div>
-
-
-                    <div className='items-center justify-center'>
-                        <Formik
-                            initialValues={{
-                                customerName: "",
-                                fromDate: "",
-                                toDate: ""
-                            }}
-                            onSubmit={handleSubmit}
-                        >
-                            {({ setFieldValue, values, handleBlur }) => (
-                                <Form>
-                                    {/* Customer Row */}
-                                    <div className="mb-4.5 flex flex-wrap gap-6 mt-12">
-                                        <div className="flex-1 min-w-[200px]">
-                                            <label className="mb-2.5 block text-black dark:text-white">Customer</label>
-                                            <ReactSelect
-                                                name="customerName"
-                                                value={productgrp.find(option => option.value === values.customerName)}
-                                                onChange={(option) => {
-                                                    setFieldValue('customerName', option.value);
-                                                }}
-                                                onBlur={handleBlur}
-                                                options={[{ label: 'View All Customers', value: null }, ...formattedCustomer]}
-                                                styles={customStyles}
-                                                className="bg-white dark:bg-form-input"
-                                                classNamePrefix="react-select"
-                                                placeholder="Select"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    {/* Date Range Row */}
-                                    <div className="mb-4.5 flex flex-wrap gap-6 mt-6">
-                                        <div className="flex-1 min-w-[200px]">
-                                            <label className="mb-2.5 block text-black dark:text-white">From Date</label>
-                                            <Field
-                                                type="date"
-                                                name="fromDate"
-                                                className="w-full rounded border border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                                            />
-                                        </div>
-
-                                        <div className="flex-1 min-w-[200px]">
-                                            <label className="mb-2.5 block text-black dark:text-white">To Date</label>
-                                            <Field
-                                                type="date"
-                                                name="toDate"
-                                                className="w-full rounded border border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex justify-center mt-4">
-                                        <button
-                                            type="submit"
-                                            className="flex md:w-[240px] w-[220px] md:h-[37px] h-[40px] pt-2 rounded-lg justify-center bg-primary md:p-2.5 font-medium md:text-sm text-gray hover:bg-opacity-90"
-                                        >
-                                            Search
-                                        </button>
-                                    </div>
-                                </Form>
-                            )}
-                        </Formik>
-                    </div>
-
-
-
-                    <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
-                        <div className="inline-block min-w-full shadow-md rounded-lg overflow-hidden">
-                            <table className="min-w-full leading-normal">
-                                <thead>
-                                    <tr className='bg-slate-300 dark:bg-slate-700 dark:text-white'>
-                                        <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider" >SNO</th>
-                                        <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">PID</th>
-                                        <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Order Type</th>
-                                        <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"> Order No</th>
-                                        <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
-                                        {/* <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-[600px] md:w-[120px]">ADD BOM </th> */}
-                                        <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Product Id</th>
-
-                                        {/* <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th> */}
-                                        <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {renderTableRows()}
-                                </tbody>
-                            </table>
-                        </div>
-                        <Pagination totalPages={pagination.totalPages} currentPage={pagination.currentPage} handlePageChange={handlePageChange} />
-                    </div>
-
-
-                </div>
-
+      <DefaultLayout>
+        <Breadcrumb pageName="Order/ View Proforma" />
+        <div className="container mx-auto px-4 sm:px-8 bg-white dark:bg-slate-800">
+          <div className="pt-5">
+            <div className="flex justify-between">
+              <h2 className="text-xl font-semibold leading-tight uppercase tracking-widest">
+                Search ProForma
+              </h2>
             </div>
 
-        </DefaultLayout>
-    )
+            <div className="items-center justify-center">
+              <Formik
+                initialValues={{
+                  customerName: '',
+                  fromDate: '',
+                  toDate: '',
+                }}
+                onSubmit={handleSubmit}
+              >
+                {({ setFieldValue, values, handleBlur }) => (
+                  <Form>
+                    {/* Customer Row */}
+                    <div className="mb-4.5 flex flex-wrap gap-6 mt-12">
+                      <div className="flex-1 min-w-[200px]">
+                        <label className="mb-2.5 block text-black dark:text-white">
+                          Customer
+                        </label>
+                        <ReactSelect
+                          name="customerName"
+                          value={productgrp.find(
+                            (option) => option.value === values.customerName,
+                          )}
+                          onChange={(option) => {
+                            setFieldValue('customerName', option.value);
+                          }}
+                          onBlur={handleBlur}
+                          options={[
+                            { label: 'View All Customers', value: null },
+                            ...formattedCustomer,
+                          ]}
+                          styles={customStyles}
+                          className="bg-white dark:bg-form-input"
+                          classNamePrefix="react-select"
+                          placeholder="Select"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Date Range Row */}
+                    <div className="mb-4.5 flex flex-wrap gap-6 mt-6">
+                      <div className="flex-1 min-w-[200px]">
+                        <label className="mb-2.5 block text-black dark:text-white">
+                          From Date
+                        </label>
+                        <Field
+                          type="date"
+                          name="fromDate"
+                          className="w-full rounded border border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        />
+                      </div>
+
+                      <div className="flex-1 min-w-[200px]">
+                        <label className="mb-2.5 block text-black dark:text-white">
+                          To Date
+                        </label>
+                        <Field
+                          type="date"
+                          name="toDate"
+                          className="w-full rounded border border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-whiter dark:border-form-strokedark dark:bg-form-input dark:text-white dark:focus:border-primary"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex justify-center mt-4">
+                      <button
+                        type="submit"
+                        className="flex md:w-[240px] w-[220px] md:h-[37px] h-[40px] pt-2 rounded-lg justify-center bg-primary md:p-2.5 font-medium md:text-sm text-gray hover:bg-opacity-90"
+                      >
+                        Search
+                      </button>
+                    </div>
+                  </Form>
+                )}
+              </Formik>
+            </div>
+
+            <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+              <div className="inline-block min-w-full shadow-md rounded-lg overflow-hidden">
+                <table className="min-w-full leading-normal">
+                  <thead>
+                    <tr className="bg-slate-300 dark:bg-slate-700 dark:text-white">
+                      <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        SNO
+                      </th>
+                      <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        PID
+                      </th>
+                      <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Order Type
+                      </th>
+                      <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        {' '}
+                        Order No
+                      </th>
+                      <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Customer
+                      </th>
+                      {/* <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-[600px] md:w-[120px]">ADD BOM </th> */}
+                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Product Id
+                      </th>
+
+                      {/* <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th> */}
+                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>{renderTableRows()}</tbody>
+                </table>
+              </div>
+              <Pagination
+                totalPages={pagination.totalPages}
+                currentPage={pagination.currentPage}
+                handlePageChange={handlePageChange}
+              />
+            </div>
+          </div>
+        </div>
+      </DefaultLayout>
+    );
 }
 
 export default ViewOrderApproved
