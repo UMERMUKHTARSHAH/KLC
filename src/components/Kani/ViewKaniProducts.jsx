@@ -1843,7 +1843,7 @@ const ViewKaniProducts = () => {
                                                     </div>
 
                                                     {/* GST RATE DETAILS Section (Conditional) */}
-                                                    {/* {product.gstDetails === "Applicable" && (
+                                                    {product.gstDetails === "Applicable" && (
 
                                                         <div className="flex-1 min-w-[250px]">
                                                             <label className="mb-2.5 block text-black dark:text-white">GST RATE DETAILS</label>
@@ -1859,7 +1859,7 @@ const ViewKaniProducts = () => {
                                                                 isDisabled={true}
                                                             />
                                                         </div>
-                                                    )} */}
+                                                    )}
                                                 </div>
 
 
