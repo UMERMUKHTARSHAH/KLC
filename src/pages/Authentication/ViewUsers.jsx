@@ -163,12 +163,12 @@ const ViewUsers = () => {
       <div className="flex flex-col gap-6">
         {/* Main Card */}
         <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
-         <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+          <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
+         <div className="py-2 px-6.5 dark:border-strokedark">
                 <h3 className="font-medium text-slate-500 text-center text-xl dark:text-slate-400">
                     View Users
                 </h3>
             </div>
-          <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
                 {/* <h2 className="font-medium text-black dark:text-white text-xl">
@@ -180,7 +180,7 @@ const ViewUsers = () => {
                 <svg className="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                 </svg>
-                Add New User
+                Add User
               </button>
             </div>
           </div>
@@ -194,7 +194,7 @@ const ViewUsers = () => {
                     #
                   </th>
                   <th className="min-w-[220px] py-4 px-4 font-medium text-black dark:text-white text-sm">
-                    User Information
+                    NAME / USERNAME
                   </th>
                   <th className="min-w-[180px] py-4 px-4 font-medium text-black dark:text-white text-sm">
                     Contact Details
@@ -205,9 +205,9 @@ const ViewUsers = () => {
                   <th className="min-w-[100px] py-4 px-4 font-medium text-black dark:text-white text-sm">
                     Status
                   </th>
-                  <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white text-sm">
+                  {/* <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white text-sm">
                     Last Updated
-                  </th>
+                  </th> */}
                 </tr>
               </thead>
               <tbody>
@@ -303,11 +303,11 @@ const ViewUsers = () => {
                         {getStatusBadge(user)}
                       </td>
                       
-                      <td className="py-5 px-4">
+                      {/* <td className="py-5 px-4">
                         <span className="text-sm text-gray-500 dark:text-gray-400">
                           {formatDate(user.updated)}
                         </span>
-                      </td>
+                      </td> */}
                     </tr>
                   ))
                 )}
