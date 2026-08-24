@@ -153,14 +153,14 @@ const Signup = () => {
                 </div>
 
                 {/* Row 4: Submit Button - spans full width */}
-                <div className=" flex items-center justify-center col-span-1 md:col-span-1">
-                    <button 
-                        type="submit" 
-                        className="w-full rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90"
-                    >
-                        Add User
-                    </button>
-                </div>
+        <div className="flex justify-center items-center col-span-1 md:col-span-3">
+    <button 
+        type="submit" 
+        className="rounded bg-primary p-3 font-medium text-gray hover:bg-opacity-90 px-6"
+    >
+        Add User
+    </button>
+</div>
             </div>
         </div>
     </div>

@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import DefaultLayout from '../../layout/DefaultLayout';
 import axios from 'axios';
-import { FaUser, FaEnvelope, FaPhone, FaEye, FaEdit, FaTrash } from 'react-icons/fa';
+import { FaUser, FaEnvelope, FaPhone, FaCopy, FaCheck } from 'react-icons/fa';
 import Breadcrumb from '../../components/Breadcrumbs/Breadcrumb';
+import Pagination from '../../components/Pagination/Pagination';
 import { VIEWUSERS_URL } from '../../Constants/utils';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +18,7 @@ const ViewUsers = () => {
   const { token } = currentUser;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [copiedUserId, setCopiedUserId] = useState(null);
   const [pagination, setPagination] = useState({
     currentPage: 1,
     totalPages: 0,
@@ -62,6 +64,31 @@ const ViewUsers = () => {
   // Handle page change
   const handlePageChange = (page) => {
     setPagination(prev => ({ ...prev, currentPage: page }));
+  };
+
+  // Copy username to clipboard
+  const copyToClipboard = async (username, userId) => {
+    try {
+      await navigator.clipboard.writeText(username);
+      setCopiedUserId(userId);
+      // Reset copied state after 2 seconds
+      setTimeout(() => {
+        setCopiedUserId(null);
+      }, 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = username;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopiedUserId(userId);
+      setTimeout(() => {
+        setCopiedUserId(null);
+      }, 2000);
+    }
   };
 
   // Get role badge color
@@ -118,40 +145,6 @@ const ViewUsers = () => {
     );
   };
 
-  // Generate page numbers
-  const getPageNumbers = () => {
-    const totalPages = pagination.totalPages;
-    const currentPage = pagination.currentPage;
-    const pages = [];
-    
-    if (totalPages <= 7) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
-      }
-    } else {
-      pages.push(1);
-      
-      let start = Math.max(2, currentPage - 1);
-      let end = Math.min(totalPages - 1, currentPage + 1);
-      
-      if (start > 3) {
-        pages.push('...');
-      }
-      
-      for (let i = start; i <= end; i++) {
-        pages.push(i);
-      }
-      
-      if (end < totalPages - 2) {
-        pages.push('...');
-      }
-      
-      pages.push(totalPages);
-    }
-    
-    return pages;
-  };
-
   // Get user initials for avatar
   const getInitials = (name) => {
     if (!name) return 'U';
@@ -173,12 +166,9 @@ const ViewUsers = () => {
           <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
               <div>
-                <h3 className="font-medium text-black dark:text-white text-xl">
+                {/* <h2 className="font-medium text-black dark:text-white text-xl">
                   Users List
-                </h3>
-                {/* <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                  View and manage all system users
-                </p> */}
+                </h2> */}
               </div>
               
               <button onClick={()=>navigate("/auth/signup")} className="inline-flex items-center justify-center rounded-md bg-primary py-2 px-4 text-center font-medium text-white hover:bg-opacity-90 transition-colors">
@@ -213,15 +203,12 @@ const ViewUsers = () => {
                   <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white text-sm">
                     Last Updated
                   </th>
-                  {/* <th className="min-w-[120px] py-4 px-4 font-medium text-black dark:text-white text-sm text-center">
-                    Actions
-                  </th> */}
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-12">
+                    <td colSpan={6} className="text-center py-12">
                       <div className="flex flex-col items-center">
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
                         <p className="mt-4 text-sm text-gray-500 dark:text-gray-400">Loading users...</p>
@@ -230,7 +217,7 @@ const ViewUsers = () => {
                   </tr>
                 ) : error ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-12">
+                    <td colSpan={6} className="text-center py-12">
                       <div className="flex flex-col items-center">
                         <div className="text-4xl mb-2">⚠️</div>
                         <p className="text-red-500">{error}</p>
@@ -239,7 +226,7 @@ const ViewUsers = () => {
                   </tr>
                 ) : users.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="text-center py-12">
+                    <td colSpan={6} className="text-center py-12">
                       <div className="flex flex-col items-center">
                         <FaUser className="text-5xl text-gray-300 dark:text-gray-600 mb-3" />
                         <p className="text-gray-500 dark:text-gray-400 font-medium">No users found</p>
@@ -270,9 +257,20 @@ const ViewUsers = () => {
                             <p className="font-medium text-black dark:text-white">
                               {user.name || 'N/A'}
                             </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              @{user.username || 'username'}
-                            </p>
+                            <button 
+                              onClick={() => copyToClipboard(user.username, user.id)}
+                              className="flex items-center gap-2 group"
+                              title="Click to copy username"
+                            >
+                              <span className="text-sm text-blue-500 dark:text-gray-400 group-hover:text-primary transition-colors">
+                                @{user.username || 'username'}
+                              </span>
+                              {copiedUserId === user.id ? (
+                                <FaCheck className="text-green-500 text-xs" />
+                              ) : (
+                                <FaCopy className="text-gray-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity" />
+                              )}
+                            </button>
                           </div>
                         </div>
                       </td>
@@ -291,7 +289,7 @@ const ViewUsers = () => {
                       </td>
                       
                       <td className="py-5 px-4">
-                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(user.role?.name)}`}>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${getRoleBadgeColor(user?.authorities[0]?.authority)}`}>
                           {user?.authorities[0]?.authority || 'No Role'}
                         </span>
                       </td>
@@ -305,29 +303,6 @@ const ViewUsers = () => {
                           {formatDate(user.updated)}
                         </span>
                       </td>
-                      
-                      {/* <td className="py-5 px-4">
-                        <div className="flex items-center justify-center gap-2">
-                          <button 
-                            className="p-2 text-blue-600 hover:bg-blue-100 dark:hover:bg-blue-900 rounded-full transition-colors"
-                            title="View Details"
-                          >
-                            <FaEye className="h-4 w-4" />
-                          </button>
-                          <button 
-                            className="p-2 text-green-600 hover:bg-green-100 dark:hover:bg-green-900 rounded-full transition-colors"
-                            title="Edit User"
-                          >
-                            <FaEdit className="h-4 w-4" />
-                          </button>
-                          <button 
-                            className="p-2 text-red-600 hover:bg-red-100 dark:hover:bg-red-900 rounded-full transition-colors"
-                            title="Delete User"
-                          >
-                            <FaTrash className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td> */}
                     </tr>
                   ))
                 )}
@@ -335,68 +310,14 @@ const ViewUsers = () => {
             </table>
           </div>
 
-          {/* Pagination */}
+          {/* Pagination Component */}
           {!loading && users.length > 0 && (
             <div className="border-t border-stroke dark:border-strokedark py-4 px-6.5">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div className="text-sm text-gray-600 dark:text-gray-400">
-                  Showing <span className="font-semibold">{(pagination.currentPage - 1) * pagination.pageSize + 1}</span> to{' '}
-                  <span className="font-semibold">
-                    {Math.min(pagination.currentPage * pagination.pageSize, pagination.totalItems)}
-                  </span>{' '}
-                  of <span className="font-semibold">{pagination.totalItems}</span> users
-                </div>
-                
-                <nav aria-label="Pagination">
-                  <ul className="flex items-center gap-2">
-                    {/* Previous button */}
-                    <li>
-                      <button
-                        onClick={() => handlePageChange(pagination.currentPage - 1)}
-                        disabled={pagination.currentPage === 1}
-                        className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
-                        </svg>
-                      </button>
-                    </li>
-                    
-                    {/* Page numbers */}
-                    {getPageNumbers().map((page, index) => (
-                      <li key={index}>
-                        {page === '...' ? (
-                          <span className="px-3 py-2 text-sm text-gray-500 dark:text-gray-400">...</span>
-                        ) : (
-                          <button
-                            onClick={() => handlePageChange(page)}
-                            className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                              page === pagination.currentPage
-                                ? 'bg-primary text-white'
-                                : 'text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
-                            }`}
-                          >
-                            {page}
-                          </button>
-                        )}
-                      </li>
-                    ))}
-                    
-                    {/* Next button */}
-                    <li>
-                      <button
-                        onClick={() => handlePageChange(pagination.currentPage + 1)}
-                        disabled={pagination.currentPage === pagination.totalPages}
-                        className="px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                      >
-                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </button>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
+              <Pagination
+                totalPages={pagination.totalPages}
+                currentPage={pagination.currentPage}
+                handlePageChange={handlePageChange}
+              />
             </div>
           )}
         </div>
