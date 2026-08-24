@@ -5,6 +5,7 @@ import Loader from './common/Loader/index.js';
 import PageTitle from './components/PageTitle.js';
 import SignIn from './pages/Authentication/SignIn.jsx';
 import SignUp from './pages/Authentication/SignUp.jsx';
+import ViewUsers from './pages/Authentication/ViewUsers.jsx';
 import Calendar from './pages/Calendar.js';
 import Chart from './pages/Chart.jsx';
 
@@ -424,6 +425,16 @@ function App() {
               <>
                 <PageTitle title="AddUser " />
                 <SignUp />
+              </>
+            }
+          />
+
+              <Route
+            path="/auth/viewusers"
+            element={
+              <>
+                <PageTitle title="AddUser " />
+                <ViewUsers />
               </>
             }
           />
