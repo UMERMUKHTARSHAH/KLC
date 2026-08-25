@@ -45,7 +45,7 @@ import { FaBook } from 'react-icons/fa6';
 const Home = () => {
   const [unitCount, setUnitCount] = useState([]);
   const [isDownloadingAllGroups, setIsDownloadingAllGroups] = useState(false);
-  const [isDownloadingCustomer, setIsDownloadingCustomer] = useState(false); // 🔹 ADD THIS
+  const [isDownloadingCustomer, setIsDownloadingCustomer] = useState(false);
 
   const { currentUser } = useSelector((state) => state?.persisted?.user);
   const { user, token } = currentUser;
@@ -55,7 +55,7 @@ const Home = () => {
   const { mode } = appMode;
   console.log(mode, 'kk');
 
-  // 🔹 Spinner Overlay Component
+  // Spinner Overlay Component
   const SpinnerOverlay = () => (
     <div className="absolute inset-0 bg-black/50 backdrop-blur-sm rounded-xl flex items-center justify-center z-10">
       <div className="bg-white/90 p-4 rounded-lg shadow-lg flex flex-col items-center">
@@ -80,9 +80,7 @@ const Home = () => {
       }
 
       const blob = await response.blob();
-
       const disposition = response.headers.get('Content-Disposition');
-
       let filename = 'AllGroupsProductReport.xlsx';
 
       if (disposition && disposition.includes('filename=')) {
@@ -93,14 +91,11 @@ const Home = () => {
       }
 
       const url = window.URL.createObjectURL(blob);
-
       const link = document.createElement('a');
       link.href = url;
       link.download = filename;
-
       document.body.appendChild(link);
       link.click();
-
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
@@ -114,7 +109,7 @@ const Home = () => {
   };
 
   const handleDownloadReport = async () => {
-    setIsDownloadingCustomer(true); // 🔹 ADD THIS
+    setIsDownloadingCustomer(true);
     try {
       const response = await fetch(`${DOWNLOADCUSTOMER_REPORT}`, {
         method: 'GET',
@@ -130,7 +125,6 @@ const Home = () => {
       }
 
       const blob = await response.blob();
-
       const disposition = response.headers.get('Content-Disposition');
       let filename = 'Customer.csv';
       if (disposition && disposition.includes('attachment')) {
@@ -143,10 +137,8 @@ const Home = () => {
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', filename);
-
       document.body.appendChild(link);
       link.click();
-
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
 
@@ -155,7 +147,7 @@ const Home = () => {
       console.error(error);
       toast.error('An error occurred while downloading the report');
     } finally {
-      setIsDownloadingCustomer(false); // 🔹 ADD THIS
+      setIsDownloadingCustomer(false);
     }
   };
 
@@ -191,222 +183,203 @@ const Home = () => {
       {
         title: 'Production Dashboard',
         link: '/kaniProducts',
-        icon: <SiHomeassistantcommunitystore className="w-10 h-10" />,
+        icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelUp: true,
+        description: 'Approval, in-progress, and completion status across every order.'
       },
-         {
+      {
         title: 'Orders Dashboard',
         link: '/chart',
-        countKey: '',
-        icon: <SiHomeassistantcommunitystore className="w-10 h-10" />,
+        icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelDown: true,
+        description: 'Track pending, delayed, and shipped orders in one place.'
+      },
+      {
+        title: 'Monthly Order Calendar',
+        link: '/Order/monthlyorders',
+        icon: <RiProgress8Fill className="w-5 h-5" />,
+        levelUp: true,
+        description: 'See every order plotted against its month, at a glance.'
       },
       {
         title: 'Reports',
         link: '/Reports',
-        icon: <RiAlignItemBottomFill className="w-10 h-10" />,
+        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
+        description: 'Analysis by area of the business'
       },
       {
-        title: 'Retail/WholeSale Reports',
+        title: 'All Reports',
+        link: '/allReports',
+        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
+        levelUp: true,
+        description: 'The full library of report views for this workspace.'
+      },
+      {
+        title: 'Retail/Wholesale Reports',
         link: '/report/wsRetailReport',
-        countKey: 'proforma',
-        icon: <RiAlignItemBottomFill className="w-10 h-10" />,
+        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-      },
-   
-      {
-        title: 'Upload Excel',
-        link: '/product/addExcelProduct',
-        countKey: '',
-        icon: <AiOutlinePartition className="w-10 h-10" />,
-        levelUp: true,
+        description: 'Compare sales performance across retail and wholesale channels.'
       },
       {
         title: 'Financial Reports',
         link: '/report/freports',
-        countKey: '',
-        icon: <SiHomeassistantcommunitystore className="w-10 h-10" />,
+        icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelDown: true,
+        description: 'Revenue, dues, and payment status across all customers.'
       },
       {
         title: 'Customer Report',
-        countKey: '',
-        icon: <RiProgress1Line className="w-10 h-10" />,
+        icon: <RiProgress1Line className="w-5 h-5" />,
         levelUp: true,
         isDownload: true,
-      },
-      {
-        title: 'Monthly Order Calender',
-        link: '/Order/monthlyorders',
-        countKey: '',
-        icon: <RiProgress8Fill className="w-10 h-10" />,
-        levelUp: true,
+        description: 'Order history and activity broken down by customer.'
       },
       {
         title: 'Product Report',
         link: '/report/product',
-        countKey: '',
-        icon: <GrCompliance className="w-10 h-10" />,
+        icon: <GrCompliance className="w-5 h-5" />,
         levelUp: true,
+        description: 'Volume and status broken down by individual product.'
       },
       {
-        title: "All Groups Product Report",
-        countKey: "",
-        icon: <GrCompliance className="w-10 h-10" />,
+        title: 'All Groups Product Report',
+        icon: <GrCompliance className="w-5 h-5" />,
         levelUp: true,
         isDownload: true,
         isAllGroupsDownload: true,
+        description: 'The same product view, rolled up across every product group.'
       },
-      // {
-      //   title: 'Verify Product Transfer',
-      //   link: '/stockJournal/verify',
-      //   countKey: 'verifyStockJournals',
-      //   icon: <RiProgress8Fill className="w-10 h-10" />,
-      //   levelUp: true,
-      // },
-      // {
-      //   title: 'Pending for Bill',
-      //   link: '/Recieved/pendingForBill',
-      //   countKey: 'orderBillStatusAllowed',
-      //   icon: <RiProgress8Fill className="w-10 h-10" />,
-      //   levelUp: true,
-      // },
+      {
+        title: 'Upload Excel',
+        link: '/product/addExcelProduct',
+        icon: <AiOutlinePartition className="w-5 h-5" />,
+        levelUp: true,
+        description: 'Import orders, products, or inventory from a spreadsheet.'
+      },
     ],
     ROLE_EXECUTOR: [
       {
         title: 'Reports',
         link: '/Reports',
-        icon: <RiAlignItemBottomFill className="w-10 h-10" />,
+        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
+        description: 'Analysis by area of the business'
       },
       {
-        title: 'Retail/WholeSale Reports',
+        title: 'Retail/Wholesale Reports',
         link: '/report/wsRetailReport',
-        countKey: 'proforma',
-        icon: <RiAlignItemBottomFill className="w-10 h-10" />,
+        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
+        description: 'Compare sales performance across retail and wholesale channels.'
       },
       {
-        title: 'Orders',
+        title: 'Orders Dashboard',
         link: '/chart',
-        countKey: 'orders',
-        icon: <SiHomeassistantcommunitystore className="w-10 h-10" />,
+        icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelDown: true,
+        description: 'Track pending, delayed, and shipped orders in one place.'
       },
       {
-        title: 'Monthly Order Calender',
+        title: 'Monthly Order Calendar',
         link: '/Order/monthlyorders',
-        countKey: 'ordersWithApprovedOrForcedClosure',
-        icon: <RiProgress8Fill className="w-10 h-10" />,
+        icon: <RiProgress8Fill className="w-5 h-5" />,
         levelUp: true,
+        description: 'See every order plotted against its month, at a glance.'
       },
     ],
     ROLE_ADMIN_DLI: [
       {
         title: 'Reports',
         link: '/Reports',
-        icon: <RiAlignItemBottomFill className="w-10 h-10" />,
+        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
+        description: 'Analysis by area of the business'
       },
       {
-        title: 'Retail/WholeSale Reports',
+        title: 'Retail/Wholesale Reports',
         link: '/report/wsRetailReport',
-        countKey: 'proforma',
-        icon: <RiAlignItemBottomFill className="w-10 h-10" />,
+        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
+        description: 'Compare sales performance across retail and wholesale channels.'
       },
       {
-        title: 'Orders',
+        title: 'Orders Dashboard',
         link: '/chart',
-        countKey: 'orders',
-        icon: <SiHomeassistantcommunitystore className="w-10 h-10" />,
+        icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelDown: true,
+        description: 'Track pending, delayed, and shipped orders in one place.'
       },
       {
         title: 'Upload Excel',
         link: '/product/addExcelProduct',
-        countKey: 'ordersWithCreated',
-        icon: <AiOutlinePartition className="w-10 h-10" />,
+        icon: <AiOutlinePartition className="w-5 h-5" />,
         levelUp: true,
+        description: 'Import orders, products, or inventory from a spreadsheet.'
       },
       {
-        title: 'Monthly Order Calender',
+        title: 'Monthly Order Calendar',
         link: '/Order/monthlyorders',
-        countKey: 'ordersWithApprovedOrForcedClosure',
-        icon: <RiProgress8Fill className="w-10 h-10" />,
+        icon: <RiProgress8Fill className="w-5 h-5" />,
         levelUp: true,
+        description: 'See every order plotted against its month, at a glance.'
       },
     ],
     ROLE_QUALITYCONTROL: [
       {
-        title: 'Monthly Order Calender',
+        title: 'Monthly Order Calendar',
         link: '/Order/monthlyorders',
-        countKey: 'ordersWithApprovedOrForcedClosure',
-        icon: <RiProgress8Fill className="w-10 h-10" />,
+        icon: <RiProgress8Fill className="w-5 h-5" />,
         levelUp: true,
+        description: 'See every order plotted against its month, at a glance.'
       },
     ],
-    // ROLE_VERIFIER: [
-    //   {
-    //     title: 'Verify Product Transfer',
-    //     link: '/stockJournal/verify',
-    //     countKey: 'verifyStockJournals',
-    //     icon: <RiProgress8Fill className="w-10 h-10" />,
-    //     levelUp: true,
-    //   },
-    // ],
-    ROLE_FINANCE: [
-      // {
-      //   title: 'Pending for Bill',
-      //   link: '/Recieved/pendingForBill',
-      //   countKey: 'orderBillStatusAllowed',
-      //   icon: <RiProgress8Fill className="w-10 h-10" />,
-      //   levelUp: true,
-      // },
-    ],
+    ROLE_FINANCE: [],
     ROLE_ADMIN_SXR: [
       {
         title: 'Reports',
         link: '/Reports',
-        icon: <RiAlignItemBottomFill className="w-10 h-10" />,
+        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
+        description: 'Analysis by area of the business'
       },
       {
-        title: 'Retail/WholeSale Reports',
+        title: 'Retail/Wholesale Reports',
         link: '/report/wsRetailReport',
-        countKey: 'proforma',
-        icon: <RiAlignItemBottomFill className="w-10 h-10" />,
+        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
+        description: 'Compare sales performance across retail and wholesale channels.'
       },
       {
-        title: 'Orders',
+        title: 'Orders Dashboard',
         link: '/chart',
-        countKey: 'orders',
-        icon: <SiHomeassistantcommunitystore className="w-10 h-10" />,
+        icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelDown: true,
+        description: 'Track pending, delayed, and shipped orders in one place.'
       },
       {
-        title: 'Monthly Order Calender',
+        title: 'Monthly Order Calendar',
         link: '/Order/monthlyorders',
-        countKey: 'ordersWithApprovedOrForcedClosure',
-        icon: <RiProgress8Fill className="w-10 h-10" />,
+        icon: <RiProgress8Fill className="w-5 h-5" />,
         levelUp: true,
+        description: 'See every order plotted against its month, at a glance.'
       },
     ],
     ROLE_USER: [
       {
         title: 'Reports',
         link: '/Reports',
-        icon: <RiAlignItemBottomFill className="w-10 h-10" />,
+        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
+        description: 'Analysis by area of the business'
       },
       {
-        title: 'Retail/WholeSale Reports',
+        title: 'Retail/Wholesale Reports',
         link: '/report/wsRetailReport',
-        countKey: 'proforma',
-        icon: <RiAlignItemBottomFill className="w-10 h-10" />,
+        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
+        description: 'Compare sales performance across retail and wholesale channels.'
       },
     ],
   };
@@ -417,94 +390,91 @@ const Home = () => {
       title: 'Kani Section',
       link: '/kaniSection',
       countKey: 'kaniOrders',
-      icon: <SiHomeassistantcommunitystore className="w-10 h-10" />,
+      icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
       levelUp: true,
       isGradient: true,
+      description: 'Manage Kani section orders and production.'
     },
     {
       title: 'Pashmina Embroidery',
       link: '/pashminaEmbroidery',
       countKey: 'pashminaEmbroidery',
-      icon: <GiScrollUnfurled className="w-10 h-10" />,
+      icon: <GiScrollUnfurled className="w-5 h-5" />,
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-purple-500 to-purple-600',
+      description: 'Track Pashmina embroidery orders.'
     },
     {
       title: 'Contemporary Pashmina',
       link: '/contemporaryPashmina',
       countKey: 'contemporaryPashmina',
-      icon: <GiBandageRoll className="w-10 h-11" />,
+      icon: <GiBandageRoll className="w-5 h-5" />,
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-green-500 to-green-600',
+      description: 'Manage contemporary Pashmina production.'
     },
     {
       title: 'Papier Mache',
       link: '/papierMache',
       countKey: 'papierMache',
-      icon: <TbReorder className="w-10 h-10" />,
+      icon: <TbReorder className="w-5 h-5" />,
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-red-500 to-red-600',
+      description: 'Track Papier Mache orders and status.'
     },
     {
       title: 'Wool Embroidery',
       link: '/woolEmbroidery',
       countKey: 'woolEmbroidery',
-      icon: <GiWool className="w-10 h-10" />,
+      icon: <GiWool className="w-5 h-5" />,
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-amber-700 to-amber-800',
+      description: 'Manage Wool embroidery production.'
     },
     {
       title: 'Contemporary Wool',
       link: '/contemporaryWool',
       countKey: 'contemporaryWool',
-      icon: <GiRolledCloth className="w-10 h-10" />,
+      icon: <GiRolledCloth className="w-5 h-5" />,
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-orange-600 to-orange-700',
+      description: 'Track contemporary wool orders.'
     },
     {
       title: 'Cotton',
       link: '/cotton',
       countKey: 'cotton',
-      icon: <GiCottonFlower className="w-10 h-10" />,
+      icon: <GiCottonFlower className="w-5 h-5" />,
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-yellow-600 to-yellow-700',
+      description: 'Manage cotton product orders.'
     },
     {
       title: 'Contemporary Saree',
       link: '/contemporarySaree',
       countKey: 'contemporarySaree',
-      icon: <FaDropbox className="w-10 h-10" />,
+      icon: <FaDropbox className="w-5 h-5" />,
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-teal-500 to-teal-600',
+      description: 'Track contemporary saree orders.'
     },
   ];
 
   // Accounts mode cards
-  // const accountsModeCards = [
-  //   {
-  //     title: 'Pending for Bill',
-  //     link: '/Recieved/pendingForBill',
-  //     countKey: 'orderBillStatusAllowed',
-  //     icon: <RiProgress8Fill className="w-10 h-10" />,
-  //     levelUp: true,
-  //   },
-  // ];
-
-  
   const accountsModeCards = [
     {
       title: 'Day Book',
       link: '/configurator/dayBook',
-      countKey: '',
-      icon: <FaBook className="w-10 h-10" />,
+      icon: <FaBook className="w-5 h-5" />,
       levelUp: true,
+      description: 'View daily accounting entries and transactions.'
     },
   ];
 
@@ -522,140 +492,165 @@ const Home = () => {
     return [];
   })();
 
-  return (
-    <DefaultLayout>
-      <Breadcrumb pageName="Home" />
-      <div className="grid grid-cols-1 gap-3 my-1 md:grid-cols-4 md:gap-3 xl:grid-cols-5 2xl:gap-4 rounded-lg">
-        {cardsToShow.map((card, index) => {
-          // ✅ MOVE THESE INSIDE THE MAP - card is available here!
-          const isAllGroupsDownloading = card.isAllGroupsDownload && isDownloadingAllGroups;
-          const isCustomerDownloading = card.isDownload && !card.isAllGroupsDownload && isDownloadingCustomer;
-          const isDownloading = isAllGroupsDownloading || isCustomerDownloading;
+  // Group cards by categories
+  const getGroupedCards = () => {
+    const operations = [];
+    const reports = [];
+    const dataTools = [];
 
-          return card.isDownload ? (
-            <div
-              key={index}
-              onClick={
-                isDownloading
-                  ? undefined
-                  : card.isAllGroupsDownload
-                  ? handleDownloadAllGroupsProductReport
-                  : handleDownloadReport
-              }
-              className={`cursor-pointer flex-col mt-4 rounded-lg relative ${
-                isDownloading ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'
-              }`}
-            >
-              {isDownloading && <SpinnerOverlay />}
-              {card.isGradient ? (
-                <div
-                  className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${
-                    card.gradientColor || 'from-blue-500 to-blue-600'
-                  } p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer h-48 flex flex-col rounded-lg ${
-                    isDownloading ? 'hover:transform-none' : ''
-                  }`}
-                >
-                  <div className="absolute right-0 top-0 -mt-4 -mr-4 h-20 w-20 rounded-full bg-white/10 blur-2xl"></div>
-                  {card.levelUp && (
-                    <span className="absolute right-4 top-4 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
-                      Level Up
-                    </span>
-                  )}
-                  <div className="mb-4 text-white/90">{card.icon}</div>
-                  <h3 className="text-xl font-bold text-white min-h-[56px] leading-tight">
-                    {card.title}
-                  </h3>
-                  {card.countKey && countMapping[card.countKey] !== undefined && (
-                    <p className="text-sm text-white/80 mt-2">
-                      {countMapping[card.countKey]} items
-                    </p>
-                  )}
-                  <div className="mt-auto flex items-center text-sm font-medium text-white/90 pt-4">
-                    {isDownloading ? 'Downloading...' : 'Download'}
-                    {!isDownloading && (
-                      <svg
-                        className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
+    cardsToShow.forEach(card => {
+      if (['Production Dashboard', 'Orders Dashboard', 'Monthly Order Calendar'].includes(card.title)) {
+        operations.push(card);
+      } else if (['Reports', 'All Reports', 'Retail/Wholesale Reports', 'Financial Reports', 
+                  'Customer Report', 'Product Report', 'All Groups Product Report'].includes(card.title)) {
+        reports.push(card);
+      } else if (['Upload Excel'].includes(card.title)) {
+        dataTools.push(card);
+      } else {
+        // If not categorized, put in operations
+        operations.push(card);
+      }
+    });
+
+    return { operations, reports, dataTools };
+  };
+
+  const { operations, reports, dataTools } = getGroupedCards();
+
+  // Render a group of cards with heading
+  const renderCardGroup = (cards, heading) => {
+    if (cards.length === 0) return null;
+
+    return (
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">{heading}</h2>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {cards.map((card, index) => {
+            const isAllGroupsDownloading = card.isAllGroupsDownload && isDownloadingAllGroups;
+            const isCustomerDownloading = card.isDownload && !card.isAllGroupsDownload && isDownloadingCustomer;
+            const isDownloading = isAllGroupsDownloading || isCustomerDownloading;
+
+            return card.isDownload ? (
+              <div
+                key={index}
+                onClick={isDownloading ? undefined : card.isAllGroupsDownload ? handleDownloadAllGroupsProductReport : handleDownloadReport}
+                className={`cursor-pointer relative ${isDownloading ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
+              >
+                {isDownloading && <SpinnerOverlay />}
+                <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-semibold text-gray-900 truncate">
+                          {card.title}
+                        </h3>
+                        {card.levelUp && (
+                          <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            ↑
+                          </span>
+                        )}
+                        {card.levelDown && (
+                          <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            ↓
+                          </span>
+                        )}
+                      </div>
+                      {card.description && (
+                        <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                          {card.description}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex-shrink-0 ml-3 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                      <div className="text-gray-600">
+                        {card.icon}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-3 flex items-center text-sm font-medium text-blue-600">
+                    {isDownloading ? (
+                      <span className="flex items-center gap-2">
+                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Downloading...
+                      </span>
+                    ) : (
+                      <>
+                        Download
+                        <svg className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </>
                     )}
                   </div>
                 </div>
-              ) : (
-                <CardDataStats
-                  title={card.title}
-                  total={card.countKey ? countMapping[card.countKey] : undefined}
-                  levelUp={card.levelUp}
-                  levelDown={card.levelDown}
-                >
-                  {card.icon}
-                </CardDataStats>
-              )}
-            </div>
-          ) : (
-            <Link to={card.link} key={index}>
-              <div className="cursor-pointer flex-col mt-4">
-                {card.isGradient ? (
-                  <div
-                    className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${
-                      card.gradientColor || 'from-blue-500 to-blue-600'
-                    } p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer`}
-                  >
-                    <div className="absolute right-0 top-0 -mt-4 -mr-4 h-20 w-20 rounded-full bg-white/10 blur-2xl"></div>
-                    {card.levelUp && (
-                      <span className="absolute right-4 top-4 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
-                        Level Up
-                      </span>
-                    )}
-                    <div className="mb-4 text-white/90">{card.icon}</div>
-                    <h3 className="mb-2 text-xl font-bold text-white">
-                      {card.title}
-                    </h3>
-                    {card.countKey && countMapping[card.countKey] !== undefined && (
-                      <p className="text-sm text-white/80">
-                        {countMapping[card.countKey]} items
-                      </p>
-                    )}
-                    <div className="mt-6 flex items-center text-sm font-medium text-white/90">
-                      View
-                      <svg
-                        className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-2"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M9 5l7 7-7 7"
-                        />
-                      </svg>
+              </div>
+            ) : (
+              <Link to={card.link} key={index}>
+                <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 h-full">
+                  <div className="flex items-start justify-between h-full">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-base font-semibold text-gray-900 truncate">
+                          {card.title}
+                        </h3>
+                        {/* {card.levelUp && (
+                          <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            ↑
+                          </span>
+                        )}
+                        {card.levelDown && (
+                          <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                            ↓
+                          </span>
+                        )} */}
+                      </div>
+                      {card.description && (
+                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                          {card.description}
+                        </p>
+                      )}
+                      {card.countKey && countMapping[card.countKey] !== undefined && (
+                        <span className="inline-block mt-2 text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                          {countMapping[card.countKey]} items
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex-shrink-0 ml-3 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
+                      <div className="text-gray-600">
+                        {card.icon}
+                      </div>
                     </div>
                   </div>
-                ) : (
-                  <CardDataStats
-                    title={card.title}
-                    total={card.countKey ? countMapping[card.countKey] : undefined}
-                    levelUp={card.levelUp}
-                    levelDown={card.levelDown}
-                  >
-                    {card.icon}
-                  </CardDataStats>
-                )}
-              </div>
-            </Link>
-          );
-        })}
+                  {/* <div className="mt-3 flex items-center text-sm font-medium text-blue-600">
+                    Open
+                    <svg className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div> */}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
+    );
+  };
+
+  return (
+    <DefaultLayout>
+      <Breadcrumb pageName="Home" />
+      
+      {/* Operations Group */}
+      {renderCardGroup(operations, "Operations")}
+      
+      {/* Reports Group */}
+      {renderCardGroup(reports, "Reports")}
+      
+      {/* Data Tools Group */}
+      {renderCardGroup(dataTools, "Data tools")}
     </DefaultLayout>
   );
 };
