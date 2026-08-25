@@ -148,10 +148,10 @@ const Chart = () => {
   
   const roleBasedCards = {
     ROLE_ADMIN: [
-      { title: "Fiber Allocated Details", link: "/order/Fiber", countKey: "fiberCount", icon: <SiHomeassistantcommunitystore className="w-10 h-10" />, levelDown: true },
+      { title: "Fibers Allocated", link: "/order/Fiber", countKey: "fiberCount", icon: <SiHomeassistantcommunitystore className="w-10 h-10" />, levelDown: true },
       { title: "Proforma", link: "/order/searchproforma", icon: <RiAlignItemBottomFill className="w-10 h-10" />, levelUp: true },
-      { title: "Orders Pending For Production Approval", link: "/order/created", countKey: "ordersWithCreated", icon: <AiOutlinePartition className="w-10 h-10" />, levelUp: true },
-      { title: "Partially Approved By Production Orders", link: "/order/partiallyexecuted", countKey: "ordersWithCreatedAccepted", icon: <RiProgress1Line className="w-10 h-10" />, levelUp: true },
+      { title: "Orders Pending For Approval", link: "/order/created", countKey: "ordersWithCreated", icon: <AiOutlinePartition className="w-10 h-10" />, levelUp: true },
+      { title: "Partially Approved Orders", link: "/order/partiallyexecuted", countKey: "ordersWithCreatedAccepted", icon: <RiProgress1Line className="w-10 h-10" />, levelUp: true },
       { title: "Approved By Production Orders", link: "/orderlist/Executed", countKey: "ordersWithOnlyAccepted", icon: <FcApproval className="w-10 h-10" />, levelUp: true },
       { title: "In Progress Orders", link: "/order/Approved", countKey: "approvedOrders", icon: <GrCompliance className="w-10 h-10" />, levelUp: true },
       { title: "Partially In Progress Orders", link: "/order/partiallyApproved", countKey: "ordersWithApprovedOrForcedClosure", icon: <RiProgress8Fill className="w-10 h-10" />, levelUp: true },
@@ -174,9 +174,9 @@ const Chart = () => {
       { title: "Completed Orders", link: "/orderlist/Closed", countKey: "ordersWithOnlyClosed", icon: <MdRecommend className="w-10 h-10" />, levelUp: true },
     ],
     ROLE_EXECUTOR: [
-      { title: "Orders Pending For Production Approval", link: "/order/created", countKey: "ordersWithCreated", icon: <AiOutlinePartition className="w-10 h-10" />, levelUp: true },
+      { title: "Orders Pending For Approval", link: "/order/created", countKey: "ordersWithCreated", icon: <AiOutlinePartition className="w-10 h-10" />, levelUp: true },
       { title: "Approved By Production Orders", link: "/orderlist/Executed", countKey: "ordersWithOnlyAccepted", icon: <FcApproval className="w-10 h-10" />, levelUp: true },
-      { title: "Partially Approved By Production Orders", link: "/order/partiallyexecuted", countKey: "ordersWithCreatedAccepted", icon: <RiProgress1Line className="w-10 h-10" />, levelUp: true },
+      { title: "Partially Approved Orders", link: "/order/partiallyexecuted", countKey: "ordersWithCreatedAccepted", icon: <RiProgress1Line className="w-10 h-10" />, levelUp: true },
       { title: "Partially In Progress Orders", link: "/order/partiallyApproved", countKey: "ordersWithApprovedOrForcedClosure", icon: <RiProgress8Fill className="w-10 h-10" />, levelUp: true },
       { title: "Partially Completed Orders", link: "/orderlist/PartiallyClosed", countKey: "ordersWithOnlyPartiallyClosed", icon: <MdRepartition className="w-10 h-10" />, levelUp: true },
       { title: "Partially Pending Orders", link: "/orderlist/PartiallyPending", countKey: "ordersWithAtLeastOnePending", icon: <MdOutlinePending className="w-10 h-10" />, levelUp: true },
@@ -186,8 +186,8 @@ const Chart = () => {
     ],
     ROLE_ADMIN_DLI: [
       { title: "Proforma", link: "/order/searchproforma", countKey: "proforma", icon: <RiAlignItemBottomFill className="w-10 h-10" />, levelUp: true },
-      { title: "Orders Pending For Production Approval", link: "/order/created", countKey: "ordersWithCreated", icon: <AiOutlinePartition className="w-10 h-10" />, levelUp: true },
-      { title: "Partially Approved By Production Orders", link: "/order/partiallyexecuted", countKey: "ordersWithCreatedAccepted", icon: <RiProgress1Line className="w-10 h-10" />, levelUp: true },
+      { title: "Orders Pending For Approval", link: "/order/created", countKey: "ordersWithCreated", icon: <AiOutlinePartition className="w-10 h-10" />, levelUp: true },
+      { title: "Partially Approved Orders", link: "/order/partiallyexecuted", countKey: "ordersWithCreatedAccepted", icon: <RiProgress1Line className="w-10 h-10" />, levelUp: true },
       { title: "In Progress Orders", link: "/order/Approved", countKey: "approvedOrders", icon: <GrCompliance className="w-10 h-10" />, levelUp: true },
       { title: "Partially In Progress Orders", link: "/order/partiallyApproved", countKey: "ordersWithApprovedOrForcedClosure", icon: <RiProgress8Fill className="w-10 h-10" />, levelUp: true },
       { title: "Partially Completed Orders", link: "/orderlist/PartiallyClosed", countKey: "ordersWithOnlyPartiallyClosed", icon: <MdRepartition className="w-10 h-10" />, levelUp: true },
@@ -198,7 +198,7 @@ const Chart = () => {
     ],
     ROLE_ADMIN_SXR: [
       { title: "Approved By Production Orders", link: "/orderlist/Executed", countKey: "ordersWithOnlyAccepted", icon: <FcApproval className="w-10 h-10" />, levelUp: true },
-      { title: "Partially Approved By Production Orders", link: "/order/partiallyexecuted", countKey: "ordersWithCreatedAccepted", icon: <RiProgress1Line className="w-10 h-10" />, levelUp: true },
+      { title: "Partially Approved Orders", link: "/order/partiallyexecuted", countKey: "ordersWithCreatedAccepted", icon: <RiProgress1Line className="w-10 h-10" />, levelUp: true },
       { title: "Update Challan No And Date", link: "/orderlist/UpdateChallan", countKey: "ordersWithApprovedChallan", icon: <PiGearFineFill className="w-10 h-10" />, levelUp: true },
       { title: "In Progress Orders", link: "/order/Approved", countKey: "approvedOrders", icon: <GrCompliance className="w-10 h-10" />, levelUp: true },
       { title: "Partially In Progress Orders", link: "/order/partiallyApproved", countKey: "ordersWithApprovedOrForcedClosure", icon: <RiProgress8Fill className="w-10 h-10" />, levelUp: true },
@@ -295,7 +295,7 @@ const Chart = () => {
         needsAttention.push(card);
       }
       // Fiber, Proforma & Suppliers category
-      else if (['Fiber Allocated Details', 'Proforma', 'Supplier Receiving Orders'].includes(card.title)) {
+      else if (['Fibers Allocated', 'Proforma', 'Supplier Receiving Orders'].includes(card.title)) {
         fiberProformaSuppliers.push(card);
       }
       // This Month category
@@ -332,7 +332,7 @@ const Chart = () => {
                     </span>
                   )}
                   <div className="mb-2 text-white/80">{card.icon}</div>
-                  <h3 className="text-sm font-semibold text-white min-h-[40px] leading-tight">
+                  <h3 className="text-xs font-semibold text-white min-h-[40px] leading-tight">
                     {card.title}
                   </h3>
                   {card.countKey && countMapping[card.countKey] !== undefined && (
@@ -374,7 +374,7 @@ const Chart = () => {
               <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200 hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 ease-in-out cursor-pointer hover:scale-[1.02] hover:-translate-y-1">
   <div className="flex items-center justify-between">
     <div>
-      <p className={`text-xs font-medium ${card.textColor} uppercase tracking-wider`}>
+      <p className={`text-6px font-sm ${card.textColor} uppercase tracking-wider`}>
         {card.title}
       </p>
       <h3 className="text-2xl font-bold text-gray-900 mt-1">{card.count}</h3>
