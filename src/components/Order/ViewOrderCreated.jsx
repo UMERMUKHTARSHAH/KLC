@@ -255,7 +255,7 @@ const ViewOrderCreated = () => {
         return Order.map((item, index) => (
 
             <tr key={index} className='bg-white dark:bg-slate-700 dark:text-white'>
-                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                <td className="px-5 py-5 border-b border-gray-200 text-sm w-5">
                     <p className="text-gray-900 whitespace-no-wrap">{startingSerialNumber + index}</p>
                 </td>
 
@@ -279,7 +279,7 @@ const ViewOrderCreated = () => {
                         ))}
                 </td>
 
-                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                <td className="px-5 py-5 border-b border-gray-200 text-sm whitespace-nowrap tracking">
                     {item.products &&
                         item.products.map((prodId, index) => (
                             <p key={index} className="text-gray-900 whitespace-nowrap">
@@ -296,7 +296,7 @@ const ViewOrderCreated = () => {
 
 
 
-            <td className="px-5 py-5 border-b border-gray-200 text-sm whitespace-noWrap tracking-wider w-[230px]">
+            <td className="px-5 py-5 border-b border-gray-200 text-sm whitespace-noWrap tracking-wider w-[250px]">
   <div className="flex items-center gap-2 flex-wrap">
     <FiEdit3
       color='blue'
@@ -527,7 +527,7 @@ const ViewOrderCreated = () => {
                             <table className="min-w-full leading-normal">
                                 <thead>
                                     <tr className='bg-slate-300 dark:bg-slate-700 dark:text-white'>
-                                        <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider" >SNO</th>
+                                        <th className=" py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase w-5" >SNO</th>
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Order No</th>
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Order Date</th>
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
@@ -535,7 +535,7 @@ const ViewOrderCreated = () => {
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
                                         {/* <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-[600px] md:w-[120px]">ADD BOM </th> */}
 
-                                        <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+                                        <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase whitespace-nowrap tracking-widert">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
