@@ -36,7 +36,7 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
     <div className="flex-1 min-w-0">
       <div className="relative inline-block">
         <span className="absolute inset-0 blur-md bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-50 transition-opacity duration-500"></span>
-        <h4 className="relative text-2xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400 animate-blink">
+        <h4 className="relative text-2xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400 ">
           {total}
         </h4>
       </div>
