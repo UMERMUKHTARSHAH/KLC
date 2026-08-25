@@ -901,7 +901,7 @@ const EditVoucher = () => {
                         {loadingProducts && (
                           <span className="ml-2 text-xs text-gray-400">
                             <FaSpinner className="animate-spin inline mr-1" />
-                            Loading products...
+                            Loading
                           </span>
                         )}
                       </h3>
@@ -927,9 +927,12 @@ const EditVoucher = () => {
                                     <th className="py-4 px-3 font-medium text-black dark:text-white text-sm border-b border-gray-300">
                                       Qty
                                     </th>
+                                    {
+                                      voucherData?.typeOfVoucher.toLowerCase()==="sales"?
                                     <th className="py-4 px-3 font-medium text-black dark:text-white text-sm border-b border-gray-300">
                                       Discount %
-                                    </th>
+                                    </th>:null
+                                    }
                                     <th className="py-4 px-3 font-medium text-black dark:text-white text-sm border-b border-gray-300">
                                       Total
                                     </th>
@@ -1045,7 +1048,7 @@ const EditVoucher = () => {
                                             options={allProducts}
                                             placeholder={
                                               loadingProducts
-                                                ? 'Loading products...'
+                                                ? 'Loading'
                                                 : 'Select Product'
                                             }
                                             className="react-select-container"
@@ -1108,6 +1111,8 @@ const EditVoucher = () => {
                                             }}
                                           />
                                         </td>
+                                        {
+                                          voucherData?.typeOfVoucher.toLowerCase()==="sales"?
                                         <td className="border-b border-[#eee] py-4 px-3 dark:border-strokedark">
                                           <Field
                                             type="number"
@@ -1135,7 +1140,8 @@ const EditVoucher = () => {
                                               );
                                             }}
                                           />
-                                        </td>
+                                        </td>:null
+                                        }
                                         <td className="border-b border-[#eee] py-4 px-3 dark:border-strokedark font-medium">
                                           <Field
                                             type="text"

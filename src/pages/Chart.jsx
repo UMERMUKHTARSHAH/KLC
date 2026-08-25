@@ -27,7 +27,6 @@ import { GiScrollUnfurled } from "react-icons/gi";
 import { FaDropbox } from "react-icons/fa";
 import { BiBookOpen } from 'react-icons/bi';
 
-
 const Chart = () => {
   const [unitCount, setUnitCount] = useState([]);
   const { currentUser } = useSelector((state) => state?.persisted?.user);
@@ -82,7 +81,7 @@ const Chart = () => {
       icon: <GiScrollUnfurled className="w-10 h-10" />,
       levelUp: true,
       isGradient: true,
-      gradientColor: "from-purple-500 to-purple-600", // Add this line for purple
+      gradientColor: "from-purple-500 to-purple-600",
     },
     {
       title: "Contemporary Pashmina",
@@ -138,33 +137,17 @@ const Chart = () => {
       isGradient: true,
       gradientColor: "from-teal-500 to-teal-600",
     },
-    // {
-    //   title: "Client Orders",
-    //   link: "/ClientOrders",
-    //   countKey: "ClientOrders",
-    //   icon: <RiUserReceived2Fill className="w-10 h-10" />,
-    //   levelUp: true,
-    // },
-
-
-
   ];
-
 
   // Role-based card mapping
   const accountsModeCards = [
-    // { title: "Accounts Dashboard", link: "/accounts/dashboard", countKey: "accountsData", icon: <LuScale className="w-10 h-10" />, levelUp: true },
-    // { title: "Billing Info", link: "/accounts/billing", countKey: "billing", icon: <MdRepartition className="w-10 h-10" />, levelDown: true },
-    // { title: "Invoices", link: "/accounts/invoices", countKey: "invoices", icon: <MdOutlinePending className="w-10 h-10" />, levelUp: true },
-    // { title: "Day Book", link: "/configurator/dayBook", countKey: "invoices", icon: <FaBook className="w-10 h-10" />, levelUp: true },
     { title: "Ledger Summary Balances", link: "/configurator/ledgersummary", countKey: "invoices", icon: <FaBook className="w-10 h-10" />, levelUp: true },
     { title: "Orders With Vouchers", link: "/configurator/OrderVoucher", countKey: "invoices", icon: <TbReorder className="w-10 h-10" />, levelUp: true },
     { title: "Reports", link: "/configurator/accreports", countKey: "accReports", icon: <BiBookOpen className="w-10 h-10" />, levelUp: true },
   ];
+  
   const roleBasedCards = {
     ROLE_ADMIN: [
-      // { title: "Products", link: "/product/viewProducts", countKey: "products", icon: <RiAlignItemBottomFill className="w-10 h-10" />, levelUp: true },
-      { title: "Total Orders", link: "/Order/ViewOrder", countKey: "orders", icon: <SiHomeassistantcommunitystore className="w-10 h-10" />, levelDown: true },
       { title: "Fiber Allocated Details", link: "/order/Fiber", countKey: "fiberCount", icon: <SiHomeassistantcommunitystore className="w-10 h-10" />, levelDown: true },
       { title: "Proforma", link: "/order/searchproforma", icon: <RiAlignItemBottomFill className="w-10 h-10" />, levelUp: true },
       { title: "Orders Pending For Production Approval", link: "/order/created", countKey: "ordersWithCreated", icon: <AiOutlinePartition className="w-10 h-10" />, levelUp: true },
@@ -172,9 +155,6 @@ const Chart = () => {
       { title: "Approved By Production Orders", link: "/orderlist/Executed", countKey: "ordersWithOnlyAccepted", icon: <FcApproval className="w-10 h-10" />, levelUp: true },
       { title: "In Progress Orders", link: "/order/Approved", countKey: "approvedOrders", icon: <GrCompliance className="w-10 h-10" />, levelUp: true },
       { title: "Partially In Progress Orders", link: "/order/partiallyApproved", countKey: "ordersWithApprovedOrForcedClosure", icon: <RiProgress8Fill className="w-10 h-10" />, levelUp: true },
-
-
-      { title: "Completed Orders", link: "/orderlist/Closed", countKey: "ordersWithOnlyClosed", icon: <MdRecommend className="w-10 h-10" />, levelUp: true },
       { title: "Partially Closed Orders", link: "/orderlist/PartiallyClosed", countKey: "ordersWithOnlyPartiallyClosed", icon: <MdRepartition className="w-10 h-10" />, levelUp: true },
       { title: "Update Challan No And Date", link: "/orderlist/UpdateChallan", countKey: "ordersWithApprovedChallan", icon: <PiGearFineFill className="w-10 h-10" />, levelUp: true },
       { title: "Pending Orders", link: "/orderlist/Pending", countKey: "ordersWithOnlyPending", icon: <MdOutlinePendingActions className="w-10 h-10" />, levelUp: true },
@@ -188,16 +168,12 @@ const Chart = () => {
       { title: "Edit Received Quantity", link: "/order/recievedQuantity", countKey: "ordersWithPendingProducts", icon: <MdEditSquare className="w-10 h-10" />, levelUp: true },
       { title: "Update Shipping Date", link: "/order/updateShippingDate", countKey: "ordersWithShippingDate", icon: <GrUpdate className="w-10 h-10" />, levelUp: true },
       { title: "Monthly Orders", link: "/Order/monthlyorders", icon: <SiHomeassistantcommunitystore className="w-10 h-10" />, levelDown: true },
-      { title: "Delayed Orders", link: "/delayedOrders",countKey: "ordersWithDelayed", icon: <MdTimer className="w-10 h-10" />, levelDown: true }
+      { title: "Delayed Orders", link: "/delayedOrders", countKey: "ordersWithDelayed", icon: <MdTimer className="w-10 h-10" />, levelDown: true }
     ],
     ROLE_QUALITYCONTROL: [
-      // { title: "Products", link: "/product/viewProducts", countKey: "products", icon: <RiAlignItemBottomFill className="w-10 h-10" />, levelUp: true },{ title: "Approved By Production Orders", link: "/orderlist/Executed", countKey: "ordersWithOnlyAccepted", icon: <FcApproval className="w-10 h-10" />, levelUp: true },
       { title: "Completed Orders", link: "/orderlist/Closed", countKey: "ordersWithOnlyClosed", icon: <MdRecommend className="w-10 h-10" />, levelUp: true },
-
     ],
-
     ROLE_EXECUTOR: [
-      { title: "Total Orders", link: "/Order/ViewOrder", countKey: "orders", icon: <SiHomeassistantcommunitystore className="w-10 h-10" />, levelDown: true },
       { title: "Orders Pending For Production Approval", link: "/order/created", countKey: "ordersWithCreated", icon: <AiOutlinePartition className="w-10 h-10" />, levelUp: true },
       { title: "Approved By Production Orders", link: "/orderlist/Executed", countKey: "ordersWithOnlyAccepted", icon: <FcApproval className="w-10 h-10" />, levelUp: true },
       { title: "Partially Approved By Production Orders", link: "/order/partiallyexecuted", countKey: "ordersWithCreatedAccepted", icon: <RiProgress1Line className="w-10 h-10" />, levelUp: true },
@@ -207,13 +183,8 @@ const Chart = () => {
       { title: "Rejected By Production Orders", link: "/orderlist/RejectedOrders", countKey: "ordersWithRejected", icon: <AiOutlineClose className="w-10 h-10" />, levelUp: true },
       { title: "Production Modification Orders", link: "/order/needModification", countKey: "ordersNeedModification", icon: <VscDiffModified className="w-10 h-10" />, levelUp: true },
       { title: "Cancelled Orders", link: "/order/Cancelled", countKey: "ordersCancelled", icon: <FcCancel className="w-10 h-10" />, levelUp: true },
-
-
-
     ],
-
     ROLE_ADMIN_DLI: [
-      { title: "Total Orders", link: "/Order/ViewOrder", countKey: "orders", icon: <SiHomeassistantcommunitystore className="w-10 h-10" />, levelDown: true },
       { title: "Proforma", link: "/order/searchproforma", countKey: "proforma", icon: <RiAlignItemBottomFill className="w-10 h-10" />, levelUp: true },
       { title: "Orders Pending For Production Approval", link: "/order/created", countKey: "ordersWithCreated", icon: <AiOutlinePartition className="w-10 h-10" />, levelUp: true },
       { title: "Partially Approved By Production Orders", link: "/order/partiallyexecuted", countKey: "ordersWithCreatedAccepted", icon: <RiProgress1Line className="w-10 h-10" />, levelUp: true },
@@ -222,14 +193,10 @@ const Chart = () => {
       { title: "Partially Completed Orders", link: "/orderlist/PartiallyClosed", countKey: "ordersWithOnlyPartiallyClosed", icon: <MdRepartition className="w-10 h-10" />, levelUp: true },
       { title: "Partially Pending Orders", link: "/orderlist/PartiallyPending", countKey: "ordersWithAtLeastOnePending", icon: <MdOutlinePending className="w-10 h-10" />, levelUp: true },
       { title: "Supplier Receiving Orders", link: "/order/supplierRecievingOrders", countKey: "ordersWithSupplierReceiving", icon: <RiUserReceived2Fill className="w-10 h-10" />, levelUp: true },
-
       { title: "Production Modification Orders", link: "/order/needModification", countKey: "ordersNeedModification", icon: <VscDiffModified className="w-10 h-10" />, levelUp: true },
       { title: "Update Shipping Date", link: "/order/updateShippingDate", countKey: "ordersWithShippingDate", icon: <GrUpdate className="w-10 h-10" />, levelUp: true },
-
     ],
-
     ROLE_ADMIN_SXR: [
-      { title: "Total Orders", link: "/Order/ViewOrder", countKey: "orders", icon: <SiHomeassistantcommunitystore className="w-10 h-10" />, levelDown: true },
       { title: "Approved By Production Orders", link: "/orderlist/Executed", countKey: "ordersWithOnlyAccepted", icon: <FcApproval className="w-10 h-10" />, levelUp: true },
       { title: "Partially Approved By Production Orders", link: "/order/partiallyexecuted", countKey: "ordersWithCreatedAccepted", icon: <RiProgress1Line className="w-10 h-10" />, levelUp: true },
       { title: "Update Challan No And Date", link: "/orderlist/UpdateChallan", countKey: "ordersWithApprovedChallan", icon: <PiGearFineFill className="w-10 h-10" />, levelUp: true },
@@ -242,13 +209,7 @@ const Chart = () => {
       { title: "Forced Closed Orders", link: "/orderlist/ForcedClosure", countKey: "ordersWithForcedClosure", icon: <LuPanelLeftClose className="w-10 h-10" />, levelUp: true },
       { title: "Supplier Date Updation Orders", link: "/order/supplierExpectdateUpdate", countKey: "approvedSupplierOrdersCount", icon: <CiCalendarDate className="w-10 h-10" />, levelUp: true },
       { title: "Supplier Receiving Orders", link: "/order/supplierRecievingOrders", countKey: "ordersWithSupplierReceiving", icon: <RiUserReceived2Fill className="w-10 h-10" />, levelUp: true },
-
     ],
-    // ROLE_VERIFIER: [
-
-    //   { title: "Verify Product Transfer", link: "/stockJournal/verify", countKey: "verifyStockJournals", icon: <RiProgress8Fill className="w-10 h-10" />, levelUp: true },
-
-    // ],
   };
 
   // Get all cards user should see based on roles
@@ -256,87 +217,238 @@ const Chart = () => {
     if (mode === "production") {
       return role.flatMap(roleName => roleBasedCards[roleName] || []);
     }
-
     if (mode === "accounts" && role.includes("ROLE_ADMIN")) {
       return accountsModeCards;
     }
-    // 🔹 Kani Dashboard
     if (mode === "kani") {
       return kaniModeCards;
     }
-
     return [];
   })();
 
-  return (
-    // <DefaultLayout>
-    //   <Breadcrumb pageName="Dashboard" />
-    //   <div className="grid grid-cols-1  gap-3 my-1 md:grid-cols-4 md:gap-3 xl:grid-cols-4 2xl:gap-7.5">
-    //     {cardsToShow.map((card, index) => (
-    //       <Link to={card.link} key={index}>
-    //         <CardDataStats
-    //           title={card.title}
-    //           total={countMapping[card.countKey] }
-    //           levelUp={card.levelUp}
-    //           levelDown={card.levelDown}
-    //         >
-    //           {card.icon}
-    //         </CardDataStats>
-    //       </Link>
-    //     ))}
-    //   </div>
-    // </DefaultLayout>
+  // Calculate summary stats for production mode
+  const totalOrders = countMapping['orders'] || 0;
+  const completedOrders = countMapping['ordersWithOnlyClosed'] || 0;
+  const delayedOrders = countMapping['ordersWithDelayed'] || 0;
+  const cancelledOrders = countMapping['ordersCancelled'] || 0;
 
+  // Calculate max value for progress bar (use total or 1 to avoid division by zero)
+  const maxValue = Math.max(totalOrders, 1);
+
+  // Summary cards with their respective links
+  const summaryCards = [
+    {
+      title: "Total orders",
+      count: totalOrders,
+      icon: <SiHomeassistantcommunitystore className="w-5 h-5 text-blue-600" />,
+      bgColor: "bg-blue-100",
+      barColor: "bg-blue-500",
+      textColor: "text-gray-500",
+      link: "/Order/ViewOrder"
+    },
+    {
+      title: "Completed orders",
+      count: completedOrders,
+      icon: <FcApproval className="w-5 h-5" />,
+      bgColor: "bg-green-100",
+      barColor: "bg-green-500",
+      textColor: "text-green-600",
+      link: "/orderlist/Closed"
+    },
+    {
+      title: "Delayed orders",
+      count: delayedOrders,
+      icon: <MdTimer className="w-5 h-5 text-orange-600" />,
+      bgColor: "bg-orange-100",
+      barColor: "bg-orange-500",
+      textColor: "text-orange-600",
+      link: "/delayedOrders"
+    },
+    {
+      title: "Cancelled orders",
+      count: cancelledOrders,
+      icon: <FcCancel className="w-5 h-5" />,
+      bgColor: "bg-red-100",
+      barColor: "bg-red-500",
+      textColor: "text-red-600",
+      link: "/order/Cancelled"
+    }
+  ];
+
+  // Group cards by categories
+  const getGroupedCards = () => {
+    const needsAttention = [];
+    const fiberProformaSuppliers = [];
+    const thisMonth = [];
+    const otherCards = [];
+
+    const filteredCards = cardsToShow.filter(card => {
+      const summaryTitles = ['Total Orders', 'Completed Orders', 'Delayed Orders', 'Cancelled Orders'];
+      return !summaryTitles.includes(card.title);
+    });
+
+    filteredCards.forEach(card => {
+      // Needs Attention category
+      if (['Update Shipping Date', 'Delayed Orders', 'Pending Orders', 'Supplier Date Updation Orders', 
+           'Edit Received Quantity', 'Update Challan No And Date', 'Supplier Receiving Orders', 
+           'Production Modification Orders', 'Cancelled Orders', 'Rejected By Production Orders'].includes(card.title)) {
+        needsAttention.push(card);
+      }
+      // Fiber, Proforma & Suppliers category
+      else if (['Fiber Allocated Details', 'Proforma', 'Supplier Receiving Orders'].includes(card.title)) {
+        fiberProformaSuppliers.push(card);
+      }
+      // This Month category
+      else if (['Monthly Orders'].includes(card.title)) {
+        thisMonth.push(card);
+      }
+      // Other cards that don't fit in any category
+      else {
+        otherCards.push(card);
+      }
+    });
+
+    return { needsAttention, fiberProformaSuppliers, thisMonth, otherCards };
+  };
+
+  const { needsAttention, fiberProformaSuppliers, thisMonth, otherCards } = getGroupedCards();
+
+  // Render a group of cards with heading
+  const renderCardGroup = (cards, heading) => {
+    if (cards.length === 0) return null;
+
+    return (
+      <div className="mb-6">
+        <h2 className="text-lg font-semibold text-gray-800 mb-3">{heading}</h2>
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-4 md:gap-3 xl:grid-cols-5 2xl:gap-4">
+          {cards.map((card, index) => (
+            <Link to={card.link} key={index}>
+              {card.isGradient ? (
+                <div className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${card.gradientColor || 'from-blue-500 to-blue-600'} p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer h-44 flex flex-col`}>
+                  <div className="absolute right-0 top-0 -mt-4 -mr-4 h-20 w-20 rounded-full bg-white/10 blur-2xl"></div>
+                  {card.levelUp && (
+                    <span className="absolute right-3 top-3 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
+                      Level Up
+                    </span>
+                  )}
+                  <div className="mb-2 text-white/80">{card.icon}</div>
+                  <h3 className="text-sm font-semibold text-white min-h-[40px] leading-tight">
+                    {card.title}
+                  </h3>
+                  {card.countKey && countMapping[card.countKey] !== undefined && (
+                    <p className="text-xs text-white/70 mt-1">{countMapping[card.countKey]} items</p>
+                  )}
+                  <div className="mt-auto flex items-center text-xs font-medium text-white/80 pt-3">
+                    View
+                    <svg className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </div>
+              ) : (
+                <CardDataStats
+                  title={card.title}
+                  total={countMapping[card.countKey]}
+                  levelUp={card.levelUp}
+                  levelDown={card.levelDown}
+                >
+                  {card.icon}
+                </CardDataStats>
+              )}
+            </Link>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  return (
     <DefaultLayout>
       <Breadcrumb pageName="Dashboard" />
-      <div className="grid grid-cols-1 gap-1 my-1 md:grid-cols-4 md:gap-3 xl:grid-cols-5 2xl:gap-4 rounded-lg ">
-        {cardsToShow.map((card, index) => (
-          <Link to={card.link} key={index}>
-            {card.isGradient ? (
-              // Gradient styled card with fixed height and consistent layout
-              <div className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${card.gradientColor || 'from-blue-500 to-blue-600'} p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer h-48 flex flex-col rounded-lg width-"100px"`}>
-                <div className="absolute right-0 top-0 -mt-4 -mr-4 h-20 w-20 rounded-full bg-white/10 blur-2xl "></div>
-                {card.levelUp && (
-                  <span className="absolute right-4 top-4 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-sm">
-                    Level Up
-                  </span>
-                )}
-                <div className="mb-4 text-white/90">{card.icon}</div>
+      
+      {/* Summary Stats Cards - Always shown for production mode */}
+      {mode === "production" && (
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+          {summaryCards.map((card, idx) => (
+            <Link to={card.link} key={idx}>
+              <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200 hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 ease-in-out cursor-pointer hover:scale-[1.02] hover:-translate-y-1">
+  <div className="flex items-center justify-between">
+    <div>
+      <p className={`text-xs font-medium ${card.textColor} uppercase tracking-wider`}>
+        {card.title}
+      </p>
+      <h3 className="text-2xl font-bold text-gray-900 mt-1">{card.count}</h3>
+    </div>
+    <div className={`w-10 h-10 rounded-full ${card.bgColor} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
+      {card.icon}
+    </div>
+  </div>
+  <div className="mt-3">
+    <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+      <div 
+        className={`h-full ${card.barColor} rounded-full transition-all duration-700 ease-out`}
+        style={{ width: `${(card.count / maxValue) * 100}%` }}
+      />
+    </div>
+  </div>
+</div>
+            </Link>
+          ))}
+        </div>
+      )}
 
-                {/* Title with fixed height for 2 lines */}
-                <h3 className="text-xl font-bold text-white min-h-[56px] leading-tight">
-                  {card.title}
-                </h3>
+      {/* Grouped Cards for Production Mode */}
+      {mode === "production" && (
+        <>
+          {renderCardGroup(otherCards, "Orders Process")}
+          {renderCardGroup(needsAttention, "Needs your attention")}
+          {renderCardGroup(fiberProformaSuppliers, "Fiber, proforma & suppliers")}
+          {renderCardGroup(thisMonth, "This month")}
+        </>
+      )}
 
-                {/* Count with fixed margin */}
-                {card.countKey && countMapping[card.countKey] !== undefined && (
-                  <p className="text-sm text-white/80 mt-2">{countMapping[card.countKey]} items</p>
-                )}
-
-                {/* View link always at bottom */}
-                <div className="mt-auto flex items-center text-sm font-medium text-white/90 pt-4">
-                  View
-                  <svg className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                  </svg>
+      {/* For other modes (accounts, kani) - show cards without grouping */}
+      {mode !== "production" && (
+        <div className="grid grid-cols-1 gap-3 my-1 md:grid-cols-4 md:gap-3 xl:grid-cols-5 2xl:gap-4 rounded-lg">
+          {cardsToShow.map((card, index) => (
+            <Link to={card.link} key={index}>
+              {card.isGradient ? (
+                <div className={`group relative overflow-hidden rounded-xl bg-gradient-to-br ${card.gradientColor || 'from-blue-500 to-blue-600'} p-4 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 cursor-pointer h-44 flex flex-col`}>
+                  <div className="absolute right-0 top-0 -mt-4 -mr-4 h-20 w-20 rounded-full bg-white/10 blur-2xl"></div>
+                  {card.levelUp && (
+                    <span className="absolute right-3 top-3 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold text-white backdrop-blur-sm">
+                      Level Up
+                    </span>
+                  )}
+                  <div className="mb-2 text-white/80">{card.icon}</div>
+                  <h3 className="text-sm font-semibold text-white min-h-[40px] leading-tight">
+                    {card.title}
+                  </h3>
+                  {card.countKey && countMapping[card.countKey] !== undefined && (
+                    <p className="text-xs text-white/70 mt-1">{countMapping[card.countKey]} items</p>
+                  )}
+                  <div className="mt-auto flex items-center text-xs font-medium text-white/80 pt-3">
+                    View
+                    <svg className="ml-1 h-3 w-3 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </div>
-              </div>
-            ) : (
-              // Regular CardDataStats for all other cards
-              <CardDataStats
-                title={card.title}
-                total={countMapping[card.countKey]}
-                levelUp={card.levelUp}
-                levelDown={card.levelDown}
-              >
-                {card.icon}
-              </CardDataStats>
-            )}
-          </Link>
-        ))}
-      </div>
+              ) : (
+                <CardDataStats
+                  title={card.title}
+                  total={countMapping[card.countKey]}
+                  levelUp={card.levelUp}
+                  levelDown={card.levelDown}
+                >
+                  {card.icon}
+                </CardDataStats>
+              )}
+            </Link>
+          ))}
+        </div>
+      )}
     </DefaultLayout>
-
   );
 };
 

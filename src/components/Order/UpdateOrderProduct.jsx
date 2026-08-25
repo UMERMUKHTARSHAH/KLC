@@ -161,7 +161,7 @@ const UpdateOrderProduct = () => {
 
       const data = await response.json();
       if (response.ok) {
-        console.log(data, "coming ");
+      
         toast.success(`Order Updated successfully`);
         navigate("/order/created")
 
@@ -171,6 +171,9 @@ const UpdateOrderProduct = () => {
     } catch (error) {
       console.error(error);
       toast.error("An error occurred");
+    }
+    finally{
+      navigate(-1)
     }
   };
 

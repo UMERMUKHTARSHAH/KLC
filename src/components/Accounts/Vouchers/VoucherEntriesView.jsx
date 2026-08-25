@@ -212,7 +212,7 @@ const VoucherEntriesView = () => {
       }
     };
 
-    console.log(Voucher, 'amjh');
+    console.log(Voucher, 'amjhaas');
 
     return Voucher.map((item, index) => (
       <tr key={index} className="bg-white dark:bg-slate-700 dark:text-white">
@@ -291,12 +291,14 @@ const VoucherEntriesView = () => {
               title="Print Entry"
             />
 
-            {item?.typeOfVoucher?.toLowerCase() === 'purchase' ||
-              (item?.typeOfVoucher?.toLowerCase() === 'sales' && (
-               
-                  <FiEdit onClick={()=>navigate(`/entrypayment/edit/${item.id}`)} size={17} className="text-teal-500 hover:text-teal-700 mx-2" />
-               
-              ))}
+           {item?.typeOfVoucher?.toLowerCase() === 'purchase' ||
+item?.typeOfVoucher?.toLowerCase() === 'sales' ? (
+  <FiEdit 
+    onClick={() => navigate(`/entrypayment/edit/${item.id}`)} 
+    size={17} 
+    className="text-teal-500 hover:text-teal-700 mx-2" 
+  />
+) : null}
 
             <FiTrash2
                             size={17}
