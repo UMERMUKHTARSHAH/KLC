@@ -41,6 +41,7 @@ import { GiBandageRoll } from 'react-icons/gi';
 import { GiScrollUnfurled } from 'react-icons/gi';
 import { FaDropbox } from 'react-icons/fa';
 import { FaBook } from 'react-icons/fa6';
+import { IoArrowForward } from 'react-icons/io5';
 
 const Home = () => {
   const [unitCount, setUnitCount] = useState([]);
@@ -185,63 +186,81 @@ const Home = () => {
         link: '/kaniProducts',
         icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelUp: true,
-        description: 'Approval, in-progress, and completion status across every order.'
+        description: 'Approval, in-progress, and completion status across every order.',
+        iconBg: 'bg-purple-100',
+        iconColor: 'text-purple-600'
       },
       {
         title: 'Orders Dashboard',
         link: '/chart',
         icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelDown: true,
-        description: 'Track pending, delayed, and shipped orders in one place.'
+        description: 'Track pending, delayed, and shipped orders in one place.',
+        iconBg: 'bg-blue-100',
+        iconColor: 'text-blue-600'
       },
       {
         title: 'Monthly Order Calendar',
         link: '/Order/monthlyorders',
         icon: <RiProgress8Fill className="w-5 h-5" />,
         levelUp: true,
-        description: 'See every order plotted against its month, at a glance.'
+        description: 'See every order plotted against its month, at a glance.',
+        iconBg: 'bg-green-100',
+        iconColor: 'text-green-600'
       },
       {
         title: 'Reports',
         link: '/Reports',
         icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-        description: 'Analysis by area of the business'
+        description: 'Analysis by area of the business',
+        iconBg: 'bg-orange-100',
+        iconColor: 'text-orange-600'
       },
       {
         title: 'All Reports',
         link: '/allReports',
         icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-        description: 'The full library of report views for this workspace.'
+        description: 'The full library of report views for this workspace.',
+        iconBg: 'bg-indigo-100',
+        iconColor: 'text-indigo-600'
       },
       {
         title: 'Retail/Wholesale Reports',
         link: '/report/wsRetailReport',
         icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-        description: 'Compare sales performance across retail and wholesale channels.'
+        description: 'Compare sales performance across retail and wholesale channels.',
+        iconBg: 'bg-pink-100',
+        iconColor: 'text-pink-600'
       },
       {
         title: 'Financial Reports',
         link: '/report/freports',
         icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelDown: true,
-        description: 'Revenue, dues, and payment status across all customers.'
+        description: 'Revenue, dues, and payment status across all customers.',
+        iconBg: 'bg-emerald-100',
+        iconColor: 'text-emerald-600'
       },
       {
         title: 'Customer Report',
         icon: <RiProgress1Line className="w-5 h-5" />,
         levelUp: true,
         isDownload: true,
-        description: 'Order history and activity broken down by customer.'
+        description: 'Order history and activity broken down by customer.',
+        iconBg: 'bg-cyan-100',
+        iconColor: 'text-cyan-600'
       },
       {
         title: 'Product Report',
         link: '/report/product',
         icon: <GrCompliance className="w-5 h-5" />,
         levelUp: true,
-        description: 'Volume and status broken down by individual product.'
+        description: 'Volume and status broken down by individual product.',
+        iconBg: 'bg-amber-100',
+        iconColor: 'text-amber-600'
       },
       {
         title: 'All Groups Product Report',
@@ -249,14 +268,18 @@ const Home = () => {
         levelUp: true,
         isDownload: true,
         isAllGroupsDownload: true,
-        description: 'The same product view, rolled up across every product group.'
+        description: 'The same product view, rolled up across every product group.',
+        iconBg: 'bg-rose-100',
+        iconColor: 'text-rose-600'
       },
       {
         title: 'Upload Excel',
         link: '/product/addExcelProduct',
         icon: <AiOutlinePartition className="w-5 h-5" />,
         levelUp: true,
-        description: 'Import orders, products, or inventory from a spreadsheet.'
+        description: 'Import orders, products, or inventory from a spreadsheet.',
+        iconBg: 'bg-violet-100',
+        iconColor: 'text-violet-600'
       },
     ],
     ROLE_EXECUTOR: [
@@ -265,28 +288,36 @@ const Home = () => {
         link: '/Reports',
         icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-        description: 'Analysis by area of the business'
+        description: 'Analysis by area of the business',
+        iconBg: 'bg-orange-100',
+        iconColor: 'text-orange-600'
       },
       {
         title: 'Retail/Wholesale Reports',
         link: '/report/wsRetailReport',
         icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-        description: 'Compare sales performance across retail and wholesale channels.'
+        description: 'Compare sales performance across retail and wholesale channels.',
+        iconBg: 'bg-pink-100',
+        iconColor: 'text-pink-600'
       },
       {
         title: 'Orders Dashboard',
         link: '/chart',
         icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelDown: true,
-        description: 'Track pending, delayed, and shipped orders in one place.'
+        description: 'Track pending, delayed, and shipped orders in one place.',
+        iconBg: 'bg-blue-100',
+        iconColor: 'text-blue-600'
       },
       {
         title: 'Monthly Order Calendar',
         link: '/Order/monthlyorders',
         icon: <RiProgress8Fill className="w-5 h-5" />,
         levelUp: true,
-        description: 'See every order plotted against its month, at a glance.'
+        description: 'See every order plotted against its month, at a glance.',
+        iconBg: 'bg-green-100',
+        iconColor: 'text-green-600'
       },
     ],
     ROLE_ADMIN_DLI: [
@@ -295,35 +326,45 @@ const Home = () => {
         link: '/Reports',
         icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-        description: 'Analysis by area of the business'
+        description: 'Analysis by area of the business',
+        iconBg: 'bg-orange-100',
+        iconColor: 'text-orange-600'
       },
       {
         title: 'Retail/Wholesale Reports',
         link: '/report/wsRetailReport',
         icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-        description: 'Compare sales performance across retail and wholesale channels.'
+        description: 'Compare sales performance across retail and wholesale channels.',
+        iconBg: 'bg-pink-100',
+        iconColor: 'text-pink-600'
       },
       {
         title: 'Orders Dashboard',
         link: '/chart',
         icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelDown: true,
-        description: 'Track pending, delayed, and shipped orders in one place.'
+        description: 'Track pending, delayed, and shipped orders in one place.',
+        iconBg: 'bg-blue-100',
+        iconColor: 'text-blue-600'
       },
       {
         title: 'Upload Excel',
         link: '/product/addExcelProduct',
         icon: <AiOutlinePartition className="w-5 h-5" />,
         levelUp: true,
-        description: 'Import orders, products, or inventory from a spreadsheet.'
+        description: 'Import orders, products, or inventory from a spreadsheet.',
+        iconBg: 'bg-violet-100',
+        iconColor: 'text-violet-600'
       },
       {
         title: 'Monthly Order Calendar',
         link: '/Order/monthlyorders',
         icon: <RiProgress8Fill className="w-5 h-5" />,
         levelUp: true,
-        description: 'See every order plotted against its month, at a glance.'
+        description: 'See every order plotted against its month, at a glance.',
+        iconBg: 'bg-green-100',
+        iconColor: 'text-green-600'
       },
     ],
     ROLE_QUALITYCONTROL: [
@@ -332,7 +373,9 @@ const Home = () => {
         link: '/Order/monthlyorders',
         icon: <RiProgress8Fill className="w-5 h-5" />,
         levelUp: true,
-        description: 'See every order plotted against its month, at a glance.'
+        description: 'See every order plotted against its month, at a glance.',
+        iconBg: 'bg-green-100',
+        iconColor: 'text-green-600'
       },
     ],
     ROLE_FINANCE: [],
@@ -342,28 +385,36 @@ const Home = () => {
         link: '/Reports',
         icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-        description: 'Analysis by area of the business'
+        description: 'Analysis by area of the business',
+        iconBg: 'bg-orange-100',
+        iconColor: 'text-orange-600'
       },
       {
         title: 'Retail/Wholesale Reports',
         link: '/report/wsRetailReport',
         icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-        description: 'Compare sales performance across retail and wholesale channels.'
+        description: 'Compare sales performance across retail and wholesale channels.',
+        iconBg: 'bg-pink-100',
+        iconColor: 'text-pink-600'
       },
       {
         title: 'Orders Dashboard',
         link: '/chart',
         icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
         levelDown: true,
-        description: 'Track pending, delayed, and shipped orders in one place.'
+        description: 'Track pending, delayed, and shipped orders in one place.',
+        iconBg: 'bg-blue-100',
+        iconColor: 'text-blue-600'
       },
       {
         title: 'Monthly Order Calendar',
         link: '/Order/monthlyorders',
         icon: <RiProgress8Fill className="w-5 h-5" />,
         levelUp: true,
-        description: 'See every order plotted against its month, at a glance.'
+        description: 'See every order plotted against its month, at a glance.',
+        iconBg: 'bg-green-100',
+        iconColor: 'text-green-600'
       },
     ],
     ROLE_USER: [
@@ -372,14 +423,18 @@ const Home = () => {
         link: '/Reports',
         icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-        description: 'Analysis by area of the business'
+        description: 'Analysis by area of the business',
+        iconBg: 'bg-orange-100',
+        iconColor: 'text-orange-600'
       },
       {
         title: 'Retail/Wholesale Reports',
         link: '/report/wsRetailReport',
         icon: <RiAlignItemBottomFill className="w-5 h-5" />,
         levelUp: true,
-        description: 'Compare sales performance across retail and wholesale channels.'
+        description: 'Compare sales performance across retail and wholesale channels.',
+        iconBg: 'bg-pink-100',
+        iconColor: 'text-pink-600'
       },
     ],
   };
@@ -393,7 +448,9 @@ const Home = () => {
       icon: <SiHomeassistantcommunitystore className="w-5 h-5" />,
       levelUp: true,
       isGradient: true,
-      description: 'Manage Kani section orders and production.'
+      description: 'Manage Kani section orders and production.',
+      iconBg: 'bg-purple-100',
+      iconColor: 'text-purple-600'
     },
     {
       title: 'Pashmina Embroidery',
@@ -403,7 +460,9 @@ const Home = () => {
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-purple-500 to-purple-600',
-      description: 'Track Pashmina embroidery orders.'
+      description: 'Track Pashmina embroidery orders.',
+      iconBg: 'bg-pink-100',
+      iconColor: 'text-pink-600'
     },
     {
       title: 'Contemporary Pashmina',
@@ -413,7 +472,9 @@ const Home = () => {
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-green-500 to-green-600',
-      description: 'Manage contemporary Pashmina production.'
+      description: 'Manage contemporary Pashmina production.',
+      iconBg: 'bg-green-100',
+      iconColor: 'text-green-600'
     },
     {
       title: 'Papier Mache',
@@ -423,7 +484,9 @@ const Home = () => {
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-red-500 to-red-600',
-      description: 'Track Papier Mache orders and status.'
+      description: 'Track Papier Mache orders and status.',
+      iconBg: 'bg-red-100',
+      iconColor: 'text-red-600'
     },
     {
       title: 'Wool Embroidery',
@@ -433,7 +496,9 @@ const Home = () => {
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-amber-700 to-amber-800',
-      description: 'Manage Wool embroidery production.'
+      description: 'Manage Wool embroidery production.',
+      iconBg: 'bg-amber-100',
+      iconColor: 'text-amber-600'
     },
     {
       title: 'Contemporary Wool',
@@ -443,7 +508,9 @@ const Home = () => {
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-orange-600 to-orange-700',
-      description: 'Track contemporary wool orders.'
+      description: 'Track contemporary wool orders.',
+      iconBg: 'bg-orange-100',
+      iconColor: 'text-orange-600'
     },
     {
       title: 'Cotton',
@@ -453,7 +520,9 @@ const Home = () => {
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-yellow-600 to-yellow-700',
-      description: 'Manage cotton product orders.'
+      description: 'Manage cotton product orders.',
+      iconBg: 'bg-yellow-100',
+      iconColor: 'text-yellow-600'
     },
     {
       title: 'Contemporary Saree',
@@ -463,7 +532,9 @@ const Home = () => {
       levelUp: true,
       isGradient: true,
       gradientColor: 'from-teal-500 to-teal-600',
-      description: 'Track contemporary saree orders.'
+      description: 'Track contemporary saree orders.',
+      iconBg: 'bg-teal-100',
+      iconColor: 'text-teal-600'
     },
   ];
 
@@ -474,7 +545,9 @@ const Home = () => {
       link: '/configurator/dayBook',
       icon: <FaBook className="w-5 h-5" />,
       levelUp: true,
-      description: 'View daily accounting entries and transactions.'
+      description: 'View daily accounting entries and transactions.',
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600'
     },
   ];
 
@@ -507,7 +580,6 @@ const Home = () => {
       } else if (['Upload Excel'].includes(card.title)) {
         dataTools.push(card);
       } else {
-        // If not categorized, put in operations
         operations.push(card);
       }
     });
@@ -523,8 +595,8 @@ const Home = () => {
 
     return (
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">{heading}</h2>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <h6 className="text-sm font-bold text-black mb-4">{heading}</h6>
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
           {cards.map((card, index) => {
             const isAllGroupsDownloading = card.isAllGroupsDownload && isDownloadingAllGroups;
             const isCustomerDownloading = card.isDownload && !card.isAllGroupsDownload && isDownloadingCustomer;
@@ -537,99 +609,57 @@ const Home = () => {
                 className={`cursor-pointer relative ${isDownloading ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
               >
                 {isDownloading && <SpinnerOverlay />}
-                <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
+                <div className="bg-white rounded-xl shadow-sm p-5 hover:border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
                   <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-base font-semibold text-gray-900 truncate">
-                          {card.title}
-                        </h3>
-                        {card.levelUp && (
-                          <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            ↑
-                          </span>
-                        )}
-                        {card.levelDown && (
-                          <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            ↓
-                          </span>
-                        )}
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                      <div className={`w-10 h-10 rounded-xl ${card.iconBg || 'bg-gray-100'} flex items-center justify-center`}>
+                        <div className={`${card.iconColor || 'text-gray-600'}`}>
+                          {card.icon}
+                        </div>
                       </div>
+                      <h3 className="text-base font-semibold text-black mt-2">
+                        {card.title}
+                      </h3>
                       {card.description && (
-                        <p className="text-sm text-gray-500 mt-1 line-clamp-2">
+                        <p className="text-sm text-gray-500">
                           {card.description}
                         </p>
                       )}
                     </div>
-                    <div className="flex-shrink-0 ml-3 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                      <div className="text-gray-600">
-                        {card.icon}
-                      </div>
+                    <div className="flex-shrink-0 ml-3 mt-1">
+                      <IoArrowForward className="w-5 h-5 text-gray-400" />
                     </div>
-                  </div>
-                  <div className="mt-3 flex items-center text-sm font-medium text-blue-600">
-                    {isDownloading ? (
-                      <span className="flex items-center gap-2">
-                        <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                        Downloading...
-                      </span>
-                    ) : (
-                      <>
-                        Download
-                        <svg className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </>
-                    )}
                   </div>
                 </div>
               </div>
             ) : (
               <Link to={card.link} key={index}>
-                <div className="bg-white rounded-xl shadow-sm p-5 border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 h-full">
-                  <div className="flex items-start justify-between h-full">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-base font-semibold text-gray-900 truncate">
-                          {card.title}
-                        </h3>
-                        {/* {card.levelUp && (
-                          <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            ↑
-                          </span>
-                        )}
-                        {card.levelDown && (
-                          <span className="flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            ↓
-                          </span>
-                        )} */}
+                <div className="bg-white rounded-xl shadow-sm p-5 hover:border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
+                  <div className="flex items-start justify-between">
+                    <div className="flex flex-col gap-1 flex-1 min-w-0">
+                      <div className={`w-10 h-10 rounded-xl ${card.iconBg || 'bg-gray-100'} flex items-center justify-center`}>
+                        <div className={`${card.iconColor || 'text-gray-600'}`}>
+                          {card.icon}
+                        </div>
                       </div>
+                      <h3 className="text-base font-semibold text-black mt-2">
+                        {card.title}
+                      </h3>
                       {card.description && (
-                        <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                        <p className="text-sm text-gray-500">
                           {card.description}
                         </p>
                       )}
                       {card.countKey && countMapping[card.countKey] !== undefined && (
-                        <span className="inline-block mt-2 text-xs font-medium text-gray-600 bg-gray-100 px-2 py-1 rounded-full">
+                        <span className="inline-block mt-1 text-xs font-medium text-gray-600 bg-gray-100 px-2 py-0.5 rounded-full">
                           {countMapping[card.countKey]} items
                         </span>
                       )}
                     </div>
-                    <div className="flex-shrink-0 ml-3 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                      <div className="text-gray-600">
-                        {card.icon}
-                      </div>
+                    <div className="flex-shrink-0 ml-3 mt-1">
+                      <IoArrowForward className="w-5 h-5 text-gray-400" />
                     </div>
                   </div>
-                  {/* <div className="mt-3 flex items-center text-sm font-medium text-blue-600">
-                    Open
-                    <svg className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div> */}
                 </div>
               </Link>
             );
