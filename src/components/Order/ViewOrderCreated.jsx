@@ -341,7 +341,7 @@ const ViewOrderCreated = () => {
       size={17}
       className="text-red-500 hover:text-red-700 cursor-pointer"
       onClick={(e) => handleDelete(e, item?.id)}
-      title="Delete Product"
+      title="Delete"
     />
   </div>
 </td>
