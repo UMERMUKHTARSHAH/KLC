@@ -196,11 +196,13 @@ const AddColorGroup = () => {
                       <ReactSelect
                         name="productGroupId"
                         options={groupOptions}
-                       value={
-  groupOptions.find(
-    (option) => String(option.value) === String(values.productGroupId),
-  ) || null
-}
+                        value={
+                          groupOptions.find(
+                            (option) =>
+                              String(option.value) ===
+                              String(values.productGroupId),
+                          ) || null
+                        }
                         onChange={(selectedOption) => {
                           setFieldValue(
                             'productGroupId',
@@ -265,9 +267,13 @@ const AddColorGroup = () => {
                               <button
                                 type="button"
                                 onClick={() => push({ colorName: '' })}
-                                className="mt-3 flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
+                                className="mt-3 inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium
+             text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg
+             hover:bg-emerald-100 hover:border-emerald-300 hover:text-emerald-800
+             focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1
+             transition-all duration-200"
                               >
-                                <FiPlus size={18} />
+                                <FiPlus size={16} />
                                 Add Design Group
                               </button>
                             </div>
@@ -275,7 +281,6 @@ const AddColorGroup = () => {
                         }}
                       </FieldArray>
                     </div>
-                  
                   </div>
 
                   <div className="flex justify-center mt-6">
