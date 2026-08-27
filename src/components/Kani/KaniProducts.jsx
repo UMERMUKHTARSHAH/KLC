@@ -95,7 +95,7 @@ const KaniProducts = () => {
     const categories = {
       "Weave & embroidery styles": {
         items: [],
-        note: "Finished-technique categories",
+        // note: "Finished-technique categories",
         keywords: ["contemporary", "pashmina embroidery", "kani", "wool embroidery", "ari", "sozni", "plain pashmina", "cotton", "saree"]
       },
       "Fabric": {
