@@ -296,50 +296,44 @@ const ViewOrderCreated = () => {
 
 
 
-            <td className="px-5 py-5 border-b border-gray-200 text-sm whitespace-noWrap tracking-wider w-[250px]">
-  <div className="flex items-center gap-2 flex-wrap">
+     <td className="px-5 py-5 border-b border-gray-200 text-sm whitespace-nowrap">
+  <div className="flex items-center gap-2 flex-nowrap">
     <FiEdit3
       color='blue'
       size={17}
-      className="text-blue-500 hover:text-blue-700 cursor-pointer"
+      className="text-blue-500 hover:text-blue-700 cursor-pointer flex-shrink-0"
       onClick={() => navigate(`/Order/updateorder/${item?.id}`)}
       title="Edit Order"
     />
     
-   
-    
     <button
       onClick={() => navigate(`/Order/updateorderCreated/${item?.id}`)}
-      className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-teal-700 bg-teal-100 rounded-md hover:bg-teal-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+      className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-teal-700 bg-teal-100 rounded-md hover:bg-teal-200 transition-colors focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2 whitespace-nowrap flex-shrink-0"
       title="Edit Order Status"
     >
-      <FiEdit size={14} className="mr-1" />
+      <FiEdit size={14} className="mr-1 flex-shrink-0" />
       Edit Status
     </button>
-    
-    
     
     {item.orderTypeName === "WSClients" ? (
       <MdCreateNewFolder
         size={20}
-        className="text-teal-500 hover:text-teal-700 cursor-pointer"
+        className="text-teal-500 hover:text-teal-700 cursor-pointer flex-shrink-0"
         onClick={() => navigate(`/Order/generateProforma/${item?.id}`)}
         title="Create proforma"
       />
     ) : item.orderTypeName === "RetailClients" ? (
       <MdCreateNewFolder
         size={20}
-        className="text-teal-500 hover:text-teal-700 cursor-pointer"
+        className="text-teal-500 hover:text-teal-700 cursor-pointer flex-shrink-0"
         onClick={() => navigate(`/Order/generateRetailProforma/${item?.id}`)}
         title="Create proforma"
       />
     ) : null}
     
-   
-    
     <FiTrash2
       size={17}
-      className="text-red-500 hover:text-red-700 cursor-pointer"
+      className="text-red-500 hover:text-red-700 cursor-pointer flex-shrink-0"
       onClick={(e) => handleDelete(e, item?.id)}
       title="Delete"
     />
