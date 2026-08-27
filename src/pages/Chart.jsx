@@ -155,6 +155,7 @@ const Chart = () => {
       { title: "Approved Orders", link: "/orderlist/Executed", countKey: "ordersWithOnlyAccepted", icon: <FcApproval className="w-10 h-10" />, levelUp: true },
       { title: "In Progress Orders", link: "/order/Approved", countKey: "approvedOrders", icon: <GrCompliance className="w-10 h-10" />, levelUp: true },
       { title: "Partially In Progress", link: "/order/partiallyApproved", countKey: "ordersWithApprovedOrForcedClosure", icon: <RiProgress8Fill className="w-10 h-10" />, levelUp: true },
+       { title: "Completed", link: "/orderlist/Closed", countKey: "ordersWithOnlyClosed", icon: <MdRecommend className="w-10 h-10" />, levelUp: true },
       { title: "Partially Closed Orders", link: "/orderlist/PartiallyClosed", countKey: "ordersWithOnlyPartiallyClosed", icon: <MdRepartition className="w-10 h-10" />, levelUp: true },
       { title: "Update Challan", link: "/orderlist/UpdateChallan", countKey: "ordersWithApprovedChallan", icon: <PiGearFineFill className="w-10 h-10" />, levelUp: true },
       { title: "Pending Orders", link: "/orderlist/Pending", countKey: "ordersWithOnlyPending", icon: <MdOutlinePendingActions className="w-10 h-10" />, levelUp: true },
@@ -291,7 +292,7 @@ const Chart = () => {
       // Needs Attention category
       if (['Update Shipping Date', 'Delayed Orders', 'Pending Orders', 'Supplier Date Updation', 
            'Edit Received Quantity', 'Update Challan', 'Supplier Receiving Orders', 
-           'Need Modification Orders', 'Cancelled Orders', 'Rejected Orders'].includes(card.title)) {
+           'Need Modification Orders', 'Cancelled Orders', ].includes(card.title)) {
         needsAttention.push(card);
       }
       // Fiber, Proforma & Suppliers category
@@ -363,6 +364,7 @@ const Chart = () => {
   };
 
   // Render the "Orders Process" group as a horizontal pipeline (same cards, same order, same counts)
+  // Wraps to new rows instead of scrolling, and shows clear dashed connectors between every step.
   const renderOrderPipeline = (cards, heading) => {
     if (!cards || cards.length === 0) return null;
 
@@ -377,37 +379,41 @@ const Chart = () => {
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-gray-800">{heading}</h2>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 overflow-x-auto">
-          <div className="flex items-start" style={{ minWidth: `${steps.length * 120}px` }}>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+          <div className="flex flex-nowrap items-start w-full">
             {steps.map((step, index) => {
               const isCompleted = step.title.toLowerCase().includes('complet');
+              const isRejected = step.title.toLowerCase().includes('reject');
               const isActive = step.count > 0;
 
               let circleClasses = 'border-gray-300 text-gray-400 bg-white';
               if (isActive && isCompleted) {
                 circleClasses = 'border-green-500 text-green-700 bg-green-50';
+              } else if (isActive && isRejected) {
+                circleClasses = 'border-red-500 text-red-700 bg-red-50';
               } else if (isActive) {
                 circleClasses = 'border-amber-500 text-amber-700 bg-amber-50';
               }
 
               return (
-                <div key={index} className="flex items-center flex-1 last:flex-none">
-                  <Link
-                    to={step.link}
-                    className="flex flex-col items-center text-center group flex-shrink-0"
-                    style={{ width: '112px' }}
-                  >
-                    <div
-                      className={`w-14 h-14 rounded-full border-2 flex items-center justify-center font-bold text-lg transition-transform duration-300 group-hover:scale-110 ${circleClasses}`}
-                    >
-                      {step.count}
-                    </div>
-                    <p className="mt-2 text-xs font-medium text-gray-600 leading-tight px-1">
-                      {step.title}
-                    </p>
-                  </Link>
+                <div key={index} className="flex items-start flex-1 min-w-0">
+                  <div className="flex flex-col items-center text-center flex-1 min-w-0 px-0.5">
+                    <Link to={step.link} className="flex flex-col items-center group w-full">
+                      <div
+                        className={`w-9 h-9 rounded-full border-2 flex items-center justify-center font-bold text-xs shrink-0 transition-transform duration-300 group-hover:scale-110 ${circleClasses}`}
+                      >
+                        {step.count}
+                      </div>
+                      <p className="mt-1 text-[9px] font-medium text-gray-600 leading-tight break-words w-full">
+                        {step.title}
+                      </p>
+                    </Link>
+                  </div>
+
                   {index < steps.length - 1 && (
-                    <div className="flex-1 border-t-2 border-dashed border-gray-300 mx-1 -mt-8"></div>
+                    <div className="flex-shrink-0 flex items-center justify-center w-3 h-9">
+                      <div className="w-full border-t-2 border-dashed border-gray-400"></div>
+                    </div>
                   )}
                 </div>
               );
@@ -456,7 +462,7 @@ const Chart = () => {
       {/* Grouped Cards for Production Mode */}
       {mode === "production" && (
         <>
-          {renderOrderPipeline(otherCards, "Orders Process")}
+          {renderOrderPipeline(otherCards, "Orders Pipeline")}
           {renderCardGroup(needsAttention, "Needs your attention")}
           {renderCardGroup(fiberProformaSuppliers, "Fiber, proforma & suppliers")}
           {renderCardGroup(thisMonth, "This month")}
