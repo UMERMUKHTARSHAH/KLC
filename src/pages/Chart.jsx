@@ -290,13 +290,13 @@ const Chart = () => {
 
     filteredCards.forEach(card => {
       // Needs Attention category
-      if (['Update Shipping Date', 'Delayed Orders', 'Pending Orders', 'Supplier Date Updation', 
+      if (['Update Shipping Date', 'Delayed Orders', 'Pending Orders', , 
            'Edit Received Quantity', 'Update Challan', 
            'Need Modification Orders', 'Cancelled Orders', ].includes(card.title)) {
         needsAttention.push(card);
       }
       // Fiber, Proforma & Suppliers category
-      else if (['Fibers Allocated', 'Proforma', 'Supplier Receiving Orders'].includes(card.title)) {
+      else if (['Fibers Allocated', 'Proforma', 'Supplier Receiving Orders','Supplier Date Updation'].includes(card.title)) {
         fiberProformaSuppliers.push(card);
       }
       // This Month category
