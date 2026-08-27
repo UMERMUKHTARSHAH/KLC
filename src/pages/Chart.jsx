@@ -400,11 +400,11 @@ const Chart = () => {
                   <div className="flex flex-col items-center text-center flex-1 min-w-0 px-0.5">
                     <Link to={step.link} className="flex flex-col items-center group w-full">
                       <div
-                        className={`w-9 h-9 rounded-full border-2 flex items-center justify-center font-bold text-xs shrink-0 transition-transform duration-300 group-hover:scale-110 ${circleClasses}`}
+                        className={`w-12 h-12 rounded-full border-2 flex items-center justify-center font-bold text-xs shrink-0 transition-transform duration-300 group-hover:scale-110 ${circleClasses}`}
                       >
                         {step.count}
                       </div>
-                      <p className="mt-1 text-[9px] font-medium text-gray-600 leading-tight break-words w-full">
+                      <p className="mt-3 text-[12px] font-medium text-gray-600 leading-tight break-words w-full">
                         {step.title}
                       </p>
                     </Link>
