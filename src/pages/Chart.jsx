@@ -408,6 +408,8 @@ const Chart = () => {
                         {step.title}
                       </p>
                     </Link>
+
+                    
                   </div>
 
                   {index < steps.length -1 && (
