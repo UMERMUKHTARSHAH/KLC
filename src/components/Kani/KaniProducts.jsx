@@ -95,7 +95,7 @@ const KaniProducts = () => {
     const categories = {
       "Weave & embroidery styles": {
         items: [],
-        // note: "Finished-technique categories",
+        note: "Finished-technique categories",
         keywords: ["contemporary", "pashmina embroidery", "kani", "wool embroidery", "ari", "sozni", "plain pashmina", "cotton", "saree"]
       },
       "Fabric": {
@@ -287,7 +287,7 @@ const KaniProducts = () => {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
                 {categoryData.items.map((product) => {
                   const count = product.count || 0;
-                  
+                    
                   return (
                     <Link 
                       to={`/ProductGroupDetails/${product.id}?name=${encodeURIComponent(product.productGroupName)}`} 
