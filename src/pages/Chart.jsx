@@ -291,7 +291,7 @@ const Chart = () => {
     filteredCards.forEach(card => {
       // Needs Attention category
       if (['Update Shipping Date', 'Delayed Orders', 'Pending Orders', 'Supplier Date Updation', 
-           'Edit Received Quantity', 'Update Challan', 'Supplier Receiving Orders', 
+           'Edit Received Quantity', 'Update Challan', 
            'Need Modification Orders', 'Cancelled Orders', ].includes(card.title)) {
         needsAttention.push(card);
       }
