@@ -9,6 +9,10 @@ export const VIEW_ALL_UNITS = `${BASE_URL}/unit/viewAll`;
 export const DELETE_UNIT_URL = `${BASE_URL}/unit/deleteUnit/`;
 //BOM
 
+// Product Url
+export const PRODUCTCOUNT_URL = `${BASE_URL}/api/dashboard/productGroupCounts`;
+
+
 export const ADDBOM = `${BASE_URL}/bom`;
 export const VIEWBOM = `${BASE_URL}/bom`;
 export const UPDATEBOM = `${BASE_URL}/bom/update`;
