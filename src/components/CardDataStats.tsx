@@ -41,18 +41,18 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
         </h4>
       </div>
 
-      <div className="mt-0.5">
-        <h2 className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">
+      <div className="mt-9">
+        <h2 className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
           {title}
         </h2>
       </div>
     </div>
 
     {/* Icon - Right side corner */}
-    <div className="relative flex-shrink-0">
+    <div className="relative flex-shrink-0 mt-[-20px]">
       <div className="absolute inset-0 rounded-full border-2 border-dashed border-purple-500 animate-spin-slow opacity-0 group-hover:opacity-100"></div>
-      <div className="relative flex h-12 w-12 items-center justify-center rounded-full shadow-lg group-hover:shadow-purple-500/50 transition-all duration-500 group-hover:scale-105">
-        <div className="text-xl">
+      <div className="relative flex h-10 w-10 items-center justify-center rounded-full shadow-lg group-hover:shadow-purple-500/50 transition-all duration-500 group-hover:scale-105">
+        <div className="text-xs">
           {children}
         </div>
       </div>
