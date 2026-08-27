@@ -366,6 +366,7 @@ const UpdateOrderAccepted = () => {
     }
   }
 
+console.log(role,"4521");
 
 
 
@@ -426,7 +427,7 @@ const UpdateOrderAccepted = () => {
                   <div className="rounded-sm border border-stroke bg-white shadow-default dark:border-strokedark dark:bg-boxdark">
                     <div className="border-b border-stroke py-4 px-6.5 dark:border-strokedark">
                       <h3 className="font-medium text-slate-500 text-center text-xl dark:text-white">
-                        Update ORDER FORM
+                        Issue Challan
                       </h3>
                     </div>
                     <div className="p-6.5">
@@ -673,28 +674,28 @@ const UpdateOrderAccepted = () => {
 
 
 
-                      {
-                        role === "ROLE_EXECUTOR" ? (
-                          <div className="flex justify-center mt-4">
-                            <button
-                              type='button'
-                              onClick={() => handleCancelOrder(values)} // Ensure the function is executed
-                              className="w-1/3 px-6 py-2 text-white bg-primary rounded-lg shadow hover:bg-primary-dark focus:outline-none"
-                            >
-                              Cancel Order
-                            </button>
-                          </div>
-                        ) : (
-                          <div className="flex justify-center mt-4">
-                            {/* <button
-                              type="submit"
-                              className="w-1/3 px-6 py-2 text-white bg-primary rounded-lg shadow hover:bg-primary-dark focus:outline-none"
-                            >
-                              Accept All
-                            </button> */}
-                          </div>
-                        )
-                      }
+                   {
+  (role.includes("ROLE_EXECUTOR") || role.includes("ROLE_ADMIN")) ? (
+    <div className="flex justify-center mt-4">
+      <button
+        type='button'
+        onClick={() => handleCancelOrder(values)}
+        className="w-1/3 px-6 py-2 text-white bg-primary rounded-lg shadow hover:bg-primary-dark focus:outline-none"
+      >
+        Cancel Order
+      </button>
+    </div>
+  ) : (
+    <div className="flex justify-center mt-4">
+      {/* <button
+        type="submit"
+        className="w-1/3 px-6 py-2 text-white bg-primary rounded-lg shadow hover:bg-primary-dark focus:outline-none"
+      >
+        Accept All
+      </button> */}
+    </div>
+  )
+}
 
 
 
