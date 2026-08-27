@@ -12,6 +12,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { customStyles as createCustomStyles } from '../../Constants/utils';
+import { MdViewList } from 'react-icons/md';
 
 
 
@@ -25,8 +26,10 @@ const productgrp = [
 
 const ViewOrderCancelled = () => {
 
-    const { handleUpdate, getorderNumber, orderNo, getSupplier, getProdId, productIdd, supplier, getCustomer, customer } = useorder();
+    const { handleUpdate, getorderNumber, orderNo, getSupplier,  getprodId,
+    productId, supplier, getCustomer, customer } = useorder();
     const { currentUser } = useSelector((state) => state?.persisted?.user);
+    const [isprodLoading, setisprodLoading] = useState(false)
     const theme = useSelector(state => state?.persisted?.theme);
 
     const customStyles = createCustomStyles(theme?.mode);
@@ -34,7 +37,7 @@ const ViewOrderCancelled = () => {
 
     const { token } = currentUser;
 
-    console.log(productIdd,"huhuuhuuuuuuuuuuuuuuuuu");
+    console.log(productId,"huhuuhuuuuuuuuuuuuuuuuu");
     
     const [Order, setOrder] = useState()
 
@@ -47,12 +50,13 @@ const ViewOrderCancelled = () => {
         getorderNumber();
         getSupplier();
         getCustomer();
-        getProdId();
+        getprodId();
 
     }, []);
 
 
-    console.log(supplier, customer, productIdd, "orderNo");
+    
+console.log(productId,"4521");
 
     const formattedorder = orderNo.map(order => ({
         label: order,
@@ -64,9 +68,9 @@ const ViewOrderCancelled = () => {
         value: supplier.name
     }));
 
-    const formattedProdId = productIdd.map(prod => ({
-        label: prod,
-        value: prod
+    const formattedProdId = productId.map(prod => ({
+        label: prod.productId,
+        value: prod.productId
     }));
 
 
@@ -282,6 +286,17 @@ const ViewOrderCancelled = () => {
                             </p>
                         ))}
                 </td>
+                   <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                            <p className="flex text-gray-900 whitespace-no-wrap">
+                              <MdViewList
+                                size={17}
+                                className="text-teal-500 hover:text-teal-700 mx-2 cursor-pointer"
+                                onClick={() => navigate(`/order/viewOrder/${item?.id}`)}
+                                title="View Order"
+                              />
+                              <span className="text-gray-300 mx-1">|</span>
+                            </p>
+                          </td>
 
 
 
@@ -333,7 +348,7 @@ const ViewOrderCancelled = () => {
                             initialValues={{
                                 orderNo: '',
                                 customerName: "",
-                                supplierName: "",
+                                // supplierName: "",
                                 ProductId: ""
 
 
@@ -368,7 +383,7 @@ const ViewOrderCancelled = () => {
                                         </div>
 
 
-                                        <div className="flex-1 min-w-[300px]">
+                                        {/* <div className="flex-1 min-w-[300px]">
                                             <label className="mb-2.5 block text-black dark:text-white">
                                                 Supplier
                                                 <span className="text-red-700 text-xl mt-[40px] justify-center items-center"> *</span>
@@ -388,14 +403,9 @@ const ViewOrderCancelled = () => {
                                                     placeholder="Select supplier Name"
                                                 />
                                             </div>
-                                        </div>
-                                    </div>
+                                        </div> */}
 
-
-
-
-                                    <div className="mb-4.5 flex flex-wrap gap-6 mt-12">
-                                        <div className="flex-1 min-w-[200px]">
+                                         <div className="flex-1 min-w-[200px]">
                                             <label className="mb-2.5 block text-black dark:text-white">Product Id</label>
                                             <ReactSelect
                                                 name="ProductId"
@@ -433,6 +443,13 @@ const ViewOrderCancelled = () => {
                                             />
 
                                         </div>
+                                    </div>
+
+
+
+
+                                    <div className="mb-4.5 flex flex-wrap gap-6 mt-12">
+                                       
 
                                     </div>
 
@@ -461,6 +478,7 @@ const ViewOrderCancelled = () => {
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Customer</th>
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Product Id</th>
                                         <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+                                        <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">View Order Details</th>
                                         {/* <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-[600px] md:w-[120px]">ADD BOM </th> */}
 
                                      
