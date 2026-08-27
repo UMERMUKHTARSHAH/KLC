@@ -348,9 +348,9 @@ const AddStockJournels = () => {
           {({ setFieldValue, values, isSubmitting }) => (
             <Form>
               {/* Header Card */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-blue-900/20 rounded-2xl shadow-lg border border-blue-100 dark:border-blue-800/30 p-6 mb-8">
-                <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                  <div className="flex items-center gap-4">
+           
+                
+                  {/* <div className="flex items-center gap-4">
                     <div className="p-3 text-black rounded-xl shadow">
                       <FaExchangeAlt className="w-6 h-6 text-black dark:text-white" />
                     </div>
@@ -359,9 +359,28 @@ const AddStockJournels = () => {
                         Create Stock Journal
                       </h2>
                     </div>
-                  </div>
+                  </div> */}
+                     <div className='flex flex-row items-center justify-between w-full'>
+                        <h2 className="text-xl text-slate-500 font-semibold w-full flex items-center justify-between">
+                          <FaExchangeAlt className="w-6 h-6 text-black dark:text-white" />
+                            <span>  Create Stock Journal</span>
+                            <span className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-blue-900/20 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-800/30 text-sm font-semibold text-blue-700 dark:text-blue-300 ml-4">
+                                {/* Count: {pagination.totalItems} */}
+                            </span>
+                        </h2>
+                    </div>
 
-                  <div className="w-full md:w-auto">
+                 
+              
+              
+
+              {/* Main Table - Source and Destination Side by Side */}
+              <div className=" ml-[-30px] mr-[-20px] bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+                {/* Table Header */}
+                <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
+                  <div className="flex justify-between items-center">
+                   
+                     <div className="w-full md:w-auto">
                     <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                       Voucher Number <span className="text-red-500 ml-1">*</span>
                     </label>
@@ -378,15 +397,7 @@ const AddStockJournels = () => {
                     </div>
                     <ErrorMessage name="voucherNo" component="div" className="text-red-500 text-xs mt-1" />
                   </div>
-                </div>
-              </div>
-
-              {/* Main Table - Source and Destination Side by Side */}
-              <div className=" ml-[-30px] mr-[-20px] bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-                {/* Table Header */}
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                   <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                       Stock Transfer Details
                     </h3>
                     <button
@@ -512,7 +523,7 @@ const AddStockJournels = () => {
                                     type="number"
                                     min="1"
                                     max={availableQuantity}
-                                    placeholder="Used Qty"
+                                    placeholder=" Qty"
                                     className="w-[90px] px-3 py-2 bg-white dark:bg-gray-800 border-2 border-gray-300 dark:border-gray-700 rounded-lg text-center"
                                     onChange={(e) => {
                                       const value = e.target.value;
