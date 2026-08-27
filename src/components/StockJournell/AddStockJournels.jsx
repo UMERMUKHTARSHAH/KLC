@@ -263,6 +263,7 @@ const AddStockJournels = () => {
         fromQty: Number(values.sourceQuantity),
         // availableQuantity: availableQuantity,
         fromValue: calculateSourceAmount(),
+        voucherId:id,
     
       toStockVoucher: destinationRows.map((row) => ({
         toProductId: row.destProductId?.value,
