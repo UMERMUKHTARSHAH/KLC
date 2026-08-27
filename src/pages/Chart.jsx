@@ -410,8 +410,8 @@ const Chart = () => {
                     </Link>
                   </div>
 
-                  {index < steps.length - 1 && (
-                    <div className="flex-shrink-0 flex items-center justify-center w-3 h-9">
+                  {index < steps.length -1 && (
+                    <div className=" mt-2 flex-shrink-0 flex items-center justify-center w-12 h-9">
                       <div className="w-full border-t-2 border-dashed border-gray-400"></div>
                     </div>
                   )}
