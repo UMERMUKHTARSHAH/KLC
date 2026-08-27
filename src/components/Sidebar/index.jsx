@@ -26,6 +26,8 @@ import { RiPagesLine } from 'react-icons/ri';
 import { MdBook } from 'react-icons/md';
 import { LuTornado } from 'react-icons/lu';
 import { FaShopify } from "react-icons/fa";
+import { toast } from 'react-toastify';
+import { GET_Vouchersearch_URL } from '../../Constants/utils';
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const [role, setrole] = useState('');
   const location = useLocation();
@@ -41,8 +43,13 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
   const { currentUser } = useSelector((state) => state?.persisted?.user);
   const appMode = useSelector((state) => state?.persisted?.appMode);
+   const [isSalesOpen, setIsSalesOpen] = useState(false);
+  const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
+   const [salesVouchers, setSalesVouchers] = useState([]);
+  const [purchaseVouchers, setPurchaseVouchers] = useState([]);
 
   const { mode } = appMode;
+    const { token } = currentUser;
 
   const { user } = currentUser || {};
   const roles = user?.authorities.map((auth) => auth.authority) || []; // Ensure it's always an array
@@ -63,6 +70,8 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     return () => document.removeEventListener('click', clickHandler);
   });
 
+  
+
   // close if the esc key is pressed
   useEffect(() => {
     const keyHandler = ({ keyCode }) => {
@@ -81,6 +90,53 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
       document.querySelector('body')?.classList.remove('sidebar-expanded');
     }
   }, [sidebarExpanded]);
+
+   const getVouchersByType = async (type) => {
+    try {
+      const response = await fetch(`${GET_Vouchersearch_URL}?page=1&size=1000`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+        body: JSON.stringify({ typeOfVoucher: type })
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Server responded with ${response.status}: ${errorText}`);
+      }
+
+      const data = await response.json();
+      console.log("Received data:", data);
+
+      return data.content || [];
+    } catch (error) {
+      console.error("Error in getVouchersByType:", error);
+      toast.error(error.message || "Failed to fetch vouchers");
+      return [];
+    }
+  };
+
+   const handleSalesClick = async (e) => {
+    e.preventDefault();
+    if (!isSalesOpen) {
+      const data = await getVouchersByType("Sales");
+      setSalesVouchers(data);
+    }
+    setIsSalesOpen(!isSalesOpen);
+    setIsPurchaseOpen(false);
+  };
+
+  const handlePurchaseClick = async (e) => {
+    e.preventDefault();
+    if (!isPurchaseOpen) {
+      const data = await getVouchersByType("Purchase");
+      setPurchaseVouchers(data);
+    }
+    setIsPurchaseOpen(!isPurchaseOpen);
+    setIsSalesOpen(false);
+  };
 
   return (
     <aside
@@ -454,94 +510,169 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 }}
               </SidebarLinkGroup>
 
-              <SidebarLinkGroup
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
+           <SidebarLinkGroup>
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
                       {mode === 'accounts' &&
                       roles.some((role) => ['ROLE_ADMIN'].includes(role)) ? (
-                        <NavLink
-                          to="#"
-                          className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
-                          }`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            sidebarExpanded
-                              ? handleClick()
-                              : setSidebarExpanded(true);
-                          }}
-                        >
-                          <RiPagesLine size={24} />
-                          Vouchers
-                          <svg
-                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
-                              open && 'rotate-180'
+                        <>
+                          <NavLink
+                            to="#"
+                            className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                              (pathname === '/configurator' || pathname.includes('configurator')) && 'bg-graydark dark:bg-meta-4'
                             }`}
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              sidebarExpanded
+                                ? handleClick()
+                                : setSidebarExpanded(true);
+                            }}
                           >
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
-                              fill=""
-                            />
-                          </svg>
-                        </NavLink>
+                            <RiPagesLine size={24} />
+                            Vouchers
+                            <svg
+                              className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${
+                                open && 'rotate-180'
+                              }`}
+                              width="20"
+                              height="20"
+                              viewBox="0 0 20 20"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                clipRule="evenodd"
+                                d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
+                                fill=""
+                              />
+                            </svg>
+                          </NavLink>
+
+                          <div
+                            className={`translate transform overflow-hidden ${
+                              !open && 'hidden'
+                            }`}
+                          >
+                            <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
+                              <li>
+                                <NavLink
+                                  to="/configurator/vouchers"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  Add New Voucher
+                                </NavLink>
+                              </li>
+                              
+                              {/* Sales Dropdown */}
+                              <li>
+                                <div
+                                  onClick={handleSalesClick}
+                                  className="group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white cursor-pointer"
+                                >
+                                  <span>Sales</span>
+                                  <svg
+                                    className={`ml-auto transition-transform duration-200 ${
+                                      isSalesOpen ? 'rotate-180' : ''
+                                    }`}
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      clipRule="evenodd"
+                                      d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
+                                    />
+                                  </svg>
+                                </div>
+                                {isSalesOpen && (
+                                  <ul className="mt-2 ml-4 flex flex-col gap-2">
+                                    {salesVouchers.map((voucher) => (
+                                      <li key={voucher.id}>
+                                        <NavLink
+                                          to={`/voucher/create/${voucher.id}`}
+                                          className={({ isActive }) =>
+                                            'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                            (isActive && '!text-white')
+                                          }
+                                        >
+                                          {voucher.name || `Voucher ${voucher.id}`}
+                                        </NavLink>
+                                      </li>
+                                    ))}
+                                    {salesVouchers.length === 0 && (
+                                      <li className="px-4 text-sm text-bodydark2">No sales vouchers found</li>
+                                    )}
+                                  </ul>
+                                )}
+                              </li>
+
+                              {/* Purchase Dropdown */}
+                              <li>
+                                <div
+                                  onClick={handlePurchaseClick}
+                                  className="group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white cursor-pointer"
+                                >
+                                  <span>Purchase</span>
+                                  <svg
+                                    className={`ml-auto transition-transform duration-200 ${
+                                      isPurchaseOpen ? 'rotate-180' : ''
+                                    }`}
+                                    width="16"
+                                    height="16"
+                                    viewBox="0 0 20 20"
+                                    fill="currentColor"
+                                  >
+                                    <path
+                                      fillRule="evenodd"
+                                      clipRule="evenodd"
+                                      d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
+                                    />
+                                  </svg>
+                                </div>
+                                {isPurchaseOpen && (
+                                  <ul className="mt-2 ml-4 flex flex-col gap-2">
+                                    {purchaseVouchers.map((voucher) => (
+                                      <li key={voucher.id}>
+                                        <NavLink
+                                          to={`/voucher/create/${voucher.id}`}
+                                          className={({ isActive }) =>
+                                            'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                            (isActive && '!text-white')
+                                          }
+                                        >
+                                          {voucher.name || `Voucher ${voucher.id}`}
+                                        </NavLink>
+                                      </li>
+                                    ))}
+                                    {purchaseVouchers.length === 0 && (
+                                      <li className="px-4 text-sm text-bodydark2">No purchase vouchers found</li>
+                                    )}
+                                  </ul>
+                                )}
+                              </li>
+
+                              <li>
+                                <NavLink
+                                  to="/Vouchers/view"
+                                  className={({ isActive }) =>
+                                    'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
+                                    (isActive && '!text-white')
+                                  }
+                                >
+                                  View Voucher
+                                </NavLink>
+                              </li>
+                            </ul>
+                          </div>
+                        </>
                       ) : null}
-
-                      <div
-                        className={`translate transform overflow-hidden ${
-                          !open && 'hidden'
-                        }`}
-                      >
-                        <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                          {/* <li>
-                            <NavLink
-                              to="/inventory/addProductInventory"
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              Add Inventory
-                            </NavLink>
-                          </li> */}
-                          <li>
-                            <NavLink
-                              to="/configurator/vouchers"
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              Add New Voucher
-                            </NavLink>
-                          </li>
-
-                          <li>
-                            <NavLink
-                              to="/Vouchers/view"
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              View Voucher
-                            </NavLink>
-                          </li>
-                        </ul>
-                      </div>
                     </React.Fragment>
                   );
                 }}
