@@ -362,6 +362,62 @@ const Chart = () => {
     );
   };
 
+  // Render the "Orders Process" group as a horizontal pipeline (same cards, same order, same counts)
+  const renderOrderPipeline = (cards, heading) => {
+    if (!cards || cards.length === 0) return null;
+
+    const steps = cards.map((card) => ({
+      title: card.title,
+      link: card.link,
+      count: card.countKey ? (countMapping[card.countKey] || 0) : 0,
+    }));
+
+    return (
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-lg font-semibold text-gray-800">{heading}</h2>
+        </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 overflow-x-auto">
+          <div className="flex items-start" style={{ minWidth: `${steps.length * 120}px` }}>
+            {steps.map((step, index) => {
+              const isCompleted = step.title.toLowerCase().includes('complet');
+              const isActive = step.count > 0;
+
+              let circleClasses = 'border-gray-300 text-gray-400 bg-white';
+              if (isActive && isCompleted) {
+                circleClasses = 'border-green-500 text-green-700 bg-green-50';
+              } else if (isActive) {
+                circleClasses = 'border-amber-500 text-amber-700 bg-amber-50';
+              }
+
+              return (
+                <div key={index} className="flex items-center flex-1 last:flex-none">
+                  <Link
+                    to={step.link}
+                    className="flex flex-col items-center text-center group flex-shrink-0"
+                    style={{ width: '112px' }}
+                  >
+                    <div
+                      className={`w-14 h-14 rounded-full border-2 flex items-center justify-center font-bold text-lg transition-transform duration-300 group-hover:scale-110 ${circleClasses}`}
+                    >
+                      {step.count}
+                    </div>
+                    <p className="mt-2 text-xs font-medium text-gray-600 leading-tight px-1">
+                      {step.title}
+                    </p>
+                  </Link>
+                  {index < steps.length - 1 && (
+                    <div className="flex-1 border-t-2 border-dashed border-gray-300 mx-1 -mt-8"></div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Dashboard" />
@@ -400,7 +456,7 @@ const Chart = () => {
       {/* Grouped Cards for Production Mode */}
       {mode === "production" && (
         <>
-          {renderCardGroup(otherCards, "Orders Process")}
+          {renderOrderPipeline(otherCards, "Orders Process")}
           {renderCardGroup(needsAttention, "Needs your attention")}
           {renderCardGroup(fiberProformaSuppliers, "Fiber, proforma & suppliers")}
           {renderCardGroup(thisMonth, "This month")}
