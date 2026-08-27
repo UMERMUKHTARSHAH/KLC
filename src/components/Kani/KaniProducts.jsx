@@ -89,54 +89,116 @@ const KaniProducts = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Categorize products based on productGroupName
-  const categorizeProducts = (products) => {
-    const categories = {
-      "Weave & embroidery styles": {
-        items: [],
-        note: "Finished-technique categories"
-      },
-      "Fabric": {
-        items: [],
-        note: "By material"
-      },
-      "Garments": {
-        items: [],
-        note: "Finished, wearable pieces"
-      },
-      "Fiber & yarn": {
-        items: [],
-        note: "Raw material stage"
-      }
-    };
+ 
+// const categorizeProducts = (products) => {
+//   const categories = {
+//     "Weave & embroidery styles": {
+//       items: [],
+//       note: "Finished-technique categories"
+//     },
+//     "Fabric": {
+//       items: [],
+//       note: "By material"
+//     },
+//     "Garments": {
+//       items: [],
+//       note: "Finished, wearable pieces"
+//     },
+//     "Fiber & yarn": {
+//       items: [],
+//       note: "Raw material stage"
+//     }
+//   };
 
-    products.forEach(product => {
-      const name = product.productGroupName?.toLowerCase() || "";
-      
-      // Check for Fabric
-      if (name === "fabric wool" || name === "fabric pashmina") {
-        categories["Fabric"].items.push(product);
-      } 
-      // Check for Garments
-      else if (name.includes("garment")) {
-        categories["Garments"].items.push(product);
-      } 
-      // Check for Fiber & yarn
-      else if (name === "paper mache" || 
-               name === "fiber / yarn wool" || 
-               name === "fiber / yarn pashmina") {
-        categories["Fiber & yarn"].items.push(product);
-      } 
-      // Everything else goes to Weave & embroidery styles
-      else {
-        categories["Weave & embroidery styles"].items.push(product);
-      }
-    });
+//   products.forEach(product => {
+//     const name = product.productGroupName?.toLowerCase() || "";
+    
+//     // Check for Fabric - includes Fabric Wool, Fabric Pashmina, Fabric Cotton
+//     if (name.includes("fabric")) {
+//       categories["Fabric"].items.push(product);
+//     } 
+//     // Check for Garments
+//     else if (name.includes("garment")) {
+//       categories["Garments"].items.push(product);
+//     } 
+//     // Check for Fiber & yarn
+//     else if (name.includes("paper mache") || 
+//              name.includes("fiber / yarn") || 
+//              name.includes("fiber/yarn")) {
+//       categories["Fiber & yarn"].items.push(product);
+//     } 
+//     // Everything else goes to Weave & embroidery styles
+//     else {
+//       categories["Weave & embroidery styles"].items.push(product);
+//     }
+//   });
 
-    // Filter out empty categories
-    return Object.fromEntries(
-      Object.entries(categories).filter(([_, data]) => data.items.length > 0)
-    );
+//   // Filter out empty categories
+//   return Object.fromEntries(
+//     Object.entries(categories).filter(([_, data]) => data.items.length > 0)
+//   );
+// };
+
+
+// Categorize products based on productGroupName with flexible keyword matching
+const categorizeProducts = (products) => {
+  const categories = {
+    "Weave & embroidery styles": {
+      items: [],
+      note: "Finished-technique categories",
+      keywords: ["contemporary", "pashmina embroidery", "kani", "wool embroidery", "ari", "sozni", "plain pashmina", "cotton", "saree"]
+    },
+    "Fabric": {
+      items: [],
+      note: "By material",
+      keywords: ["fabric"]
+    },
+    "Garments": {
+      items: [],
+      note: "Finished, wearable pieces",
+      keywords: ["garment", "garments", "apparel", "clothing"]
+    },
+    "Fiber & yarn": {
+      items: [],
+      note: "Raw material stage",
+      keywords: ["fiber", "yarn", "paper mache", "fibre", "thread"]
+    }
   };
+
+  products.forEach(product => {
+    const name = product.productGroupName?.toLowerCase() || "";
+    let categorized = false;
+
+    // Check each category in order of priority
+    const categoryOrder = ["Fabric", "Garments", "Fiber & yarn", "Weave & embroidery styles"];
+    
+    for (let categoryName of categoryOrder) {
+      const category = categories[categoryName];
+      if (!category) continue;
+      
+      // Check if product name contains any keyword from this category
+      const matchesKeyword = category.keywords.some(keyword => 
+        name.includes(keyword.toLowerCase())
+      );
+      
+      if (matchesKeyword) {
+        category.items.push(product);
+        categorized = true;
+        break;
+      }
+    }
+
+    // If no category matched, put in "Weave & embroidery styles" as default
+    if (!categorized) {
+      categories["Weave & embroidery styles"].items.push(product);
+    }
+  });
+
+  // Filter out empty categories
+  return Object.fromEntries(
+    Object.entries(categories).filter(([_, data]) => data.items.length > 0)
+  );
+};
 
   // Fetch product groups from API
   useEffect(() => {
