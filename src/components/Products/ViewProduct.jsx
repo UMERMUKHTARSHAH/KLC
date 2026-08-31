@@ -416,9 +416,9 @@ const ViewProduct = () => {
         </td>
 
         {/* Product ID */}
-        <td className="px-5 py-5 border-b border-gray-200 text-sm">
-          <p className="text-gray-900 whitespace-no-wrap">
-            {item?.productId?.substring(0, 34) + '..'}
+        <td className="px-5 py-5 border-b border-gray-200 text-sm whitespace-nowrap tracking-wider ">
+          <p className="text-gray-900 tracking-wider whitespace-nowrap">
+            {item?.productId?.substring(0, 45) }
           </p>
         </td>
 
