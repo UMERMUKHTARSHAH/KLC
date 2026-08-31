@@ -94,7 +94,7 @@ const Header = (props) => {
         <div className="hidden sm:block">
           <form action="https://formbold.com/s/unique_form_id" method="POST">
             <div className="flex items-center justify-between">
-              <h3 className="uppercase font-bold text-lg leading-tight tracking-[10px]">
+              <h3 className="uppercase font-bold text-md leading-tight tracking-[10px]">
                 CRAFT-FLOW ERP
               </h3>
               <Button
@@ -102,7 +102,7 @@ const Header = (props) => {
                 className="text-sm flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-blue-200 to-blue-400 hover:from-blue-400 hover:to-blue-700 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all duration-200"
                 onClick={() => navigate('/connectToShopify')}
               >
-                <AiOutlineDisconnect size={18} className="inline-block" />
+                <AiOutlineDisconnect size={16} className="inline-block" />
                 <span className='text-xs'>Check Connection</span>
               </Button>
             </div>
