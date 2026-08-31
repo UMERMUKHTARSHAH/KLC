@@ -144,6 +144,7 @@ const Chart = () => {
     { title: "Ledger Summary Balances", link: "/configurator/ledgersummary", countKey: "invoices", icon: <FaBook className="w-10 h-10" />, levelUp: true },
     { title: "Orders With Vouchers", link: "/configurator/OrderVoucher", countKey: "invoices", icon: <TbReorder className="w-10 h-10" />, levelUp: true },
     { title: "Reports", link: "/configurator/accreports", countKey: "accReports", icon: <BiBookOpen className="w-10 h-10" />, levelUp: true },
+     { title: "Pending for Bill", link: "/Recieved/pendingForBill", countKey: "orderBillStatusAllowed", icon: <RiProgress8Fill className="w-10 h-10" />, levelUp: true },
   ];
   
   const roleBasedCards = {

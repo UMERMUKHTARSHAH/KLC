@@ -36,7 +36,7 @@ const PendingForBill = () => {
     const [idd, setidd] = useState('')
     const [selectedVouchers, setSelectedVouchers] = useState({});
     const { token } = currentUser;
-
+ const [isSupplierLoading, setIsSupplierLoading] = useState(false);
     console.log(idd, "huhuuhuuuuuuuuuuuuuuuuu");
 
     const [Order, setOrder] = useState()
@@ -91,16 +91,27 @@ const PendingForBill = () => {
 
 
 
-    useEffect(() => {
-        if (supplier.data) {
-            const formattedOptions = supplier.data.map(supp => ({
-                value: supp.id,
-                label: supp?.name,
-                supplierNameObject: supp,
-                suplierid: { id: supp.id }
-            }));
-            setsupplierNameOptions(formattedOptions);
-        }
+      useEffect(() => {
+        const fetchSuppliers = async () => {
+            setIsSupplierLoading(true); // Set loading to true
+            try {
+                if (supplier.data) {
+                    const formattedOptions = supplier.data.map(supp => ({
+                        value: supp.id,
+                        label: supp?.name,
+                        supplierNameObject: supp,
+                        suplierid: { id: supp.id }
+                    }));
+                    setsupplierNameOptions(formattedOptions);
+                }
+            } catch (error) {
+                console.error("Error loading suppliers:", error);
+            } finally {
+                setIsSupplierLoading(false); // Set loading to false
+            }
+        };
+
+        fetchSuppliers();
     }, [supplier.data]);
 
     console.log(supplierNameOptions, "heyyy");
@@ -114,17 +125,17 @@ const PendingForBill = () => {
     });
 
 
-    useEffect(() => {
-        if (supplier.data) {
-            const formattedOptions = supplier.data.map(supp => ({
-                value: supp.id,
-                label: supp?.name,
-                supplierNameObject: supp,
-                suplierid: { id: supp.id }
-            }));
-            setsupplierNameOptions(formattedOptions);
-        }
-    }, [supplier.data]);
+    // useEffect(() => {
+    //     if (supplier.data) {
+    //         const formattedOptions = supplier.data.map(supp => ({
+    //             value: supp.id,
+    //             label: supp?.name,
+    //             supplierNameObject: supp,
+    //             suplierid: { id: supp.id }
+    //         }));
+    //         setsupplierNameOptions(formattedOptions);
+    //     }
+    // }, [supplier.data]);
 
 
 
@@ -247,6 +258,7 @@ const PendingForBill = () => {
         return filteredItems.map((item, index) => {
             // Filter orders within this item to only show those with OPVoucherCreated: false
             const pendingOrders = item?.orders?.filter(order => order.OPVoucherCreated === false) || [];
+console.log(pendingOrders,"4444444444444444444444444444444444444444444444444");
 
             // If no pending orders in this item, skip it (shouldn't happen due to outer filter)
             if (pendingOrders.length === 0) {
@@ -380,6 +392,8 @@ const PendingForBill = () => {
 
 
                                         const orderDetails = pendingOrders?.map(order => ({
+                                           
+                                            
                                             orderNo: order.orderNo,
                                             orderId: order.orderId,
                                             productId: order?.productId,
@@ -390,7 +404,7 @@ const PendingForBill = () => {
                                             igst: order?.Igst,
                                             cgst: order?.Cgst,
                                             sgst: order?.Sgst,
-                                            OPVoucherCreated: order.OPVoucherCreated // Will be false for all
+                                            OPVoucherCreated: order.OPVoucherCreated 
                                         }));
 
                                         navigate(`/Purchasevoucher/create/${selectedVouchers[item?.billStatusId]}`, {
@@ -501,7 +515,7 @@ const PendingForBill = () => {
                                         </div>
 
 
-                                        <div className="flex-1 min-w-[300px]">
+                                        <div className="flex-1 min-w-[300px] mt-[-8px]">
                                             <label className="mb-2.5 block text-black dark:text-white">
                                                 Supplier
                                                 <span className="text-red-700 text-xl mt-[40px] justify-center items-center"> *</span>
@@ -518,6 +532,7 @@ const PendingForBill = () => {
                                                     styles={customStyles} // Pass custom styles here
                                                     className="bg-white dark:bg-form-Field"
                                                     classNamePrefix="react-select"
+                                                    
                                                     placeholder="Select supplier Name"
                                                 />
                                             </div>
