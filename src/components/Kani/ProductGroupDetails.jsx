@@ -299,6 +299,10 @@ const ProductGroupDetails = () => {
         params.append('productGroupName', productGroupName);
       }
       
+      // Fetch all data with a large page size to get all items at once
+      params.append('page', '0');
+      params.append('size', '1000');
+      
       const fullUrl = params.toString() 
         ? `${GET_PRODUCTDETAILS_URL}?${params.toString()}` 
         : GET_PRODUCTDETAILS_URL;
@@ -310,6 +314,14 @@ const ProductGroupDetails = () => {
       });
       
       let suppliersList = [];
+      
+      // Log the response to debug
+      console.log('Fetch Suppliers Response:', {
+        totalCount: response.data?.totalCount,
+        totalElements: response.data?.totalElements,
+        contentLength: response.data?.content?.length,
+        totalPages: response.data?.totalPages
+      });
       
       if (response.data?.content && Array.isArray(response.data.content)) {
         response.data.content.forEach(order => {
@@ -359,6 +371,85 @@ const ProductGroupDetails = () => {
         });
       }
       
+      // If we got less than totalCount, fetch remaining pages
+      const totalCount = response.data?.totalCount || response.data?.totalElements || suppliersList.length;
+      const totalPages = response.data?.totalPages || 1;
+      
+      // If we have multiple pages and didn't get all items, fetch remaining pages
+      if (totalPages > 1 && suppliersList.length < totalCount) {
+        console.log('Fetching remaining pages...');
+        let allSuppliersList = [...suppliersList];
+        
+        for (let page = 1; page < totalPages; page++) {
+          const pageParams = new URLSearchParams();
+          if (productGroupName) {
+            pageParams.append('productGroupName', productGroupName);
+          }
+          pageParams.append('page', page.toString());
+          pageParams.append('size', '1000');
+          
+          const pageUrl = pageParams.toString() 
+            ? `${GET_PRODUCTDETAILS_URL}?${pageParams.toString()}` 
+            : GET_PRODUCTDETAILS_URL;
+          
+          const pageResponse = await axios.get(pageUrl, {
+            headers: {
+              'Authorization': `Bearer ${currentUser?.token}`
+            }
+          });
+          
+          if (pageResponse.data?.content && Array.isArray(pageResponse.data.content)) {
+            pageResponse.data.content.forEach(order => {
+              if (order.products && Array.isArray(order.products)) {
+                order.products.forEach(product => {
+                  if (product.suppliers && Array.isArray(product.suppliers)) {
+                    product.suppliers.forEach(supplier => {
+                      let referenceImage = null;
+                      let actualImage = null;
+                      let allImages = [];
+                      
+                      if (product.images && Array.isArray(product.images)) {
+                        allImages = product.images;
+                        product.images.forEach(image => {
+                          if (image.referenceImage && !referenceImage) {
+                            referenceImage = image.referenceImage;
+                          }
+                          if (image.actualImage && !actualImage) {
+                            actualImage = image.actualImage;
+                          }
+                        });
+                      }
+                      
+                      allSuppliersList.push({
+                        orderProductId: product?.orderProductId,
+                        orderNo: order.orderNo,
+                        productId: product?.productId || "N/A",
+                        productGroup: product?.productGroup || productGroupName,
+                        category: product?.productCategory || "N/A",
+                        supplier: {
+                          id: supplier.supplierId,
+                          name: supplier.supplierName,
+                          supplierName: supplier.supplierName
+                        },
+                        supplierOrderQty: supplier.supplierOrderQty || "N/A",
+                        challanNo: product.challanNo || "N/A",
+                        status: order.orderStatus || "N/A",
+                        refImage: referenceImage,
+                        actImage: actualImage,
+                        allImages: allImages,
+                        originalData: product
+                      });
+                    });
+                  }
+                });
+              }
+            });
+          }
+        }
+        
+        suppliersList = allSuppliersList;
+      }
+      
       const formattedSuppliers = suppliersList.map((item) => ({
         orderProductId: item.orderProductId,
         orderNo: item.orderNo || "N/A",
@@ -375,26 +466,34 @@ const ProductGroupDetails = () => {
         originalData: item
       }));
       
+      console.log('Total suppliers processed:', formattedSuppliers.length);
+      
       // Store all suppliers data
       setAllSuppliers(formattedSuppliers);
       
-      // Update pagination
-      const totalItems = formattedSuppliers.length;
-      const totalPages = Math.ceil(totalItems / suppliersPagination.pageSize);
+      // Update pagination using the actual total count from API
+      const actualTotal = response.data?.totalCount || 
+                         response.data?.totalElements || 
+                         formattedSuppliers.length;
+      
+      const totalPagesCount = Math.ceil(actualTotal / suppliersPagination.pageSize);
       
       setSuppliersPagination(prev => ({
         ...prev,
-        totalPages: totalPages,
-        totalItems: totalItems
+        totalPages: totalPagesCount,
+        totalItems: actualTotal
       }));
       
       // Set current page data
       const startIndex = (suppliersPagination.currentPage - 1) * suppliersPagination.pageSize;
-      const endIndex = startIndex + suppliersPagination.pageSize;
+      const endIndex = Math.min(startIndex + suppliersPagination.pageSize, formattedSuppliers.length);
       const paginatedData = formattedSuppliers.slice(startIndex, endIndex).map((item, idx) => ({
         ...item,
         sno: startIndex + idx + 1
       }));
+      
+      console.log('Paginated data length:', paginatedData.length);
+      console.log('Showing items:', startIndex + 1, 'to', endIndex, 'of', formattedSuppliers.length);
       
       setSupplierData(paginatedData);
       setSuppliers(formattedSuppliers.map(s => s.supplierName));
@@ -418,11 +517,13 @@ const ProductGroupDetails = () => {
     
     // Update displayed data
     const startIndex = (page - 1) * suppliersPagination.pageSize;
-    const endIndex = startIndex + suppliersPagination.pageSize;
+    const endIndex = Math.min(startIndex + suppliersPagination.pageSize, allSuppliers.length);
     const paginatedData = allSuppliers.slice(startIndex, endIndex).map((item, idx) => ({
       ...item,
       sno: startIndex + idx + 1
     }));
+    
+    console.log('Page:', page, 'Showing items:', startIndex + 1, 'to', endIndex, 'of', allSuppliers.length);
     setSupplierData(paginatedData);
   };
 
@@ -730,105 +831,6 @@ const ProductGroupDetails = () => {
 
   const stats = getCategoryStats();
 
-  // useEffect(() => {
-  //   const fetchProductDetails = async () => {
-  //     try {
-  //       setLoading(true);
-        
-  //       const params = new URLSearchParams();
-  //       params.append('productGroupName', productGroupName);
-        
-  //       const response = await axios.get(`${GET_PRODUCTDETAILS_URL}?${params.toString()}`, {
-  //         headers: {
-  //           'Authorization': `Bearer ${currentUser?.token}`
-  //         }
-  //       });
-        
-  //       let productsData = [];
-  //       let totalElements = 0;
-        
-  //       // Extract counts from response
-  //       if (response.data) {
-  //         setCategoryCounts({
-  //           retail: response.data.retailCount || 0,
-  //           wholesale: response.data.wsCount || 0,
-  //           klc: response.data.klcCount || 0,
-  //           total: response.data.totalCount || 0
-  //         });
-  //       }
-        
-  //       if (response.data?.content && Array.isArray(response.data.content)) {
-  //         response.data.content.forEach((order) => {
-  //           if (order.products && Array.isArray(order.products)) {
-  //             order.products.forEach((product) => {
-  //               let referenceImage = null;
-  //               let actualImage = null;
-  //               let allImages = [];
-                
-  //               if (product.images && Array.isArray(product.images)) {
-  //                 allImages = product.images;
-  //                 product.images.forEach(image => {
-  //                   if (image.referenceImage && !referenceImage) {
-  //                     referenceImage = image.referenceImage;
-  //                   }
-  //                   if (image.actualImage && !actualImage) {
-  //                     actualImage = image.actualImage;
-  //                   }
-  //                 });
-  //               }
-                
-  //               productsData.push({
-  //                 orderNo: order.orderNo,
-  //                 orderProductId: product?.orderProductId,
-  //                 productId: product?.productId || "N/A",
-  //                 productGroup: product?.productGroup || productGroupName,
-  //                 category: product?.productCategory || order.orderCategory || "N/A",
-  //                 supplier: product?.supplier?.supplierName || "N/A",
-  //                 status: order.status || order.orderStatus || "N/A",
-  //                 refImage: referenceImage,
-  //                 actImage: actualImage,
-  //                 allImages: allImages,
-  //                 product: product
-  //               });
-  //             });
-  //           }
-  //         });
-  //         totalElements = response.data.totalElements || productsData.length;
-  //       }
-        
-  //       setAllProducts(productsData);
-        
-  //       const totalPages = Math.ceil(totalElements / ordersPagination.pageSize);
-  //       const startIndex = (ordersPagination.currentPage - 1) * ordersPagination.pageSize;
-  //       const endIndex = startIndex + ordersPagination.pageSize;
-  //       const paginatedData = productsData.slice(startIndex, endIndex);
-        
-  //       setProducts(paginatedData);
-  //       setOrdersPagination({
-  //         ...ordersPagination,
-  //         totalPages: totalPages,
-  //         totalItems: totalElements
-  //       });
-        
-  //       const uniqueSuppliers = [...new Set(productsData.map(p => p.supplier).filter(s => s && s !== "N/A"))];
-  //       setSuppliers(uniqueSuppliers);
-  //       setError(productsData.length === 0 ? "No products found in this category" : null);
-  //     } catch (err) {
-  //       console.error("Error fetching product details:", err);
-  //       setError("Failed to load products. Please try again later.");
-  //       setProducts([]);
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-
-  //   if (productGroupName) {
-  //     fetchProductDetails();
-  //   }
-  // }, [productGroupName, currentUser]);
-
-  // Filtered products based on selected category and supplier
- 
  useEffect(() => {
   const fetchProductDetails = async () => {
     try {
@@ -836,6 +838,8 @@ const ProductGroupDetails = () => {
       
       const params = new URLSearchParams();
       params.append('productGroupName', productGroupName);
+      params.append('page', '0');
+      params.append('size', '1000');
       
       const response = await axios.get(`${GET_PRODUCTDETAILS_URL}?${params.toString()}`, {
         headers: {
@@ -1160,14 +1164,7 @@ const ProductGroupDetails = () => {
     if (inProgressError) {
       return (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {/* <h3 className="font-bold mb-2">Error loading in-progress orders:</h3> */}
           <p>{inProgressError}</p>
-          {/* <button
-            onClick={() => fetchInProgressOrders(1)}
-            className="mt-3 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-          >
-            Retry
-          </button> */}
         </div>
       );
     }
@@ -1282,14 +1279,7 @@ const ProductGroupDetails = () => {
     if (categoryError) {
       return (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {/* <h3 className="font-bold mb-2">Error loading {getDisplayOrderType(selectedOrderType)} orders:</h3> */}
           <p>{categoryError}</p>
-          {/* <button
-            onClick={() => fetchCategoryOrders(selectedOrderType, 1)}
-            className="mt-3 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-          >
-            Retry
-          </button> */}
         </div>
       );
     }
@@ -1620,14 +1610,7 @@ const ProductGroupDetails = () => {
     if (supplierError) {
       return (
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          {/* <h3 className="font-bold mb-2">Error loading supplier orders:</h3> */}
           <p>{supplierError}</p>
-          {/* <button
-            onClick={() => fetchSuppliers()}
-            className="mt-3 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm"
-          >
-            Retry
-          </button> */}
         </div>
       );
     }
@@ -1957,14 +1940,6 @@ const ProductGroupDetails = () => {
 
       <div className="mb-6">
         <div className="flex justify-between items-center mb-6">
-          {/* <h2 className="text-2xl font-bold text-gray-800 dark:text-white">
-            {productGroupName} {
-              activeView === 'orders' ? 'ORDERS' : 
-              activeView === 'inProgress' ? 'IN PROGRESS ORDERS' : 
-              activeView === 'category' ? `${getDisplayOrderType(selectedOrderType)} ORDERS` : 
-              'SUPPLIERS'
-            }
-          </h2> */}
           <h2 className="uppercase font-bold text-2xl leading-tight tracking-[9px] text-gray-800 dark:text-white">
   {productGroupName} {
     activeView === 'orders' ? 'ORDERS' : 
@@ -2006,11 +1981,6 @@ const ProductGroupDetails = () => {
             </button>
           </div>
         </div>
-
-        {/* Search Tabs Label */}
-        {/* <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          🔍 Search Tabs - Click any tile below to filter orders by category
-        </p> */}
 
         {/* Search Tabs Label with Total Count */}
 <div className="flex justify-between items-center mb-2">
