@@ -1,82 +1,123 @@
 import React, { useEffect, useState } from 'react'
 import DefaultLayout from '../../../layout/DefaultLayout'
-import { ErrorMessage, Field, FieldArray, Form, Formik, useFormik } from 'formik';
+import { ErrorMessage, Field, FieldArray, Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import useColorMode from '../../../hooks/useColorMode';
 import ReactSelect from 'react-select';
 import { IoMdAdd } from "react-icons/io";
 import { MdDelete } from "react-icons/md";
 import Breadcrumb from '../../../components/Breadcrumbs/Breadcrumb';
 import useVoucher from '../../../hooks/useVoucher';
-import { BASE_URL, GETPRODUCTBYSUPPLIER, GET_LEDGERSupplierId__URL, GET_VoucherNos_URL, customStyles as createCustomStyles } from '../../../Constants/utils';
+import { BASE_URL, GET_LEDGERSupplierId__URL, GET_VoucherNos_URL, customStyles as createCustomStyles } from '../../../Constants/utils';
 import { useSelector } from 'react-redux';
-import Modall from '../../Products/Modall';
-import NumberingDetailsModal from './NumberingDetailsModal';
 import { useLocation, useParams } from 'react-router-dom';
 import useLedger from '../../../hooks/useLedger';
-import { use } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { toast } from 'react-toastify';
-import { FaChevronDown, FaChevronUp } from 'react-icons/fa6';
 
+/**
+ * Determine registration location (sxr / delhi) from a GST-registration object or string.
+ */
+const getRegistrationLocation = (gstReg) => {
+    if (!gstReg) return null;
+    const regLower = gstReg?.state?.toLowerCase() || gstReg?.toLowerCase() || '';
+    if (
+        regLower.includes('jammu') ||
+        regLower.includes('kashmir') ||
+        regLower.includes('j&k') ||
+        regLower.includes('jk') ||
+        regLower.includes('sxr')
+    ) {
+        return 'sxr';
+    }
+    if (regLower.includes('delhi') || regLower.includes('ncr') || regLower.includes('nct')) {
+        return 'delhi';
+    }
+    return null;
+};
+
+/**
+ * Determine party (supplier) location from the selected ledger's shipping state,
+ * falling back to the ledger fetched by supplierId.
+ */
+const getPartyLocation = (selectedLedgerOption, custAddress) => {
+    const shippingState = selectedLedgerOption?.obj?.shippingState;
+    if (shippingState === '01') return 'sxr';
+    if (shippingState === '07') return 'delhi';
+    if (custAddress === '01') return 'sxr';
+    if (custAddress === '07') return 'delhi';
+    return null;
+};
+
+/**
+ * Purchase rate calculation.
+ * - Supplier is "Regular" (isRegular = true): MRP is inclusive of GST, so we
+ *   strip GST out to get the excl.-GST base price, and separately track the
+ *   GST amount (this GST amount is postable to an Input GST ledger for ITC,
+ *   and the supplier is owed the FULL mrp, not just the base price).
+ * - Supplier is anything other than Regular (composition/unregistered/etc):
+ *   no GST is applicable on this purchase at all — base price = mrp,
+ *   gstAmount = 0, and nothing gets posted to any GST ledger.
+ */
+const calculatePurchaseRate = (mrp, gstRatePercent, isRegular) => {
+    const rate = isRegular ? (gstRatePercent || 0) : 0;
+
+    const basePrice = rate > 0 ? mrp / (1 + rate / 100) : mrp;
+    const gstAmount = mrp - basePrice;
+
+    return {
+        basePrice,
+        gstAmount,
+        totalAmount: mrp,
+        gstRate: rate
+    };
+};
 
 const CreateVoucherPurchase = () => {
     const { id } = useParams();
     const location = useLocation();
+
     const [ledgerId, setledgerId] = useState(null)
     const [regType, setregType] = useState('')
-    const [gsttype, setgsttype] = useState("")
-
-    const [igstLedid, setigstLedid] = useState(null)
-    const [cgstLedid, setcgstLedid] = useState(null)
-    const [sgstLedid, setsgstLedid] = useState(null)
-
-    const [newShippingState, setnewShippingState] = useState('')
     const [custaddress, setcustaddress] = useState('')
     const [openingbal, setopeningbal] = useState(0)
-    const [showGSTLedgers, setShowGSTLedgers] = useState(false);
-    const [destinationLedgerOptions, setDestinationLedgerOptions] = useState([]);
+    // Gate the form's mount until the supplier ledger is known — the initial
+    // paymentDetails rows are built as soon as the form mounts, so we wait
+    // for the supplier fetch to resolve before rendering the form.
+    const [ledgerLoaded, setLedgerLoaded] = useState(false)
+
+    // Whether the currently-selected supplier is a "Regular" registered dealer.
+    // This is the single switch that decides whether GST is stripped from MRP
+    // and posted to an Input GST ledger, or ignored entirely.
+    const isRegularSupplier = (regType || '').toLowerCase() === 'regular';
 
     const { currentUser } = useSelector((state) => state?.persisted?.user);
     const { token } = currentUser;
-    const { GetVoucherById, Vouchers, CreateVoucherEntry, handleCreateVoucher } = useVoucher();
+    const { GetVoucherById, Vouchers, handleCreateVoucher } = useVoucher();
     const [voucherNos, setvoucherNos] = useState([])
     const { getLedger, Ledger, getLedgerIncome, LedgerIncome } = useLedger();
     const theme = useSelector(state => state?.persisted?.theme);
     const customStyles = createCustomStyles(theme?.mode);
 
-    const [selectedLedger, setSelectedLedger] = useState(null);
     const [availableProducts, setAvailableProducts] = useState([]);
-    const [availableOrders, setavailableOrders] = useState([])
     const [loadingProducts, setLoadingProducts] = useState(false);
-    const [loadingOrders, setloadingOrders] = useState(false)
 
     // Destructure location state
     const {
-        supplierName = '',
         supplierId = '',
-        billStatus = '',
-        billStatusId = '',
         orders = [],
-        igst,
-        cgst,
-        sgst,
-        ledgerIdd = null,
-        totalBillAmount = 0,
-        totalReceivedQty = 0,
-        originalData = null
     } = location.state || {};
 
+    console.log(orders,"47896547896555555555555555555555");
 
 
+    // Real, user-editable order selection (orders passed in via location.state is
+    // just the initial candidate list — it never changes, so it must NOT be used
+    // directly to drive the multi-select's `value`).
+    const [selectedOrderIds, setSelectedOrderIds] = useState(
+        orders?.map(ord => ord?.orderId).filter(Boolean) || []
+    );
 
-
-
-
-
-
-
-    // Get Ledger by ID
+    // ---- Fetch supplier ledger info ----
     const getLedgerId = async () => {
         try {
             const response = await fetch(`${GET_LEDGERSupplierId__URL}/${supplierId}`, {
@@ -94,11 +135,18 @@ const CreateVoucherPurchase = () => {
         } catch (error) {
             console.error(error);
             toast.error("Failed to fetch Ledger");
+        } finally {
+            setLedgerLoaded(true);
         }
     }
 
     useEffect(() => {
-        getLedgerId()
+        if (supplierId) {
+            getLedgerId()
+        } else {
+            // No supplier passed in — nothing to wait for, unblock the form.
+            setLedgerLoaded(true);
+        }
     }, [])
 
     useEffect(() => {
@@ -113,329 +161,66 @@ const CreateVoucherPurchase = () => {
         return Ledger.filter(ledg => ledg?.supplier !== null);
     };
 
-
-
     const LedgerData = getFilteredLedgers()?.map(ledg => ({
         value: ledg?.id,
         label: ledg?.name,
         obj: ledg,
+        gstType:ledg.registrationType,
         balance: ledg?.openingBalances,
         type: ledg?.ledgerType,
         isSupplier: ledg?.supplier !== null
     }));
 
-    // Destination Ledger Options
+    console.log(LedgerData,"4444444444444444440");
+
+
+    // Destination Ledger Options (income/purchase-side ledgers)
     const destinationLedger = LedgerIncome?.map(ledg => ({
         value: ledg?.id,
         label: ledg?.name,
-    }));
+    })) || [];
 
-    // GST Ledgers filtering
-    const igstLedgers = Ledger.filter(ledg =>
-        ledg?.name &&
-        ledg.name.toLowerCase().includes('igst') &&
-        !ledg.name.toLowerCase().includes('sale') &&
-        !ledg.name.toLowerCase().includes('purchase')
-    );
-
-    const cgstLedgers = Ledger.filter(ledg =>
-        ledg?.name &&
-        ledg.name.toLowerCase().includes('cgst') &&
-        !ledg.name.toLowerCase().includes('sale') &&
-        !ledg.name.toLowerCase().includes('purchase')
-    );
-
-    const sgstLedgers = Ledger.filter(ledg =>
-        ledg?.name &&
-        ledg.name.toLowerCase().includes('sgst') &&
-        !ledg.name.toLowerCase().includes('sale') &&
-        !ledg.name.toLowerCase().includes('purchase')
-    );
-
-    const igstOptions = igstLedgers?.map(ledg => ({
+    // Input GST Ledger options — only relevant for Regular suppliers, where the
+    // GST amount stripped out of MRP needs somewhere to post for ITC purposes.
+    // Sourced from the same ledger list as the destination ledger; if you keep
+    // GST ledgers in a separate list, swap this source accordingly.
+    const gstLedgerOptions = LedgerIncome?.filter(ledg =>
+        ledg?.name?.toLowerCase().includes('gst')
+    )?.map(ledg => ({
         value: ledg?.id,
         label: ledg?.name,
-    }));
+    })) || [];
 
-    const cgstOptions = cgstLedgers?.map(ledg => ({
-        value: ledg?.id,
-        label: ledg?.name,
-    }));
+    /**
+     * Pick a single destination ledger. No GST split is posted alongside this
+     * one — it always receives the excl.-GST base amount, regardless of
+     * whether the supplier is Regular or not.
+     */
+    const determineDestinationLedger = (voucherData, destOptions) => {
+        if (!destOptions || destOptions.length === 0) return null;
+        const baseType = 'purchase';
 
-    const sgstOptions = sgstLedgers?.map(ledg => ({
-        value: ledg?.id,
-        label: ledg?.name,
-    }));
-
-    // Function to determine GST ledgers based on state and registration
-    // Function to determine GST ledgers based on state and registration
-    const determineGSTLedgers = (Vouchers, custAddress, isExport, newShippingState, values) => {
-        const defGstRegist = Vouchers?.defGstRegist || '';
-        const typeOfVoucher = Vouchers?.typeOfVoucher || '';
-
-        // If regType is not "regular", no GST applicable
-        if (regType?.toLowerCase() !== "regular") {
-
-            return { igstLedgerId: null, cgstLedgerId: null, sgstLedgerId: null };
-        }
-
-        // If export, no GST
-        if (isExport) {
-
-            return { igstLedgerId: null, cgstLedgerId: null, sgstLedgerId: null };
-        }
-
-        // Determine registration location from GST registration
-        const getRegistrationLocation = (gstReg) => {
-            if (!gstReg) return null;
-            const regLower = gstReg?.state?.toLowerCase() || gstReg?.toLowerCase() || '';
-
-            if (regLower.includes('jammu') || regLower.includes('kashmir') || regLower.includes('j&k') || regLower.includes('jk') || regLower.includes('sxr')) {
-                return 'sxr';
-            } else if (regLower.includes('delhi') || regLower.includes('ncr') || regLower.includes('nct')) {
-                return 'delhi';
-            }
-            return null;
-        };
-
-        // Get supplier state from selected ledger
-        const getPartyState = () => {
-            const selectedLedgerOption = LedgerData.find(opt => opt.value === values.ledgerId);
-
-
-            if (selectedLedgerOption?.obj?.shippingState) {
-                const state = selectedLedgerOption.obj.shippingState;
-
-                if (state === '01') return 'sxr';
-                if (state === '07') return 'delhi';
-            }
-            // Check from custaddress
-            if (custAddress === '01') return 'sxr';
-            if (custAddress === '07') return 'delhi';
-            return null;
-        };
-
-        const registrationLocation = getRegistrationLocation(defGstRegist);
-        const partyLocation = getPartyState();
-
-
-
-        let igstLedgerId = null;
-        let cgstLedgerId = null;
-        let sgstLedgerId = null;
-
-        // If no registration location, default logic
-        if (!registrationLocation) {
-
-            const anyIgst = igstOptions.find(opt =>
-                opt.label.toLowerCase().includes('input') && opt.label.toLowerCase().includes('igst')
-            );
-            igstLedgerId = anyIgst?.value || null;
-            return { igstLedgerId, cgstLedgerId, sgstLedgerId };
-        }
-
-        // If no party location, we can't determine - use IGST as fallback
-        if (!partyLocation) {
-
-            const anyIgst = igstOptions.find(opt =>
-                opt.label.toLowerCase().includes('input') && opt.label.toLowerCase().includes('igst')
-            );
-            igstLedgerId = anyIgst?.value || null;
-            return { igstLedgerId, cgstLedgerId, sgstLedgerId };
-        }
-
-        // Check if same state or different state
-        if (registrationLocation === partyLocation) {
-            // Same state transaction - CGST + SGST
-
-
-            if (typeOfVoucher.toLowerCase() === "purchase") {
-                let cgstState = null;
-                let sgstState = null;
-
-                if (registrationLocation === 'sxr') {
-                    cgstState = cgstOptions.find(opt =>
-                        opt.label.toLowerCase().includes('input') &&
-                        opt.label.toLowerCase().includes('cgst') &&
-                        (opt.label.toLowerCase().includes('sxr') ||
-                            opt.label.toLowerCase().includes('j&k') ||
-                            opt.label.toLowerCase().includes('jammu') ||
-                            opt.label.toLowerCase().includes('kashmir'))
-                    );
-
-                    sgstState = sgstOptions.find(opt =>
-                        opt.label.toLowerCase().includes('input') &&
-                        opt.label.toLowerCase().includes('sgst') &&
-                        (opt.label.toLowerCase().includes('sxr') ||
-                            opt.label.toLowerCase().includes('j&k') ||
-                            opt.label.toLowerCase().includes('jammu') ||
-                            opt.label.toLowerCase().includes('kashmir'))
-                    );
-                } else {
-                    cgstState = cgstOptions.find(opt =>
-                        opt.label.toLowerCase().includes('input') &&
-                        opt.label.toLowerCase().includes('cgst') &&
-                        opt.label.toLowerCase().includes('delhi')
-                    );
-
-                    sgstState = sgstOptions.find(opt =>
-                        opt.label.toLowerCase().includes('input') &&
-                        opt.label.toLowerCase().includes('sgst') &&
-                        opt.label.toLowerCase().includes('delhi')
-                    );
-                }
-
-                // Fallback to any Input CGST/SGST if specific location not found
-                if (!cgstState) {
-                    cgstState = cgstOptions.find(opt =>
-                        opt.label.toLowerCase().includes('input') && opt.label.toLowerCase().includes('cgst')
-                    );
-                }
-                if (!sgstState) {
-                    sgstState = sgstOptions.find(opt =>
-                        opt.label.toLowerCase().includes('input') && opt.label.toLowerCase().includes('sgst')
-                    );
-                }
-
-                cgstLedgerId = cgstState?.value || null;
-                sgstLedgerId = sgstState?.value || null;
-                setcgstLedid(cgstLedgerId);
-                setsgstLedid(sgstLedgerId);
-
-            }
-        } else {
-            // Different state transaction - IGST
-
-
-            if (typeOfVoucher.toLowerCase() === "purchase") {
-                let igstState = null;
-
-                if (registrationLocation === 'sxr') {
-                    igstState = igstOptions.find(opt =>
-                        opt.label.toLowerCase().includes('input') &&
-                        opt.label.toLowerCase().includes('igst') &&
-                        (opt.label.toLowerCase().includes('sxr') ||
-                            opt.label.toLowerCase().includes('j&k') ||
-                            opt.label.toLowerCase().includes('jammu') ||
-                            opt.label.toLowerCase().includes('kashmir'))
-                    );
-                } else {
-                    igstState = igstOptions.find(opt =>
-                        opt.label.toLowerCase().includes('input') &&
-                        opt.label.toLowerCase().includes('igst') &&
-                        opt.label.toLowerCase().includes('delhi')
-                    );
-                }
-
-                // Fallback to any Input IGST
-                if (!igstState) {
-                    igstState = igstOptions.find(opt =>
-                        opt.label.toLowerCase().includes('input') && opt.label.toLowerCase().includes('igst')
-                    );
-                }
-
-                igstLedgerId = igstState?.value || null;
-                setigstLedid(igstLedgerId);
-
-            }
-        }
-
-
-        return { igstLedgerId, cgstLedgerId, sgstLedgerId };
+        return destOptions.find(opt =>
+            opt.label?.toLowerCase().includes(baseType) &&
+            !opt.label?.toLowerCase().includes('export')
+        )?.value || destOptions.find(opt =>
+            opt.label?.toLowerCase().includes(baseType)
+        )?.value || null;
     };
 
-    // Function to determine Destination Ledger
-    const determineDestinationLedger = (Vouchers, custAddress, isExport, destinationLedgerOptions, newShippingState, values) => {
-        const typeOfVoucher = Vouchers?.typeOfVoucher?.toLowerCase() || '';
-        const defGstRegist = Vouchers?.defGstRegist || '';
-
-        // If regType is not "regular", use Purchase ledger without GST
-        if (regType?.toLowerCase() !== "regular") {
-            return destinationLedgerOptions?.find(opt =>
-                opt.label?.toLowerCase().includes('purchase') &&
-                !opt.label?.toLowerCase().includes('igst') &&
-                !opt.label?.toLowerCase().includes('cgst') &&
-                !opt.label?.toLowerCase().includes('sgst')
-            )?.value || null;
-        }
-
-        // Get registration location
-        const getRegistrationLocation = (gstReg) => {
-            if (!gstReg) return null;
-            const regLower = gstReg?.state?.toLowerCase() || gstReg?.toLowerCase() || '';
-
-            if (regLower.includes('jammu') || regLower.includes('kashmir') || regLower.includes('j&k') || regLower.includes('jk') || regLower.includes('sxr')) {
-                return 'sxr';
-            } else if (regLower.includes('delhi') || regLower.includes('ncr') || regLower.includes('nct')) {
-                return 'delhi';
-            }
-            return null;
-        };
-
-        const getPartyState = () => {
-            const selectedLedgerOption = LedgerData.find(opt => opt.value === values.ledgerId);
-
-
-            if (selectedLedgerOption?.obj?.shippingState) {
-                const state = selectedLedgerOption?.obj?.shippingState;
-
-
-                if (state === '01') return 'sxr';
-                if (state === '07') return 'delhi';
-            }
-            if (custAddress === '01') return 'sxr';
-            if (custAddress === '07') return 'delhi';
-            return null;
-        };
-
-        const registrationLocation = getRegistrationLocation(defGstRegist);
-        const partyLocation = getPartyState();
-
-
-
-        const baseType = 'Purchase';
-
-        if (isExport) {
-            return destinationLedgerOptions?.find(opt =>
-                opt.label?.toLowerCase().includes(`${baseType} Export`.toLowerCase())
-            )?.value || null;
-        }
-
-        if (!registrationLocation) {
-            return destinationLedgerOptions?.find(opt =>
-                opt.label?.toLowerCase().includes(baseType.toLowerCase())
-            )?.value || null;
-        }
-
-        if (registrationLocation === partyLocation && partyLocation) {
-            // Same state - Purchase Local
-            const localLedger = destinationLedgerOptions?.find(opt =>
-                opt.label?.toLowerCase().includes(`${baseType} Local`.toLowerCase()) &&
-                opt.label?.toLowerCase().includes(registrationLocation)
-            );
-            if (localLedger) return localLedger.value;
-
-            // Fallback
-            return destinationLedgerOptions?.find(opt =>
-                opt.label?.toLowerCase().includes(baseType.toLowerCase()) &&
-                opt.label?.toLowerCase().includes('local')
-            )?.value || null;
-        } else {
-            // Different state - Purchase IGST
-            const igstLedger = destinationLedgerOptions?.find(opt =>
-                opt.label?.toLowerCase().includes(`${baseType} IGST`.toLowerCase()) &&
-                opt.label?.toLowerCase().includes(registrationLocation)
-            );
-            if (igstLedger) return igstLedger.value;
-
-            // Fallback
-            return destinationLedgerOptions?.find(opt =>
-                opt.label?.toLowerCase().includes(baseType.toLowerCase()) &&
-                opt.label?.toLowerCase().includes('igst')
-            )?.value || null;
-        }
+    /**
+     * Pick a single Input GST ledger — e.g. "Input IGST", "Input CGST".
+     * Prefers a label containing "input" + "gst"; falls back to any "gst" ledger.
+     */
+    const determineGstLedger = (gstOptions) => {
+        if (!gstOptions || gstOptions.length === 0) return null;
+        return gstOptions.find(opt =>
+            opt.label?.toLowerCase().includes('input') &&
+            opt.label?.toLowerCase().includes('gst')
+        )?.value || gstOptions[0]?.value || null;
     };
 
+    // ---- Voucher numbering ----
     const GetVoucherNos = async () => {
         try {
             const response = await fetch(`${GET_VoucherNos_URL}/${Vouchers.id}`, {
@@ -446,6 +231,8 @@ const CreateVoucherPurchase = () => {
                 },
             });
             const data = await response.json();
+            console.log(data,'4444444444444444444444444444444444444444444444444444444444448');
+            
             if (response.ok) {
                 setvoucherNos(data);
                 return data;
@@ -468,15 +255,19 @@ const CreateVoucherPurchase = () => {
     }, [Vouchers.id]);
 
     let lastvoucher = 0;
-    if (voucherNos?.receipts?.length > 0) {
-        lastvoucher = Number(voucherNos.receipts[voucherNos.receipts.length - 1]) || 0;
+    if (voucherNos.nextReceipt) {
+        lastvoucher = Number(voucherNos.nextReceipt) || 0;
     }
+    
     const nextVoucher = lastvoucher + 1;
+    console.log(nextVoucher,"333333333333330");
 
+    // ---- Fetch products for the currently-selected orders ----
     const handleOrderSelect = async (selectedValues) => {
         setAvailableProducts([]);
         if (!selectedValues || selectedValues.length === 0) return;
 
+        setLoadingProducts(true);
         try {
             const orderIdsParam = selectedValues.join(',');
             const response = await fetch(`${BASE_URL}/order/order-products/by-order-ids?orderIds=${orderIdsParam}`, {
@@ -488,15 +279,16 @@ const CreateVoucherPurchase = () => {
             });
             const data = await response.json();
 
-
-
             if (response.ok && Array.isArray(data)) {
                 const productOptions = data.map(prod => ({
                     value: prod.product.id,
                     orderProdId: prod.id,
+                    orderId: prod.orderId,
                     label: prod.product.productId,
+                    productName: prod.product?.productDescription,
                     price: prod.product?.retailMrp,
-                    hsnCode: prod.product?.hsnCode || '',
+                    hsnCode: prod.product?.hsnCode || {},
+                    gstRate: prod.product?.hsnCode?.igst ?? 0,
                     obj: prod
                 }));
                 setAvailableProducts(productOptions);
@@ -508,12 +300,15 @@ const CreateVoucherPurchase = () => {
         }
     }
 
+    // Fetch products for the initial order selection once on mount
     useEffect(() => {
-        handleOrderSelect()
-    }, [orders])
+        if (selectedOrderIds.length > 0) {
+            handleOrderSelect(selectedOrderIds);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-
-    const getUsedproductsIds = (values, currentIndex) => {
+    const getUsedProductIds = (values, currentIndex) => {
         return values.paymentDetails
             .filter((_, index) => index !== currentIndex)
             .map(item => item.productsId)
@@ -521,53 +316,34 @@ const CreateVoucherPurchase = () => {
     };
 
     const getAvailableProductsForRow = (values, currentIndex) => {
-        const usedproductsIds = getUsedproductsIds(values, currentIndex);
-
-
+        const usedProductIds = getUsedProductIds(values, currentIndex);
         return availableProducts.filter(product =>
-            !usedproductsIds.includes(product.value)
+            !usedProductIds.includes(product.value)
         );
     };
 
-    const calculateLineTotalForPur = (entry) => {
-        const basePrice = entry.mrp || 0;
-        const quantity = entry.quantity || 1;
-        return (basePrice * quantity).toFixed(2);
-    };
-
     const calculateTotals = (values) => {
-        let totalBasePrice = 0;  // Total excluding GST (goes to Supplier Ledger)
-        let totalGSTAmount = 0;  // Total GST amount (goes to GST Ledgers)
-        let totalMRP = 0;        // Total including GST (goes to Destination Ledger)
+        let totalBasePrice = 0;   // Excl. GST — always goes to the Destination ledger
+        let totalGSTAmount = 0;   // Only posted to an Input GST ledger if supplier is Regular
+        let totalMRP = 0;         // Inc. GST — what the supplier is actually owed if Regular
         let totalQuantity = 0;
-        let totalCGST = 0;
-        let totalSGST = 0;
-        let totalIGST = 0;
 
-        values.paymentDetails.forEach(entry => {
+        (values.paymentDetails || []).forEach(entry => {
             const quantity = entry.quantity || 1;
-            const basePrice = entry.basePrice || entry.rate || entry.mrp || 0;
+            const basePrice = entry.basePrice ?? entry.rate ?? entry.mrp ?? 0;
             const mrp = entry.mrp || 0;
 
             totalBasePrice += basePrice * quantity;
             totalMRP += mrp * quantity;
             totalQuantity += quantity;
-
-            // GST amounts
-            totalIGST += (entry.igstAmount || 0) * quantity;
-            totalCGST += (entry.cgstAmount || 0) * quantity;
-            totalSGST += (entry.sgstAmount || 0) * quantity;
-            totalGSTAmount += (entry.igstAmount || 0) * quantity + (entry.cgstAmount || 0) * quantity + (entry.sgstAmount || 0) * quantity;
+            totalGSTAmount += (entry.gstAmount || 0) * quantity;
         });
 
         return {
-            totalBasePrice: totalBasePrice.toFixed(2),  // For Supplier Ledger
-            totalGSTAmount: totalGSTAmount.toFixed(2),  // For GST Ledgers
-            totalMRP: totalMRP.toFixed(2),              // For Destination Ledger
-            totalQuantity: totalQuantity,
-            totalIGST: totalIGST.toFixed(2),
-            totalCGST: totalCGST.toFixed(2),
-            totalSGST: totalSGST.toFixed(2)
+            totalBasePrice: totalBasePrice.toFixed(2),
+            totalGSTAmount: totalGSTAmount.toFixed(2),
+            totalMRP: totalMRP.toFixed(2),
+            totalQuantity
         };
     };
 
@@ -578,8 +354,79 @@ const CreateVoucherPurchase = () => {
         ledgerId: Yup.string().required('Party account is required'),
     });
 
+    const buildInitialPaymentDetails = () => {
+        const rows = [];
+        selectedOrderIds.forEach(orderId => {
 
-    console.log(orders, "0000000000");
+            const order = orders.find(o => o?.orderId === orderId);
+            console.log(order,"454545");
+            if (!order) return;
+
+            if (Array.isArray(order.products) && order.products.length > 0) {
+                order.products.forEach(orderProduct => {
+                    const mrp = orderProduct?.product?.retailMrp || 0;
+                    // GST rate always lives at product.hsnCode.igst
+                    const gstRate = orderProduct?.product?.hsnCode?.igst || 0;
+                    const quantity = orderProduct?.receivedQuantity || 1;
+                    const rateCalc = calculatePurchaseRate(mrp, gstRate, isRegularSupplier);
+
+                    rows.push({
+                        id: uuidv4(),
+                        productsId: orderProduct?.product?.id || null,
+                        orderProductId: orderProduct?.id || null,
+                        orderId: order?.orderId,
+                        productName: orderProduct?.product?.productDescription || '',
+                        mrp,
+                        rate: rateCalc.basePrice,
+                        basePrice: rateCalc.basePrice,
+                        gstRate,
+                        gstAmount: rateCalc.gstAmount,
+                        discount: 0,
+                        quantity,
+                        value: rateCalc.basePrice * quantity,
+                        voucherAmount: rateCalc.basePrice * quantity,
+                    });
+                });
+            } else {
+                const mrp = order?.productCost || 0;
+                // GST rate always lives at hsnCode.igst
+                const gstRate = order?.product?.hsnCode?.igst || order?.igst || 0;
+                const quantity = order?.receivedQty || 1;
+                const rateCalc = calculatePurchaseRate(mrp, gstRate, isRegularSupplier);
+
+                rows.push({
+                    id: uuidv4(),
+                    productsId: order?.productId || null,
+                    orderProductId: null,
+                    orderId: order?.orderId,
+                    productName: order?.ProductIdString || '',
+                    mrp,
+                    rate: rateCalc.basePrice,
+                    basePrice: rateCalc.basePrice,
+                    gstRate,
+                    gstAmount: rateCalc.gstAmount,
+                    discount: 0,
+                    quantity,
+                    value: rateCalc.basePrice * quantity,
+                    voucherAmount: rateCalc.basePrice * quantity,
+                });
+            }
+        });
+
+        return rows.filter(row => row.quantity > 0);
+    };
+
+    if (!ledgerLoaded) {
+        return (
+            <DefaultLayout>
+                <Breadcrumb pageName="Configurator/Create Voucher" />
+                <div className="flex items-center justify-center p-10 text-gray-500">
+                    Loading supplier details...
+                </div>
+            </DefaultLayout>
+        );
+    }
+    console.log(Vouchers,"111111111111111111111111111");
 
 
     return (
@@ -587,482 +434,212 @@ const CreateVoucherPurchase = () => {
             <Breadcrumb pageName="Configurator/Create Voucher" />
             <div>
                 <Formik
+                key={nextVoucher}
+                 
                     initialValues={{
-                        recieptNumber: `${nextVoucher}`,
+                        recieptNumber: nextVoucher,
                         supplierInvoiceNumber: '',
                         date: new Date().toISOString().split('T')[0],
                         voucherId: Number(id),
-                        ledgerId: ledgerId,
-                        orderIds: orders && orders?.map(ord => ord?.orderId),
-                        currentBalance: openingbal || 0,
+                        ledgerId: null,
+                        orderIds: selectedOrderIds,
+                        currentBalance: 0,
                         gstRegistration: Vouchers?.defGstRegist?.state || "",
                         destinationLedgerId: null,
+                        gstLedgerId: null,
+                        locationId:Vouchers?.defGstRegist?.id,
                         narration: "",
                         modeOfPayment: "",
-                        igstLedgerId: igstLedid || null,
-                        cgstLedgerId: cgstLedid || null,
-                        sgstLedgerId: sgstLedid || null,
                         chequeNumber: "",
                         cardNumber: "",
                         transactionId: "",
-                        isExport: false,
-                        totalAmount: orders.reduce((total, order) => total + (order.totalAmount || 0), 0),
-                        totalIgst: 0,
-
-                        totalSgst: 0,
-                        totalCgst: 0,
-                        totalGst: 0,
-                        paymentDetails: orders?.map(order => {
-
-                            if (order && order.length > 0) {
-                                return order.map(orderProduct => ({
-                                    id: uuidv4(),
-                                    productsId: orderProduct?.ProductIdString || null,
-                                    orderProductId: orderProduct?.id || null,
-                                    orderId: order?.orderId,
-                                    mrp: orderProduct?.product?.retailMrp || 0,
-                                    rate: orderProduct?.product?.retailMrp || 0,
-                                    exclusiveGst: orderProduct?.product?.retailMrp || 0,
-                                    discount: 0,
-                                    quantity: orderProduct?.receivedQuantity || 1,
-                                    value: (orderProduct?.product?.retailMrp || 0) * (orderProduct?.receivedQuantity || 1),
-                                    voucherAmount: (orderProduct?.product?.retailMrp || 0) * (orderProduct?.receivedQuantity || 1),
-                                    igstRate: order?.igst,
-                                    cgstRate: order?.cgst,
-                                    sgstRate: order?.sgst,
-                                    gstAmount: 0,
-                                    gstCalculation: null,
-                                    productName: orderProduct.product?.productDescription
-                                }));
-                            }
-                            return {
-                                id: uuidv4(),
-                                productsId: order.productId || null,
-                                orderProductId: null,
-                                productName: order?.ProductIdString || '',
-                                orderId: order.orderId,
-                                mrp: order.productCost || 0,
-                                rate: order.productCost || 0,
-                                igst: order?.Igst || 0,
-                                cgst: order?.Cgst || 0,
-                                sgst: order?.Sgst || 0,
-                                exclusiveGst: order.productCost || 0,
-                                discount: 0,
-                                quantity: order.receivedQty || 1,
-                                value: (order.productCost || 0) * (order.receivedQty || 1),
-                                voucherAmount: order.totalAmount || 0,
-                                igstRate: 0,
-                                gstAmount: 0,
-                                gstCalculation: null
-                            };
-                        }).filter(item => item.quantity > 0)
+                        totalAmount: 0,
+                        paymentDetails: buildInitialPaymentDetails()
                     }}
-                    enableReinitialize={true}
+                    enableReinitialize={false}
                     validationSchema={validationSchema}
                     onSubmit={async (values, { setSubmitting }) => {
                         const totals = calculateTotals(values);
 
                         const payload = {
                             ...values,
-                            // Amount to be credited to Supplier Ledger (Base Price excluding GST)
-                            totalAmount: parseFloat(totals.totalBasePrice),
-                            // Amount to be debited to Destination Ledger (MRP including GST)
-                            destinationAmount: parseFloat(totals.totalMRP),
-                            // GST amounts for respective ledgers
-                            totalIgst: parseFloat(totals.totalIGST),
-                            totalCgst: parseFloat(totals.totalCGST),
-                            totalSgst: parseFloat(totals.totalSGST),
-                            // GST rates
-                            igstRate: values.paymentDetails[0]?.igstRate || 0,
-                            cgstRate: values.paymentDetails[0]?.cgstRate || 0,
-                            sgstRate: values.paymentDetails[0]?.sgstRate || 0
+                            // Destination (purchase) ledger always gets the excl.-GST base amount.
+                            destinationAmount: parseFloat(totals.totalBasePrice),
+                            // Regular supplier: full MRP (incl. GST) is what's actually owed, and
+                            // the GST portion is booked separately to the Input GST ledger for ITC.
+                            // Non-regular supplier: nothing to split, owed amount = base amount,
+                            // no GST ledger posting at all.
+                            totalAmount: isRegularSupplier
+                                ? parseFloat(totals.totalMRP)
+                                : parseFloat(totals.totalBasePrice),
+                            gstAmount: isRegularSupplier ? parseFloat(totals.totalGSTAmount) : 0,
+                            gstLedgerId: isRegularSupplier ? values.gstLedgerId : null,
+                            locationId:Vouchers.defGstRegist.id,
                         };
 
-                        await handleCreateVoucher(payload, setSubmitting);
+                        await handleCreateVoucher(payload);
                     }}
                 >
                     {({ isSubmitting, setFieldValue, values }) => {
                         const totals = calculateTotals(values);
 
-                        // Recalculate GST when regType or isExport changes
+                        // Seed ledgerId ONCE from the fetched supplier — never overwrite a
+                        // user's manual selection afterward.
                         useEffect(() => {
-                            if (values.paymentDetails && values.paymentDetails.length > 0 && values.ledgerId) {
-                                // Get registration and party locations
-                                const defGstRegist = Vouchers?.defGstRegist || '';
-
-                                const getRegistrationLocation = (gstReg) => {
-                                    if (!gstReg) return null;
-                                    const regLower = gstReg?.state?.toLowerCase() || gstReg?.toLowerCase() || '';
-                                    if (regLower.includes('jammu') || regLower.includes('kashmir') || regLower.includes('j&k') || regLower.includes('jk') || regLower.includes('sxr')) {
-                                        return 'sxr';
-                                    } else if (regLower.includes('delhi') || regLower.includes('ncr') || regLower.includes('nct')) {
-                                        return 'delhi';
-                                    }
-                                    return null;
-                                };
-
-                                const getPartyState = () => {
-                                    const selectedLedgerOption = LedgerData.find(opt => opt.value === values.ledgerId);
-                                    if (selectedLedgerOption?.obj?.shippingState) {
-                                        const state = selectedLedgerOption.obj.shippingState;
-                                        if (state === '01') return 'sxr';
-                                        if (state === '07') return 'delhi';
-                                    }
-                                    if (custaddress === '01') return 'sxr';
-                                    if (custaddress === '07') return 'delhi';
-                                    return null;
-                                };
-
-                                const registrationLocation = getRegistrationLocation(defGstRegist);
-                                const partyLocation = getPartyState();
-                                const gstType = determineProductGSTType(registrationLocation, partyLocation);
-
-                                values.paymentDetails.forEach((entry, index) => {
-                                    const mrp = entry.mrp || 0;
-
-                                    let igstRate = entry.igstRate || 0;
-                                    let cgstRate = entry.cgstRate || 0;
-                                    let sgstRate = entry.sgstRate || 0;
-
-                                    // Create GST calculation object
-                                    let gstCalculation = null;
-
-
-
-
-                                    if (regType?.toLowerCase() === "regular" && !values.isExport) {
-                                        if (gstType === 'IGST') {
-                                            gstCalculation = {
-                                                type: 'IGST',
-                                                igstRate: igstRate,
-                                                cgstRate: 0,
-                                                sgstRate: 0,
-                                                registrationLocation,
-                                                partyLocation
-                                            };
-                                        } else {
-                                            gstCalculation = {
-                                                type: 'CGST+SGST',
-                                                igstRate: 0,
-                                                cgstRate: cgstRate,
-                                                sgstRate: sgstRate,
-                                                registrationLocation,
-                                                partyLocation
-                                            };
-                                        }
-                                    }
-
-                                    const rateCalculation = calculatePurchaseRate(mrp, gstCalculation, regType, values.isExport);
-
-                                    setFieldValue(`paymentDetails.${index}.basePrice`, rateCalculation.basePrice);
-                                    setFieldValue(`paymentDetails.${index}.rate`, rateCalculation.basePrice);
-                                    setFieldValue(`paymentDetails.${index}.gstCalculation`, gstCalculation);
-                                    setFieldValue(`paymentDetails.${index}.igstAmount`, rateCalculation.igstAmount);
-                                    setFieldValue(`paymentDetails.${index}.cgstAmount`, rateCalculation.cgstAmount);
-                                    setFieldValue(`paymentDetails.${index}.sgstAmount`, rateCalculation.sgstAmount);
-                                    setFieldValue(`paymentDetails.${index}.value`, rateCalculation.basePrice * (entry.quantity || 1));
-                                    setFieldValue(`paymentDetails.${index}.voucherAmount`, rateCalculation.totalAmount * (entry.quantity || 1));
-                                });
+                            if (ledgerId && !values.ledgerId) {
+                                setFieldValue('ledgerId', ledgerId);
+                                setFieldValue('currentBalance', openingbal || 0);
                             }
-                        }, [regType, values.isExport]);
+                            // eslint-disable-next-line react-hooks/exhaustive-deps
+                        }, [ledgerId]);
 
+                        // Keep totalAmount in sync — full MRP if Regular (what's owed to
+                        // supplier), excl.-GST base amount otherwise.
                         useEffect(() => {
-                            if (Vouchers && Vouchers?.typeOfVoucher?.toLowerCase() === "purchase" && destinationLedger?.length > 0) {
-                                const selectedValue = determineDestinationLedger(
-                                    Vouchers,
-                                    custaddress,
-                                    values.isExport,
-                                    destinationLedger,
-                                    newShippingState,
-                                    values
-                                );
+                            setFieldValue(
+                                'totalAmount',
+                                isRegularSupplier ? parseFloat(totals.totalMRP) : parseFloat(totals.totalBasePrice)
+                            );
+                            // eslint-disable-next-line react-hooks/exhaustive-deps
+                        }, [totals.totalBasePrice, totals.totalMRP, isRegularSupplier]);
+
+                        // Supplier's registration type changed (new supplier picked, or the
+                        // initial fetch resolved) — recompute every row's excl.-GST rate since
+                        // whether GST applies at all now depends on isRegularSupplier.
+                        // Rebuilt in one setFieldValue call to avoid the stale-row race where
+                        // only the last-touched row picks up the new rate.
+                        useEffect(() => {
+                            if (!values.paymentDetails || values.paymentDetails.length === 0) return;
+
+                            const updatedPaymentDetails = values.paymentDetails.map(entry => {
+                                const mrp = entry.mrp || 0;
+                                const gstRate = entry.gstRate || 0;
+                                const quantity = entry.quantity || 1;
+                                const rateCalculation = calculatePurchaseRate(mrp, gstRate, isRegularSupplier);
+
+                                return {
+                                    ...entry,
+                                    basePrice: rateCalculation.basePrice,
+                                    rate: rateCalculation.basePrice,
+                                    gstAmount: rateCalculation.gstAmount,
+                                    value: rateCalculation.basePrice * quantity,
+                                    voucherAmount: rateCalculation.basePrice * quantity,
+                                };
+                            });
+
+                            setFieldValue('paymentDetails', updatedPaymentDetails);
+                            // eslint-disable-next-line react-hooks/exhaustive-deps
+                        }, [isRegularSupplier]);
+
+                        // Auto-pick destination ledger once options are available
+                        useEffect(() => {
+                            if (Vouchers?.typeOfVoucher?.toLowerCase() === "purchase" && destinationLedger.length > 0) {
+                                const selectedValue = determineDestinationLedger(Vouchers, destinationLedger);
                                 if (selectedValue && selectedValue !== values.destinationLedgerId) {
                                     setFieldValue('destinationLedgerId', selectedValue);
                                 }
                             }
-                        }, [Vouchers?.typeOfVoucher, Vouchers?.defGstRegist, values, custaddress, destinationLedger, values, regType]);
+                            // eslint-disable-next-line react-hooks/exhaustive-deps
+                        }, [Vouchers?.typeOfVoucher, destinationLedger.length]);
 
-                        // Auto-select GST Ledgers
-                        // Auto-select GST Ledgers
+                        // Auto-pick Input GST ledger — only when the supplier is Regular and
+                        // there's actually GST to post; cleared otherwise.
                         useEffect(() => {
-
-
-                            if (!Vouchers || !values.ledgerId || !regType) {
-
-                                return;
-                            }
-
-                            if (Vouchers?.typeOfVoucher?.toLowerCase() === "purchase" &&
-                                Vouchers?.defGstRegist &&
-                                regType === "regular") {
-
-                                const { igstLedgerId, cgstLedgerId, sgstLedgerId } = determineGSTLedgers(
-                                    Vouchers,
-                                    custaddress,
-                                    values.isExport,
-                                    newShippingState,
-                                    values
-                                );
-
-
-
-                                if (igstLedgerId && igstLedgerId !== values.igstLedgerId) {
-                                    setFieldValue('igstLedgerId', igstLedgerId);
+                            if (isRegularSupplier && gstLedgerOptions.length > 0) {
+                                const selectedValue = determineGstLedger(gstLedgerOptions);
+                                if (selectedValue && selectedValue !== values.gstLedgerId) {
+                                    setFieldValue('gstLedgerId', selectedValue);
                                 }
-                                if (cgstLedgerId && cgstLedgerId !== values.cgstLedgerId) {
-                                    setFieldValue('cgstLedgerId', cgstLedgerId);
-                                }
-                                if (sgstLedgerId && sgstLedgerId !== values.sgstLedgerId) {
-                                    setFieldValue('sgstLedgerId', sgstLedgerId);
-                                }
-                            } else if (regType && regType?.toLowerCase() !== "regular") {
-
-                                setFieldValue('igstLedgerId', null);
-                                setFieldValue('cgstLedgerId', null);
-                                setFieldValue('sgstLedgerId', null);
+                            } else if (!isRegularSupplier && values.gstLedgerId) {
+                                setFieldValue('gstLedgerId', null);
                             }
-                        }, [Vouchers, regType, custaddress, newShippingState, values]);
-
-                        useEffect(() => {
-                            if (ledgerId && Vouchers?.typeOfVoucher?.toLowerCase() === "purchase") {
-                                // This will trigger the GST useEffect above
-                                setFieldValue('ledgerId', ledgerId);
-                            }
-                        }, [ledgerId]);
-                        useEffect(() => {
-                            setFieldValue('totalAmount', totals.subtotal);
-                        }, [totals.subtotal, setFieldValue]);
+                            // eslint-disable-next-line react-hooks/exhaustive-deps
+                        }, [isRegularSupplier, gstLedgerOptions.length]);
 
                         const handleDestinationLedgerChange = (option) => {
                             setFieldValue('destinationLedgerId', option?.value || '');
                         };
 
-                        const handleIgstLedgerChange = (option) => {
-                            setFieldValue('igstLedgerId', option?.value || '');
+                        const handleGstLedgerChange = (option) => {
+                            setFieldValue('gstLedgerId', option?.value || '');
                         };
 
-                        const handleCgstLedgerChange = (option) => {
-                            setFieldValue('cgstLedgerId', option?.value || '');
+                        const handleOrdersChange = (selectedOptions) => {
+                            const selectedValues = selectedOptions?.map(option => option.value) || [];
+                            setSelectedOrderIds(selectedValues);
+                            setFieldValue('orderIds', selectedValues);
+                            // Drop any payment rows whose order was deselected
+                            setFieldValue(
+                                'paymentDetails',
+                                values.paymentDetails.filter(pd => selectedValues.includes(pd.orderId))
+                            );
+                            handleOrderSelect(selectedValues);
                         };
 
-                        const handleSgstLedgerChange = (option) => {
-                            setFieldValue('sgstLedgerId', option?.value || '');
+                        const handleRemoveProduct = (index) => {
+                            const updated = values.paymentDetails.map((row, i) =>
+                                i === index
+                                    ? {
+                                          ...row,
+                                          productsId: null,
+                                          orderProductId: null,
+                                          productName: '',
+                                          mrp: 0,
+                                          rate: 0,
+                                          basePrice: 0,
+                                          gstAmount: 0,
+                                          gstRate: 0,
+                                          value: 0,
+                                          voucherAmount: 0,
+                                      }
+                                    : row
+                            );
+                            setFieldValue('paymentDetails', updated);
                         };
 
+                        const handleProductChange = (option, index, entry) => {
+                            const mrp = option?.price || 0;
+                            const gstRate = option?.gstRate || 0;
+                            const rateCalculation = calculatePurchaseRate(mrp, gstRate, isRegularSupplier);
+                            const quantity = entry.quantity || 1;
 
+                            const updated = values.paymentDetails.map((row, i) =>
+                                i === index
+                                    ? {
+                                          ...row,
+                                          productsId: option?.value || null,
+                                          orderProductId: option?.orderProdId || null,
+                                          orderId: option?.orderId || row.orderId || null,
+                                          productName: option?.productName || '',
+                                          mrp,
+                                          gstRate,
+                                          basePrice: rateCalculation.basePrice,
+                                          rate: rateCalculation.basePrice,
+                                          gstAmount: rateCalculation.gstAmount,
+                                          value: rateCalculation.basePrice * quantity,
+                                          voucherAmount: rateCalculation.basePrice * quantity,
+                                      }
+                                    : row
+                            );
+                            setFieldValue('paymentDetails', updated);
+                        };
 
-                        // Function to calculate purchase rate based on MRP and GST
-                        const calculatePurchaseRate = (mrp, gstCalculation, regType, isExport) => {
+                        const handleQuantityChange = (e, index) => {
+                            const quantity = parseFloat(e.target.value) || 1;
 
-                            console.log(gstCalculation,"7788");
-                            
-                            // If not regular supplier or export, no GST - rate = MRP
-                            if (regType?.toLowerCase() !== "regular" || isExport) {
+                            const updated = values.paymentDetails.map((row, i) => {
+                                if (i !== index) return row;
+                                const basePrice = row.basePrice ?? row.mrp ?? 0;
                                 return {
-                                    basePrice: mrp,
-                                    gstAmount: 0,
-                                    totalAmount: mrp,
-                                    cgstAmount: 0,
-                                    sgstAmount: 0,
-                                    igstAmount: 0,
-                                    cgstRate: 0,
-                                    sgstRate: 0,
-                                    igstRate: 0
+                                    ...row,
+                                    quantity,
+                                    value: basePrice * quantity,
+                                    voucherAmount: basePrice * quantity,
                                 };
-                            }
-                            // console.log(gstCalculation, "555555552");
-
-
-                            // For regular supplier with GST
-                            if (gstCalculation?.type === 'IGST') {
-                                // MRP is inclusive of GST, calculate base price (excluding GST)
-                                const igstRate = gstCalculation.igstRate || 0;
-                                const basePrice = mrp / (1 + (igstRate / 100));
-                                const igstAmount = mrp - basePrice;
-
-                                return {
-                                    basePrice: basePrice,
-                                    gstAmount: igstAmount,
-                                    totalAmount: mrp,
-                                    igstAmount: igstAmount,
-                                    cgstAmount: 0,
-                                    sgstAmount: 0,
-                                    igstRate: igstRate,
-                                    cgstRate: 0,
-                                    sgstRate: 0
-                                };
-                            } else if (gstCalculation?.type === 'CGST+SGST') {
-                                console.log("tahttt");
-                                console.log(gstCalculation,"44444");
-                                
-                                
-                                // MRP is inclusive of GST, calculate base price (excluding GST)
-                                const cgstRate = gstCalculation.cgstRate || 0;
-                                const sgstRate = gstCalculation.sgstRate || 0;
-                                const totalGstRate = cgstRate + sgstRate;
-                                const basePrice = mrp / (1 + (totalGstRate / 100));
-                                const cgstAmount = basePrice * (cgstRate / 100);
-                                const sgstAmount = basePrice * (sgstRate / 100);
-
-                                return {
-                                    basePrice: basePrice,
-                                    gstAmount: cgstAmount + sgstAmount,
-                                    totalAmount: mrp,
-                                    igstAmount: 0,
-                                    cgstAmount: cgstAmount,
-                                    sgstAmount: sgstAmount,
-                                    igstRate: 0,
-                                    cgstRate: cgstRate,
-                                    sgstRate: sgstRate
-                                };
-                            }
-
-                            // Default - no GST calculation available
-                            return {
-                                basePrice: mrp,
-                                gstAmount: 0,
-                                totalAmount: mrp,
-                                cgstAmount: 0,
-                                sgstAmount: 0,
-                                igstAmount: 0,
-                                cgstRate: 0,
-                                sgstRate: 0,
-                                igstRate: 0
-                            };
+                            });
+                            setFieldValue('paymentDetails', updated);
                         };
 
-                        calculatePurchaseRate()
-
-                        // Function to determine GST type for a product based on registration and party states
-                        // Function to determine GST type for a product based on registration and party states
-                        const determineProductGSTType = (registrationLocation, partyLocation) => {
-                            if (!registrationLocation || !partyLocation) {
-                                return 'IGST'; // Default to IGST if can't determine
-                            }
-
-                            if (registrationLocation === partyLocation) {
-                                return 'CGST+SGST';
-                            } else {
-                                return 'IGST';
-                            }
-                        };
-                        // Calculate GST for all products on initial load and when relevant dependencies change
-                        useEffect(() => {
-
-
-                            // Only run when we have all required data
-                            if (!Vouchers || !values.ledgerId || !regType || !orders || orders.length === 0) {
-
-                                return;
-                            }
-
-                            if (Vouchers?.typeOfVoucher?.toLowerCase() === "purchase") {
-                                // Get registration and party locations
-                                const defGstRegist = Vouchers?.defGstRegist || '';
-
-                                const getRegistrationLocation = (gstReg) => {
-                                    if (!gstReg) return null;
-                                    const regLower = gstReg?.state?.toLowerCase() || gstReg?.toLowerCase() || '';
-                                    if (regLower.includes('jammu') || regLower.includes('kashmir') || regLower.includes('j&k') || regLower.includes('jk') || regLower.includes('sxr')) {
-                                        return 'sxr';
-                                    } else if (regLower.includes('delhi') || regLower.includes('ncr') || regLower.includes('nct')) {
-                                        return 'delhi';
-                                    }
-                                    return null;
-                                };
-
-                                const getPartyState = () => {
-                                    const selectedLedgerOption = LedgerData.find(opt => opt.value === values.ledgerId);
-                                    if (selectedLedgerOption?.obj?.shippingState) {
-                                        const state = selectedLedgerOption.obj.shippingState;
-                                        if (state === '01') return 'sxr';
-                                        if (state === '07') return 'delhi';
-                                    }
-                                    if (custaddress === '01') return 'sxr';
-                                    if (custaddress === '07') return 'delhi';
-                                    return null;
-                                };
-
-                                const registrationLocation = getRegistrationLocation(defGstRegist);
-                                const partyLocation = getPartyState();
-                                const gstType = determineProductGSTType(registrationLocation, partyLocation);
-
-
-
-                                // Loop through all paymentDetails and calculate GST for each
-                                values.paymentDetails.forEach((entry, index) => {
-                                    console.log(entry,"00000000000000.");
-                                    
-                                    const mrp = entry.mrp || 0;
-
-                                    // Get HSN code and GST rates from the product
-                                    let igstRate = 0, cgstRate = 0, sgstRate = 0;
-
-                                    // Find the product in availableProducts or orders
-
-
-                                    // Check if product has GST rates from order data
-                                    igstRate = entry.igst || entry.igst || 0;
-                                    cgstRate = entry.cgst || entry.cgst || 0;
-                                    sgstRate = entry.sgst || entry.sgst || 0;
-
-                                    console.log(igstRate, cgstRate, sgstRate, "444444444444444");
-
-                                    // Create GST calculation object
-                                    let gstCalculation = null;
-
-                                    if (regType?.toLowerCase() === "regular" && !values.isExport) {
-                                        if (gstType === 'IGST') {
-                                            gstCalculation = {
-                                                type: 'IGST',
-                                                igstRate: igstRate,
-                                                cgstRate: 0,
-                                                sgstRate: 0,
-                                                registrationLocation,
-                                                partyLocation
-                                            };
-                                        } else {
-                                            gstCalculation = {
-                                                type: 'CGST+SGST',
-                                                igstRate: 0,
-                                                cgstRate: cgstRate,
-                                                sgstRate: sgstRate,
-                                                registrationLocation,
-                                                partyLocation
-                                            };
-                                        }
-                                    }
-
-                                    // Calculate purchase rate
-                                    const rateCalculation = calculatePurchaseRate(mrp, gstCalculation, regType, values.isExport);
-
-                                    // Update form fields
-                                    setFieldValue(`paymentDetails.${index}.basePrice`, rateCalculation.basePrice);
-                                    setFieldValue(`paymentDetails.${index}.rate`, rateCalculation.basePrice);
-                                    setFieldValue(`paymentDetails.${index}.gstCalculation`, gstCalculation);
-                                    setFieldValue(`paymentDetails.${index}.igstAmount`, rateCalculation.igstAmount);
-                                    setFieldValue(`paymentDetails.${index}.cgstAmount`, rateCalculation.cgstAmount);
-                                    setFieldValue(`paymentDetails.${index}.sgstAmount`, rateCalculation.sgstAmount);
-                                    setFieldValue(`paymentDetails.${index}.igstRate`, rateCalculation.igstRate);
-                                    setFieldValue(`paymentDetails.${index}.cgstRate`, rateCalculation.cgstRate);
-                                    setFieldValue(`paymentDetails.${index}.sgstRate`, rateCalculation.sgstRate);
-                                    setFieldValue(`paymentDetails.${index}.value`, rateCalculation.basePrice * (entry.quantity || 1));
-                                    setFieldValue(`paymentDetails.${index}.voucherAmount`, rateCalculation.totalAmount * (entry.quantity || 1));
-                                });
-                            }
-                        }, [regType, values.ledgerId, Vouchers?.typeOfVoucher, orders, availableProducts, custaddress, values.isExport]);
-                        // Function to determine GST type for a product based on registration and party states
-                        // const determineProductGSTType = (registrationLocation, partyLocation) => {
-                        //     if (!registrationLocation || !partyLocation) {
-                        //         return 'IGST'; // Default to IGST if can't determine
-                        //     }
-
-                        //     if (registrationLocation === partyLocation) {
-                        //         return 'CGST+SGST';
-                        //     } else {
-                        //         return 'IGST';
-                        //     }
-                        // };
                         return (
                             <Form>
                                 <div className="flex flex-col gap-9">
@@ -1102,11 +679,11 @@ const CreateVoucherPurchase = () => {
                                                     <label className="mb-2.5 block text-black dark:text-white">Supplier Account</label>
                                                     <ReactSelect
                                                         name='ledgerId'
-                                                        value={LedgerData.find(opt => opt.value === values.ledgerId)}
+                                                        value={LedgerData.find(opt => opt.value === values.ledgerId) || null}
                                                         onChange={(option) => {
-                                                            setFieldValue('ledgerId', option?.value || '');
+                                                            setFieldValue('ledgerId', option?.value || null);
                                                             setFieldValue('currentBalance', option?.balance || 0);
-                                                            setregType(option?.obj?.registrationType || '');
+                                                            setregType(option?.gstType || option?.obj?.registrationType || '');
                                                             setcustaddress(option?.obj?.shippingState || '');
                                                         }}
                                                         options={LedgerData}
@@ -1114,6 +691,7 @@ const CreateVoucherPurchase = () => {
                                                         classNamePrefix="react-select"
                                                         placeholder="Select Supplier"
                                                         menuPortalTarget={document.body}
+                                                        isClearable
                                                         styles={{
                                                             ...customStyles,
                                                             menuPortal: (base) => ({ ...base, zIndex: 100000 })
@@ -1126,14 +704,13 @@ const CreateVoucherPurchase = () => {
                                                     <label className="mb-2.5 block text-black dark:text-white">Orders</label>
                                                     <ReactSelect
                                                         name='orderIds'
-                                                        value={orders && orders.map(ord => ({ value: ord.orderId, label: ord.orderNo }))}
-                                                        onChange={(selectedOptions) => {
-                                                            const selectedValues = selectedOptions?.map(option => option.value) || [];
-                                                            setFieldValue('orderIds', selectedValues);
-                                                            handleOrderSelect(selectedValues);
-                                                        }}
-                                                        options={orders && orders.map(ord => ({ value: ord.orderId, label: ord.orderNo }))}
+                                                        value={orders
+                                                            .filter(ord => selectedOrderIds.includes(ord?.orderId))
+                                                            .map(ord => ({ value: ord.orderId, label: ord.orderNo }))}
+                                                        onChange={handleOrdersChange}
+                                                        options={orders.map(ord => ({ value: ord.orderId, label: ord.orderNo }))}
                                                         isMulti={true}
+                                                        isClearable
                                                         menuPortalTarget={document.body}
                                                         styles={{
                                                             ...customStyles,
@@ -1169,7 +746,7 @@ const CreateVoucherPurchase = () => {
                                                     <label className="mb-2.5 block text-black dark:text-white">Destination Ledger</label>
                                                     <ReactSelect
                                                         name='destinationLedgerId'
-                                                        value={destinationLedger?.find(opt => opt.value === values.destinationLedgerId)}
+                                                        value={destinationLedger?.find(opt => opt.value === values.destinationLedgerId) || null}
                                                         onChange={handleDestinationLedgerChange}
                                                         options={destinationLedger}
                                                         className="react-select-container bg-white dark:bg-form-Field w-full"
@@ -1194,88 +771,42 @@ const CreateVoucherPurchase = () => {
                                                     />
                                                 </div>
 
-                                                <div className="flex-2 min-w-[150px]">
-                                                    <label className="mb-2.5 block text-black dark:text-white">Is Export</label>
-                                                    <div className="flex items-center gap-3 mt-2">
-                                                        <Field
-                                                            name="isExport"
-                                                            type="checkbox"
-                                                            className="h-5 w-5 rounded border-stroke bg-transparent text-primary focus:ring-primary dark:border-form-strokedark dark:bg-form-input"
+                                                {isRegularSupplier && (
+                                                    <div className="flex-2 min-w-[200px]">
+                                                        <label className="mb-2.5 block text-black dark:text-white">Input GST Ledger</label>
+                                                        <ReactSelect
+                                                            name='gstLedgerId'
+                                                            value={gstLedgerOptions?.find(opt => opt.value === values.gstLedgerId) || null}
+                                                            onChange={handleGstLedgerChange}
+                                                            options={gstLedgerOptions}
+                                                            className="react-select-container bg-white dark:bg-form-Field w-full"
+                                                            classNamePrefix="react-select"
+                                                            placeholder="Select Input GST Ledger"
+                                                            menuPortalTarget={document.body}
+                                                            styles={{
+                                                                ...customStyles,
+                                                                menuPortal: (base) => ({ ...base, zIndex: 100000 })
+                                                            }}
                                                         />
-                                                        <span className="text-sm text-gray-600 dark:text-gray-300">
-                                                            {values.isExport ? 'Yes' : 'No'}
-                                                        </span>
                                                     </div>
-                                                </div>
+                                                )}
                                             </div>
 
-                                            {/* GST Section - Only for Regular Suppliers */}
-                                            {regType?.toLowerCase() === "regular" && (
-                                                <div>
-                                                    {/* <div
-                                                        className="flex items-center gap-2 cursor-pointer mt-4 mb-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                                                        onClick={() => setShowGSTLedgers(!showGSTLedgers)}
-                                                    >
-                                                        {showGSTLedgers ? <FaChevronUp /> : <FaChevronDown />}
-                                                        <span className="font-medium text-black dark:text-white">
-                                                            GST Ledgers {showGSTLedgers ? '(Click to hide)' : '(Click to show)'}
-                                                        </span>
-                                                    </div> */}
-
-
-                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 mb-4">
-                                                        <div>
-                                                            <label className="mb-2.5 block text-black dark:text-white">IGST Ledger</label>
-                                                            <ReactSelect
-                                                                value={igstOptions.find(opt => opt.value === values.igstLedgerId)}
-                                                                onChange={handleIgstLedgerChange}
-                                                                options={igstOptions}
-                                                                placeholder="Select IGST Ledger"
-                                                                menuPortalTarget={document.body}
-                                                                styles={{ ...customStyles, menuPortal: (base) => ({ ...base, zIndex: 100000 }) }}
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="mb-2.5 block text-black dark:text-white">CGST Ledger</label>
-                                                            <ReactSelect
-                                                                value={(() => {
-                                                                    const selected = cgstOptions.find(opt => opt.value === values.cgstLedgerId);
-
-
-                                                                    return selected;
-                                                                })()}
-                                                                onChange={(option) => {
-                                                                    handleCgstLedgerChange(option);
-                                                                }}
-                                                                options={cgstOptions}
-                                                                placeholder="Select CGST Ledger"
-                                                                menuPortalTarget={document.body}
-                                                                styles={{ ...customStyles, menuPortal: (base) => ({ ...base, zIndex: 100000 }) }}
-                                                            />
-                                                        </div>
-                                                        <div>
-                                                            <label className="mb-2.5 block text-black dark:text-white">SGST Ledger</label>
-                                                            <ReactSelect
-                                                                value={sgstOptions.find(opt => opt.value === values.sgstLedgerId)}
-                                                                onChange={handleSgstLedgerChange}
-                                                                options={sgstOptions}
-                                                                placeholder="Select SGST Ledger"
-                                                                menuPortalTarget={document.body}
-                                                                styles={{ ...customStyles, menuPortal: (base) => ({ ...base, zIndex: 100000 }) }}
-                                                            />
-                                                        </div>
+                                            {/* Info banner reflecting how GST is being treated for this supplier */}
+                                            {regType && (
+                                                isRegularSupplier ? (
+                                                    <div className="mt-4 mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded">
+                                                        <p className="text-blue-700 dark:text-blue-400 text-sm">
+                                                            ℹ️ Regular registered supplier — GST is stripped from MRP, and the GST amount is posted to the Input GST ledger (ITC eligible). Supplier is owed the full MRP.
+                                                        </p>
                                                     </div>
-
-                                                </div>
-                                            )}
-
-                                            {/* Message for Non-Regular Suppliers */}
-                                            {regType?.toLowerCase() !== "regular" && regType && (
-                                                <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
-                                                    <p className="text-yellow-700 dark:text-yellow-400 text-sm">
-                                                        ⚠️ This supplier is registered as {regType?.toUpperCase()}. GST is not applicable for this transaction.
-                                                    </p>
-                                                </div>
+                                                ) : (
+                                                    <div className="mt-4 mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded">
+                                                        <p className="text-yellow-700 dark:text-yellow-400 text-sm">
+                                                            ⚠️ This supplier is registered as {regType?.toUpperCase()}. No GST is applicable — rate equals MRP, and nothing is posted to any GST ledger.
+                                                        </p>
+                                                    </div>
+                                                )
                                             )}
 
                                             {/* Products Table */}
@@ -1286,11 +817,10 @@ const CreateVoucherPurchase = () => {
                                                             <table className="w-full table-fixed border-collapse">
                                                                 <thead>
                                                                     <tr className="bg-gray-2 text-left dark:bg-meta-4">
-                                                                        <th className="w-[180px] py-4 px-3 font-medium text-black dark:text-white">Product</th>
+                                                                        <th className="w-[200px] py-4 px-3 font-medium text-black dark:text-white">Product</th>
                                                                         <th className="w-[100px] py-4 px-3 font-medium text-black dark:text-white">Quantity</th>
                                                                         <th className="w-[120px] py-4 px-3 font-medium text-black dark:text-white">MRP (Inc. GST)</th>
-                                                                        <th className="w-[120px] py-4 px-3 font-medium text-black dark:text-white">Purchase Rate (Excl. GST)</th>
-                                                                        <th className="w-[120px] py-4 px-3 font-medium text-black dark:text-white">GST Type</th>
+                                                                        <th className="w-[140px] py-4 px-3 font-medium text-black dark:text-white">Rate (Excl. GST)</th>
                                                                         <th className="w-[100px] py-4 px-3 font-medium text-black dark:text-white">GST Amount</th>
                                                                         <th className="w-[120px] py-4 px-3 font-medium text-black dark:text-white">Total Value</th>
                                                                         <th className="w-[80px] py-4 px-3 font-medium text-black dark:text-white">Action</th>
@@ -1298,113 +828,33 @@ const CreateVoucherPurchase = () => {
                                                                 </thead>
                                                                 <tbody>
                                                                     {values?.paymentDetails.map((entry, index) => {
-
-
-
-
                                                                         const rowProducts = getAvailableProductsForRow(values, index);
-
-
-
+                                                                        console.log(rowProducts,"000000000000000000000000000000000000000000000000000000000000");
+                                                                        
                                                                         const productInfo = availableProducts.find(p => p.value === entry.productsId);
-
-
 
                                                                         return (
                                                                             <tr key={entry.id || index}>
                                                                                 <td className="border-b py-4 px-3">
                                                                                     {entry && entry.productsId ? (
-                                                                                        <div className="text-sm font-medium">
-                                                                                            {productInfo?.productName || entry.productName || 'Product'}
-                                                                                            <Field name={`paymentDetails.${index}.productsId`} value={entry.productsId} />
+                                                                                        <div className="text-sm font-medium flex items-center justify-between gap-2">
+                                                                                            <span>{productInfo?.label || entry.productName || 'Product'}</span>
+                                                                                            <button
+                                                                                                type="button"
+                                                                                                onClick={() => handleRemoveProduct(index)}
+                                                                                                className="text-gray-400 hover:text-red-600 text-xs"
+                                                                                                title="Change product"
+                                                                                            >
+                                                                                                ✕
+                                                                                            </button>
                                                                                         </div>
                                                                                     ) : (
                                                                                         <ReactSelect
                                                                                             value={rowProducts.find(p => p.value === entry.productsId) || null}
-                                                                                            onChange={(option) => {
-                                                                                                const mrp = option?.price || 0;
-                                                                                                const hsnCode = option?.hsnCode || {};
-
-                                                                                                // Get registration and party locations
-                                                                                                const defGstRegist = Vouchers?.defGstRegist || '';
-                                                                                                const getRegistrationLocation = (gstReg) => {
-                                                                                                    if (!gstReg) return null;
-                                                                                                    const regLower = gstReg?.state?.toLowerCase() || gstReg?.toLowerCase() || '';
-                                                                                                    if (regLower.includes('jammu') || regLower.includes('kashmir') || regLower.includes('j&k') || regLower.includes('jk') || regLower.includes('sxr')) {
-                                                                                                        return 'sxr';
-                                                                                                    } else if (regLower.includes('delhi') || regLower.includes('ncr') || regLower.includes('nct')) {
-                                                                                                        return 'delhi';
-                                                                                                    }
-                                                                                                    return null;
-                                                                                                };
-
-                                                                                                const getPartyState = () => {
-                                                                                                    const selectedLedgerOption = LedgerData.find(opt => opt.value === values.ledgerId);
-                                                                                                    if (selectedLedgerOption?.obj?.shippingState) {
-                                                                                                        const state = selectedLedgerOption.obj.shippingState;
-                                                                                                        if (state === '01') return 'sxr';
-                                                                                                        if (state === '07') return 'delhi';
-                                                                                                    }
-                                                                                                    if (custaddress === '01') return 'sxr';
-                                                                                                    if (custaddress === '07') return 'delhi';
-                                                                                                    return null;
-                                                                                                };
-
-                                                                                                const registrationLocation = getRegistrationLocation(defGstRegist);
-                                                                                                const partyLocation = getPartyState();
-                                                                                                const gstType = determineProductGSTType(registrationLocation, partyLocation);
-
-                                                                                                // Get GST rates from HSN code
-                                                                                                const igstRate = hsnCode?.igst || 0;
-                                                                                                const cgstRate = hsnCode?.cgst || 0;
-                                                                                                const sgstRate = hsnCode?.sgst || 0;
-
-                                                                                                // Create GST calculation object
-                                                                                                let gstCalculation = null;
-
-                                                                                                if (regType?.toLowerCase() === "regular" && !values.isExport) {
-                                                                                                    if (gstType === 'IGST') {
-                                                                                                        gstCalculation = {
-                                                                                                            type: 'IGST',
-                                                                                                            igstRate: igstRate,
-                                                                                                            cgstRate: 0,
-                                                                                                            sgstRate: 0,
-                                                                                                            registrationLocation,
-                                                                                                            partyLocation
-                                                                                                        };
-                                                                                                    } else {
-                                                                                                        gstCalculation = {
-                                                                                                            type: 'CGST+SGST',
-                                                                                                            igstRate: 0,
-                                                                                                            cgstRate: cgstRate,
-                                                                                                            sgstRate: sgstRate,
-                                                                                                            registrationLocation,
-                                                                                                            partyLocation
-                                                                                                        };
-                                                                                                    }
-                                                                                                }
-
-                                                                                                // Calculate purchase rate
-                                                                                                const rateCalculation = calculatePurchaseRate(mrp, gstCalculation, regType, values.isExport);
-
-                                                                                                setFieldValue(`paymentDetails.${index}.productsId`, option?.value || null);
-                                                                                                setFieldValue(`paymentDetails.${index}.orderProductId`, option?.orderProdId || null);
-                                                                                                setFieldValue(`paymentDetails.${index}.orderId`, option?.obj?.orderId || null);
-                                                                                                setFieldValue(`paymentDetails.${index}.mrp`, mrp);
-                                                                                                setFieldValue(`paymentDetails.${index}.basePrice`, rateCalculation.basePrice);
-                                                                                                setFieldValue(`paymentDetails.${index}.rate`, rateCalculation.basePrice);
-                                                                                                setFieldValue(`paymentDetails.${index}.gstCalculation`, gstCalculation);
-                                                                                                setFieldValue(`paymentDetails.${index}.igstAmount`, rateCalculation.igstAmount);
-                                                                                                setFieldValue(`paymentDetails.${index}.cgstAmount`, rateCalculation.cgstAmount);
-                                                                                                setFieldValue(`paymentDetails.${index}.sgstAmount`, rateCalculation.sgstAmount);
-                                                                                                setFieldValue(`paymentDetails.${index}.igstRate`, rateCalculation.igstRate);
-                                                                                                setFieldValue(`paymentDetails.${index}.cgstRate`, rateCalculation.cgstRate);
-                                                                                                setFieldValue(`paymentDetails.${index}.sgstRate`, rateCalculation.sgstRate);
-                                                                                                setFieldValue(`paymentDetails.${index}.value`, rateCalculation.basePrice * (entry.quantity || 1));
-                                                                                                setFieldValue(`paymentDetails.${index}.voucherAmount`, rateCalculation.totalAmount * (entry.quantity || 1));
-                                                                                            }}
+                                                                                            onChange={(option) => handleProductChange(option, index, entry)}
                                                                                             options={rowProducts}
-                                                                                            placeholder="Select Product"
+                                                                                            placeholder={loadingProducts ? "Loading..." : "Select Product"}
+                                                                                            isLoading={loadingProducts}
                                                                                             menuPortalTarget={document.body}
                                                                                             styles={{ ...customStyles, menuPortal: base => ({ ...base, zIndex: 9999 }) }}
                                                                                             isClearable
@@ -1413,14 +863,16 @@ const CreateVoucherPurchase = () => {
                                                                                 </td>
 
                                                                                 <td className="border-b py-4 px-3">
-                                                                                    <Field type="number" name={`paymentDetails.${index}.quantity`} placeholder="1" min="1" step="1" className="w-full py-2 px-3 text-sm rounded border" onChange={(e) => {
-                                                                                        const quantity = parseFloat(e.target.value) || 1;
-                                                                                        setFieldValue(`paymentDetails.${index}.quantity`, quantity);
-                                                                                        setFieldValue(`paymentDetails.${index}.value`, (entry.mrp || 0) * quantity);
-                                                                                        setFieldValue(`paymentDetails.${index}.voucherAmount`, (entry.mrp || 0) * quantity);
-                                                                                    }} />
+                                                                                    <Field
+                                                                                        type="number"
+                                                                                        name={`paymentDetails.${index}.quantity`}
+                                                                                        placeholder="1"
+                                                                                        min="1"
+                                                                                        step="1"
+                                                                                        className="w-full py-2 px-3 text-sm rounded border"
+                                                                                        onChange={(e) => handleQuantityChange(e, index)}
+                                                                                    />
                                                                                 </td>
-
 
                                                                                 <td className="border-b py-4 px-3">
                                                                                     <Field type="number" name={`paymentDetails.${index}.mrp`} placeholder="0.00" readOnly className="w-full bg-gray-50 dark:bg-slate-800 py-2 px-3 text-sm rounded border" />
@@ -1428,20 +880,9 @@ const CreateVoucherPurchase = () => {
 
                                                                                 <td className="border-b py-4 px-3">
                                                                                     <Field type="number" name={`paymentDetails.${index}.rate`} placeholder="0.00" readOnly className="w-full bg-gray-50 dark:bg-slate-800 py-2 px-3 text-sm rounded border" />
-                                                                                </td>
-
-                                                                                <td className="border-b py-4 px-3">
-                                                                                    <div className="text-xs">
-                                                                                        {entry.gstCalculation?.type === 'IGST' && (
-                                                                                            <span className="text-blue-600">IGST: {entry.igstRate}%</span>
-                                                                                        )}
-                                                                                        {entry.gstCalculation?.type === 'CGST+SGST' && (
-                                                                                            <span className="text-green-600">CGST: {entry.cgstRate}% | SGST: {entry.sgstRate}%</span>
-                                                                                        )}
-                                                                                        {(!entry.gstCalculation || regType?.toLowerCase() !== "regular") && (
-                                                                                            <span className="text-gray-500">No GST</span>
-                                                                                        )}
-                                                                                    </div>
+                                                                                    {isRegularSupplier && entry.gstRate > 0 && (
+                                                                                        <span className="text-xs text-gray-500">GST @ {entry.gstRate}%</span>
+                                                                                    )}
                                                                                 </td>
 
                                                                                 <td className="border-b py-4 px-3">
@@ -1451,7 +892,6 @@ const CreateVoucherPurchase = () => {
                                                                                 <td className="border-b py-4 px-3">
                                                                                     <Field type="number" name={`paymentDetails.${index}.value`} readOnly className="w-full bg-gray-50 dark:bg-slate-800 py-2 px-3 text-sm rounded border font-medium" />
                                                                                 </td>
-
 
                                                                                 <td className="border-b py-4 px-3 text-center">
                                                                                     {values.paymentDetails.length > 1 && (
@@ -1467,45 +907,37 @@ const CreateVoucherPurchase = () => {
                                                             </table>
                                                         </div>
 
-                                                        <button type="button" onClick={() => push({ id: uuidv4(), productsId: null, mrp: 0, quantity: 1, value: 0 })} disabled={!values.ledgerId} className="flex items-center gap-2 mt-4 text-primary hover:text-primary/80 font-medium">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => push({ id: uuidv4(), productsId: null, mrp: 0, rate: 0, basePrice: 0, gstAmount: 0, gstRate: 0, quantity: 1, value: 0, voucherAmount: 0 })}
+                                                            disabled={!values.ledgerId}
+                                                            className="flex items-center gap-2 mt-4 text-primary hover:text-primary/80 font-medium"
+                                                        >
                                                             <IoMdAdd size={20} /> Add Row
                                                         </button>
 
                                                         {/* Summary */}
                                                         <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                                                             <h4 className="text-lg font-semibold mb-3">Purchase Summary</h4>
-                                                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 text-sm">
+                                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                                                                 <div>
                                                                     <p className="text-gray-600">Total Quantity</p>
                                                                     <p className="font-medium">{totals.totalQuantity}</p>
                                                                 </div>
                                                                 <div>
-                                                                    <p className="text-gray-600">Total Base Price (Excl. GST)</p>
+                                                                    <p className="text-gray-600">Rate (Excl. GST)</p>
                                                                     <p className="font-medium text-blue-600">₹{totals.totalBasePrice}</p>
-                                                                    <p className="text-xs text-gray-500">(Goes to Supplier)</p>
+                                                                    <p className="text-xs text-gray-500">(Goes to Destination Ledger)</p>
                                                                 </div>
-                                                                {parseFloat(totals.totalIGST) > 0 && (
-                                                                    <div>
-                                                                        <p className="text-gray-600">Total IGST</p>
-                                                                        <p className="font-medium text-purple-600">₹{totals.totalIGST}</p>
-                                                                    </div>
-                                                                )}
-                                                                {parseFloat(totals.totalCGST) > 0 && (
-                                                                    <div>
-                                                                        <p className="text-gray-600">Total CGST</p>
-                                                                        <p className="font-medium text-green-600">₹{totals.totalCGST}</p>
-                                                                    </div>
-                                                                )}
-                                                                {parseFloat(totals.totalSGST) > 0 && (
-                                                                    <div>
-                                                                        <p className="text-gray-600">Total SGST</p>
-                                                                        <p className="font-medium text-green-600">₹{totals.totalSGST}</p>
-                                                                    </div>
-                                                                )}
                                                                 <div>
-                                                                    <p className="text-gray-600">Grand Total (Inc. GST)</p>
-                                                                    <p className="font-bold text-lg text-primary">₹{totals.totalMRP}</p>
-                                                                    <p className="text-xs text-gray-500">(Goes to Destination)</p>
+                                                                    <p className="text-gray-600">GST {isRegularSupplier ? '(Input GST Ledger)' : '(not applicable)'}</p>
+                                                                    <p className="font-medium text-gray-500">₹{isRegularSupplier ? totals.totalGSTAmount : '0.00'}</p>
+                                                                </div>
+                                                                <div>
+                                                                    <p className="text-gray-600">Owed to Supplier</p>
+                                                                    <p className="font-bold text-lg text-primary">
+                                                                        ₹{isRegularSupplier ? totals.totalMRP : totals.totalBasePrice}
+                                                                    </p>
                                                                 </div>
                                                             </div>
                                                         </div>

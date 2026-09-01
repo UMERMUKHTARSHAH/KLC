@@ -47,6 +47,10 @@ const ViewProduct = () => {
   const [selectedINVENTORYData, setSelectedINVENTORYData] = useState(null);
   const [mrp, setmrp] = useState(0);
 
+  // Full-screen image popup states
+  const [selectedFullImage, setSelectedFullImage] = useState(null);
+  const [isFullImageOpen, setIsFullImageOpen] = useState(false);
+
   // Image upload states
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -60,6 +64,17 @@ const ViewProduct = () => {
     getProduct();
     getProductId();
   }, []);
+
+  // Handle Escape key to close full image
+  useEffect(() => {
+    const handleEsc = (event) => {
+      if (event.key === 'Escape' && isFullImageOpen) {
+        handleCloseFullImage();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isFullImageOpen]);
 
   const formattedProductId = productId.map((id) => ({
     label: id,
@@ -78,6 +93,19 @@ const ViewProduct = () => {
   ];
 
   const customStyles = createCustomStyles(theme?.mode);
+
+  // Full-screen image handlers
+  const handleOpenFullImage = (imageUrl) => {
+    setSelectedFullImage(imageUrl);
+    setIsFullImageOpen(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const handleCloseFullImage = () => {
+    setIsFullImageOpen(false);
+    setSelectedFullImage(null);
+    document.body.style.overflow = 'auto';
+  };
 
   const openBOMModal = (bomData) => {
     setSelectedBOMData(bomData);
@@ -242,12 +270,20 @@ const ViewProduct = () => {
           <div className="relative group">
             {item?.images?.find((img) => img.referenceImage) ? (
               <img
-                className="h-[50px] w-[50px] rounded-full transition-transform duration-500 ease-in-out transform group-hover:scale-[2] group-hover:shadow-2xl"
+                className="h-[50px] w-[50px] rounded-full transition-transform duration-500 ease-in-out transform group-hover:scale-[2] group-hover:shadow-2xl cursor-pointer"
                 crossOrigin="use-credentials"
                 src={`${GET_IMAGE}/products/getimages/${
                   item?.images?.find((img) => img.referenceImage).referenceImage
                 }`}
                 alt="Product Image"
+                onClick={() =>
+                  handleOpenFullImage(
+                    `${GET_IMAGE}/products/getimages/${
+                      item?.images?.find((img) => img.referenceImage)
+                        .referenceImage
+                    }`
+                  )
+                }
               />
             ) : (
               <>
@@ -292,12 +328,19 @@ const ViewProduct = () => {
           <div className="relative group">
             {item?.images?.find((img) => img?.actualImage) ? (
               <img
-                className="h-[50px] w-[50px] rounded-full transition-transform duration-500 ease-in-out transform group-hover:scale-[2] group-hover:shadow-2xl"
+                className="h-[50px] w-[50px] rounded-full transition-transform duration-500 ease-in-out transform group-hover:scale-[2] group-hover:shadow-2xl cursor-pointer"
                 crossOrigin="use-credentials"
                 src={`${GET_IMAGE}/products/getimages/${
                   item.images.find((img) => img?.actualImage)?.actualImage
                 }`}
                 alt="Product Actual Image"
+                onClick={() =>
+                  handleOpenFullImage(
+                    `${GET_IMAGE}/products/getimages/${
+                      item.images.find((img) => img?.actualImage)?.actualImage
+                    }`
+                  )
+                }
               />
             ) : (
               <>
@@ -338,15 +381,6 @@ const ViewProduct = () => {
         </td>
 
         {/* View Images Button */}
-        {/* <td className="px-2 py-5 md:w-[50px] border-b border-gray-200 font-xs text-xs">
-          <span
-            onClick={() => openImageModal(item?.images)}
-            className="bg-green-100 text-green-800 font-xs text-xs me-2 px-1 py-0.5 rounded dark:bg-gray-700 text-center dark:text-green-400 border border-green-400 cursor-pointer"
-          >
-            VIEW
-          </span>
-        </td> */}
-
         <td className="px-3 py-4 md:w-[90px] border-b border-gray-200">
           <button
             onClick={() => openImageModal(item?.images)}
@@ -382,9 +416,9 @@ const ViewProduct = () => {
         </td>
 
         {/* Product ID */}
-        <td className="px-5 py-5 border-b border-gray-200 text-sm">
-          <p className="text-gray-900 whitespace-no-wrap">
-            {item?.productId?.substring(0, 34) + '..'}
+        <td className="px-5 py-5 border-b border-gray-200 text-sm whitespace-nowrap tracking-wider ">
+          <p className="text-gray-900 tracking-wider whitespace-nowrap">
+            {item?.productId?.substring(0, 45) }
           </p>
         </td>
 
@@ -683,13 +717,15 @@ const ViewProduct = () => {
                     <div className="flex overflow-x-auto space-x-4 py-2">
                       {Images?.map((image, index) => {
                         if (image?.referenceImage) {
+                          const imageUrl = `${GET_IMAGE}/products/getimages/${image.referenceImage}`;
                           return (
                             <img
                               key={index}
-                              className="h-[200px] w-[200px] rounded-lg object-cover flex-shrink-0 transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+                              className="h-[200px] w-[200px] rounded-lg object-cover flex-shrink-0 transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer"
                               crossOrigin="use-credentials"
-                              src={`${GET_IMAGE}/products/getimages/${image.referenceImage}`}
+                              src={imageUrl}
                               alt="Reference Image"
+                              onClick={() => handleOpenFullImage(imageUrl)}
                             />
                           );
                         }
@@ -706,13 +742,15 @@ const ViewProduct = () => {
                     <div className="flex overflow-x-auto space-x-4 py-2">
                       {Images?.map((image, index) => {
                         if (image?.actualImage) {
+                          const imageUrl = `${GET_IMAGE}/products/getimages/${image.actualImage}`;
                           return (
                             <img
                               key={index}
-                              className="h-[200px] w-[200px] rounded-lg object-cover flex-shrink-0 transition-transform duration-300 hover:scale-105 hover:shadow-xl"
+                              className="h-[200px] w-[200px] rounded-lg object-cover flex-shrink-0 transition-transform duration-300 hover:scale-105 hover:shadow-xl cursor-pointer"
                               crossOrigin="use-credentials"
-                              src={`${GET_IMAGE}/products/getimages/${image.actualImage}`}
+                              src={imageUrl}
                               alt="Actual Image"
+                              onClick={() => handleOpenFullImage(imageUrl)}
                             />
                           );
                         }
@@ -724,6 +762,55 @@ const ViewProduct = () => {
               </div>
             </div>
           )}
+
+          {/* Full Screen Image Popup */}
+       {/* Full Screen Image Popup */}
+{isFullImageOpen && selectedFullImage && (
+  <div
+    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+    onClick={handleCloseFullImage}
+  >
+    {/* Close Button */}
+    <button
+      onClick={handleCloseFullImage}
+      className="absolute top-4 right-4 z-[10000] text-white hover:text-gray-300 transition-colors duration-200"
+      aria-label="Close image"
+    >
+      <svg
+        className="w-10 h-10"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+
+    {/* Image Container */}
+    <div
+      className="relative w-full h-full flex items-center justify-center p-4"
+      onClick={(e) => e.stopPropagation()}
+    >
+      <img
+        src={selectedFullImage}
+        alt="Full Screen"
+        className="w-[600px] h-[600px] object-contain"
+        crossOrigin="use-credentials"
+      />
+
+      {/* Hint text */}
+      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full text-sm whitespace-nowrap">
+        Click outside to close • Press ESC to close
+      </div>
+    </div>
+  </div>
+)}
 
           {/* Upload Modal */}
           {uploadModalOpen && renderUploadModal()}

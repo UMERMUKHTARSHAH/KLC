@@ -144,6 +144,7 @@ const Chart = () => {
     { title: "Ledger Summary Balances", link: "/configurator/ledgersummary", countKey: "invoices", icon: <FaBook className="w-10 h-10" />, levelUp: true },
     { title: "Orders With Vouchers", link: "/configurator/OrderVoucher", countKey: "invoices", icon: <TbReorder className="w-10 h-10" />, levelUp: true },
     { title: "Reports", link: "/configurator/accreports", countKey: "accReports", icon: <BiBookOpen className="w-10 h-10" />, levelUp: true },
+     { title: "Pending for Bill", link: "/Recieved/pendingForBill", countKey: "orderBillStatusAllowed", icon: <RiProgress8Fill className="w-10 h-10" />, levelUp: true },
   ];
   
   const roleBasedCards = {
@@ -290,13 +291,13 @@ const Chart = () => {
 
     filteredCards.forEach(card => {
       // Needs Attention category
-      if (['Update Shipping Date', 'Delayed Orders', 'Pending Orders', 'Supplier Date Updation', 
-           'Edit Received Quantity', 'Update Challan', 'Supplier Receiving Orders', 
+      if (['Update Shipping Date', 'Delayed Orders', 'Pending Orders', , 
+           'Edit Received Quantity', 'Update Challan', 
            'Need Modification Orders', 'Cancelled Orders', ].includes(card.title)) {
         needsAttention.push(card);
       }
       // Fiber, Proforma & Suppliers category
-      else if (['Fibers Allocated', 'Proforma', 'Supplier Receiving Orders'].includes(card.title)) {
+      else if (['Fibers Allocated', 'Proforma', 'Supplier Receiving Orders','Supplier Date Updation'].includes(card.title)) {
         fiberProformaSuppliers.push(card);
       }
       // This Month category
