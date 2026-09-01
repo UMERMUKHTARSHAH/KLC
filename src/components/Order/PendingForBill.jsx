@@ -389,6 +389,8 @@ console.log(pendingOrders,"4444444444444444444444444444444444444444444444444");
                                             toast.error('No pending orders available');
                                             return;
                                         }
+                                        console.log(pendingOrders,"44444444444444444441");
+                                        
 
 
                                         const orderDetails = pendingOrders?.map(order => ({
@@ -401,6 +403,7 @@ console.log(pendingOrders,"4444444444444444444444444444444444444444444444444");
                                             receivedQty: order.receivedQty,
                                             totalAmount: order.totalAmount,
                                             productCost: order.productCost,
+                                            opId:order.orderProductId,
                                             igst: order?.Igst,
                                             cgst: order?.Cgst,
                                             sgst: order?.Sgst,

@@ -397,7 +397,7 @@ const CreateVoucherPurchase = () => {
                 rows.push({
                     id: uuidv4(),
                     productsId: order?.productId || null,
-                    orderProductId: null,
+                    orderProductId: order?.opId || null,
                     orderId: order?.orderId,
                     productName: order?.ProductIdString || '',
                     mrp,
@@ -476,8 +476,10 @@ const CreateVoucherPurchase = () => {
                             gstLedgerId: isRegularSupplier ? values.gstLedgerId : null,
                             locationId:Vouchers.defGstRegist.id,
                         };
+                        console.log(payload,"llkkll");
+                        
 
-                        await handleCreateVoucher(payload);
+                        // await handleCreateVoucher(payload);
                     }}
                 >
                     {({ isSubmitting, setFieldValue, values }) => {

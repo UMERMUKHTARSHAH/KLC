@@ -90,7 +90,6 @@ const UpdateOrderRecieving = () => {
     { value: 'Forced_Closure', label: 'Forced Closure' },
   ];
 
-  console.log(supplier, '2020');
 
   const [showModal, setshowModal] = useState(false);
 
