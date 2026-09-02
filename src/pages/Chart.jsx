@@ -170,7 +170,7 @@ const Chart = () => {
       { title: "Edit Received Quantity", link: "/order/recievedQuantity", countKey: "ordersWithPendingProducts", icon: <MdEditSquare className="w-10 h-10" />, levelUp: true },
       { title: "Update Shipping Date", link: "/order/updateShippingDate", countKey: "ordersWithShippingDate", icon: <GrUpdate className="w-10 h-10" />, levelUp: true },
       { title: "Monthly Orders", link: "/Order/monthlyorders", icon: <SiHomeassistantcommunitystore className="w-10 h-10" />, levelDown: true },
-      { title: "Delayed Orders", link: "/delayedOrders", countKey: "ordersWithDelayed", icon: <MdTimer className="w-10 h-10" />, levelDown: true }
+      { title: "Delayed Order Products", link: "/delayedOrders", countKey: "ordersWithDelayed", icon: <MdTimer className="w-10 h-10" />, levelDown: true }
     ],
     ROLE_QUALITYCONTROL: [
       { title: "Completed Orders", link: "/orderlist/Closed", countKey: "ordersWithOnlyClosed", icon: <MdRecommend className="w-10 h-10" />, levelUp: true },
@@ -249,7 +249,7 @@ const Chart = () => {
       link: "/Order/ViewOrder"
     },
     {
-      title: "Completed orders",
+      title: "Completed order",
       count: completedOrders,
       icon: <FcApproval className="w-5 h-5" />,
       bgColor: "bg-green-100",
@@ -258,7 +258,7 @@ const Chart = () => {
       link: "/orderlist/Closed"
     },
     {
-      title: "Delayed orders",
+      title: "Delayed order product",
       count: delayedOrders,
       icon: <MdTimer className="w-5 h-5 text-orange-600" />,
       bgColor: "bg-orange-100",
@@ -285,13 +285,13 @@ const Chart = () => {
     const otherCards = [];
 
     const filteredCards = cardsToShow.filter(card => {
-      const summaryTitles = ['Total Orders', 'Completed Orders', 'Delayed Orders', 'Cancelled Orders'];
+      const summaryTitles = ['Total Orders', 'Completed Orders', 'Delayed Order Products', 'Cancelled Orders'];
       return !summaryTitles.includes(card.title);
     });
 
     filteredCards.forEach(card => {
       // Needs Attention category
-      if (['Update Shipping Date', 'Delayed Orders', 'Pending Orders', , 
+      if (['Update Shipping Date', 'Delayed Order Products', 'Pending Orders', , 
            'Edit Received Quantity', 'Update Challan', 
            'Need Modification Orders', 'Cancelled Orders', ].includes(card.title)) {
         needsAttention.push(card);
@@ -437,7 +437,7 @@ const Chart = () => {
           {summaryCards.map((card, idx) => (
             <Link to={card.link} key={idx}>
               <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200 hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 ease-in-out cursor-pointer hover:scale-[1.02] hover:-translate-y-1">
-  <div className="flex items-center justify-between">
+  <div className="flex items-center justify-between tracking-wider whitespace-nowrap">
     <div>
       <p className={`text-6px font-sm ${card.textColor} uppercase tracking-wider`}>
         {card.title}

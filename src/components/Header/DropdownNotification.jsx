@@ -654,7 +654,7 @@ const DropdownNotification = () => {
                 dark:text-blue-200
               "
             >
-              Delayed Orders
+              Delayed Order Products
             </h4>
             {totalItems > 0 && (
               <span className="text-[8px] text-gray-400 dark:text-gray-500">
