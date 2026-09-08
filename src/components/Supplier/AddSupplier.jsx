@@ -113,7 +113,9 @@ const AddSupplier = () => {
             }))
         };
 
-        console.log((formData)); // Log the formData for debugging
+        console.log(formData,"Form Data"
+
+        ); // Log the formData for debugging
 
         try {
             console.log("Submitting form...");
@@ -182,7 +184,7 @@ const AddSupplier = () => {
                         accountNo: '',
                         shippingState: '',
                         ifscCode: '',
-                        typeOfopeningBalance: "",
+                        typeOfOpeningBalance: "",
                         previousOpType: "",
                         openingBalances: '',
                         previousOpBalance: '',
@@ -378,11 +380,11 @@ const AddSupplier = () => {
                                                         <label className="flex items-center gap-2">
                                                             <input
                                                                 type="radio"
-                                                                name="typeOfopeningBalance"
+                                                                name="typeOfOpeningBalance"
                                                                 value="DEBIT"
-                                                                checked={values.typeOfopeningBalance === "DEBIT"}
+                                                                checked={values.typeOfOpeningBalance === "DEBIT"}
                                                                 onChange={(e) => {
-                                                                    setFieldValue('typeOfopeningBalance', e.target.value);
+                                                                    setFieldValue('typeOfOpeningBalance', e.target.value);
                                                                     setFieldValue('previousOpType', e.target.value);
                                                                 }}
                                                                 className="h-4 w-4 border-stroke bg-transparent text-primary focus:ring-0 dark:border-form-strokedark dark:bg-slate-700"
@@ -392,11 +394,11 @@ const AddSupplier = () => {
                                                         <label className="flex items-center gap-2">
                                                             <input
                                                                 type="radio"
-                                                                name="typeOfopeningBalance"
+                                                                name="typeOfOpeningBalance"
                                                                 value="CREDIT"
-                                                                checked={values.typeOfopeningBalance === "CREDIT"}
+                                                                checked={values.typeOfOpeningBalance === "CREDIT"}
                                                                 onChange={(e) => {
-                                                                    setFieldValue('typeOfopeningBalance', e.target.value);
+                                                                    setFieldValue('typeOfOpeningBalance', e.target.value);
                                                                     setFieldValue('previousOpType', e.target.value);
                                                                 }}
                                                                 className="h-4 w-4 border-stroke bg-transparent text-primary focus:ring-0 dark:border-form-strokedark dark:bg-slate-700"
@@ -423,7 +425,7 @@ const AddSupplier = () => {
                                                             />
                                                         </div>
                                                         {/* Display "CR" if Credit is selected */}
-                                                        {values.typeOfopeningBalance === "CREDIT" ? (
+                                                        {values.typeOfOpeningBalance === "CREDIT" ? (
                                                             <span className="text-lg font-medium text-gray-600 dark:text-gray-300">
                                                                 Cr.
                                                             </span>

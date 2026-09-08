@@ -1355,6 +1355,8 @@ const ViewLedger = () => {
             alert("Failed to delete entry");
         }
     };
+    console.log(SelectedLEDGERData,"1010101");
+    
 
 
     return (
