@@ -465,6 +465,7 @@ const CreateVoucherPurchase = () => {
                             ...values,
                             // Destination (purchase) ledger always gets the excl.-GST base amount.
                             destinationAmount: parseFloat(totals.totalBasePrice),
+                            totalwithoutGst: parseFloat(totals.totalBasePrice),
                             // Regular supplier: full MRP (incl. GST) is what's actually owed, and
                             // the GST portion is booked separately to the Input GST ledger for ITC.
                             // Non-regular supplier: nothing to split, owed amount = base amount,

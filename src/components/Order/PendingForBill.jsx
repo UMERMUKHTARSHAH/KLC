@@ -220,231 +220,202 @@ const PendingForBill = () => {
     // console.log(filteredItems,"221");
 
 
-    const renderTableRows = () => {
-        if (!Order || !Order.length) {
-            return (
-                <tr className='bg-white dark:bg-slate-700 dark:text-white'>
-                    <td colSpan="12" className="px-5 py-5 border-b border-gray-200 text-sm">
-                        <p className="text-gray-900 whitespace-no-wrap text-center">No Order Found</p>
-                    </td>
-                </tr>
-            );
+  const renderTableRows = () => {
+    if (!Order || !Order.length) {
+        return (
+            <tr className='bg-white dark:bg-slate-700 dark:text-white'>
+                <td colSpan="12" className="px-5 py-5 border-b border-gray-200 text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap text-center">No Order Found</p>
+                </td>
+            </tr>
+        );
+    }
+
+    const startingSerialNumber = (pagination.currentPage - 1) * pagination.itemsPerPage + 1;
+    console.log(Order, "112121");
+
+    return Order.map((item, index) => {
+        // Get all orders for this supplier
+        const allOrders = item?.orders || [];
+        
+        if (allOrders.length === 0) {
+            return null;
         }
 
-        const startingSerialNumber = (pagination.currentPage - 1) * pagination.itemsPerPage + 1;
-        console.log(Order, "112121");
+        // Calculate totals for all orders
+        const totalBillAmount = allOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+        const totalReceivedQty = allOrders.reduce((sum, order) => sum + (order.receivedQty || 0), 0);
+        const totalCost = allOrders.reduce((sum, order) => sum + (order.productCost || 0), 0);
+        const totalOrdersCount = allOrders.length;
 
-        // Filter items to only include those with orders where OPVoucherCreated is false
-        const filteredItems = Order.filter(item => {
-            if (!item?.orders || item.orders.length === 0) return false;
+        // Count orders with OP voucher created
+        const completedOrders = allOrders.filter(order => order.opVoucherCreated === true);
+        const completedOrdersCount = completedOrders.length;
 
-            // Keep item if ANY order has OPVoucherCreated: false
-            return item.orders.some(order => order.OPVoucherCreated === false);
-        });
+        return (
+            <tr key={index} className='bg-white dark:bg-slate-700 dark:text-white'>
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">{startingSerialNumber + index}</p>
+                </td>
 
-        // If no items after filtering
-        if (filteredItems.length === 0) {
-            return (
-                <tr className='bg-white dark:bg-slate-700 dark:text-white'>
-                    <td colSpan="12" className="px-5 py-5 border-b border-gray-200 text-sm">
-                        <p className="text-gray-900 whitespace-no-wrap text-center">All orders Product vouchers created</p>
-                    </td>
-                </tr>
-            );
-        }
-
-        console.log(filteredItems, "filteredItemsfilteredItems");
-
-        return filteredItems.map((item, index) => {
-            // Filter orders within this item to only show those with OPVoucherCreated: false
-            const pendingOrders = item?.orders?.filter(order => order.OPVoucherCreated === false) || [];
-console.log(pendingOrders,"4444444444444444444444444444444444444444444444444");
-
-            // If no pending orders in this item, skip it (shouldn't happen due to outer filter)
-            if (pendingOrders.length === 0) {
-                return null;
-            }
-
-            // Calculate totals only for pending orders (OPVoucherCreated: false)
-            const totalBillAmount = pendingOrders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
-            const totalReceivedQty = pendingOrders.reduce((sum, order) => sum + (order.receivedQty || 0), 0);
-            const totalCost = pendingOrders.reduce((sum, order) => sum + (order.productCost || 0), 0);
-            const totalOrdersCount = pendingOrders.length;
-
-            // Also show count of orders with OPVoucherCreated: true (if any)
-            const completedOrders = item?.orders?.filter(order => order.OPVoucherCreated === true) || [];
-            const completedOrdersCount = completedOrders.length;
-
-            return (
-                <tr key={index} className='bg-white dark:bg-slate-700 dark:text-white'>
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        <p className="text-gray-900 whitespace-no-wrap">{startingSerialNumber + index}</p>
-                    </td>
-
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        <p className="text-gray-900 whitespace-no-wrap">{item?.supplierName}</p>
-                        {completedOrdersCount > 0 && (
-                            <p className="text-xs text-gray-500 mt-1">
-                                {completedOrdersCount} Product has voucher
-                            </p>
-                        )}
-                    </td>
-
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        {pendingOrders.map((order, idx) => {
-                            const formattedDate = new Date(order.updatedAt).toISOString().split("T")[0];
-                            const formattedTime = new Date(order.updatedAt).toTimeString().slice(0, 5);
-                            return (
-                                <p key={idx} className="text-gray-900 whitespace-nowrap">
-                                    {formattedDate}, {formattedTime}
-                                </p>
-                            );
-                        })}
-                    </td>
-
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        {pendingOrders.map((order, idx) => (
-                            <p key={idx} className="text-gray-900 whitespace-nowrap">
-                                {order.productId}
-                            </p>
-                        ))}
-                    </td>
-
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        {pendingOrders.map((order, idx) => (
-                            <p key={idx} className="text-gray-900 whitespace-nowrap">
-                                {order.orderNo}
-                                {order.OPVoucherCreated === true && (
-                                    <span className="ml-2 text-xs bg-green-100 text-green-800 px-1 rounded">✓ OP</span>
-                                )}
-                            </p>
-                        ))}
-                    </td>
-
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        {pendingOrders.map((order, idx) => (
-                            <p key={idx} className="text-gray-900 whitespace-nowrap">
-                                {order.productCost}
-                            </p>
-                        ))}
-                    </td>
-
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        {pendingOrders.map((order, idx) => (
-                            <p key={idx} className="text-gray-900 whitespace-nowrap">
-                                {order.receivedQty}
-                            </p>
-                        ))}
-                    </td>
-
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        {pendingOrders.map((order, idx) => (
-                            <p key={idx} className="text-gray-900 whitespace-nowrap">
-                                {order.totalAmount}
-                            </p>
-                        ))}
-                    </td>
-
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        <p className="text-gray-900 whitespace-nowrap font-semibold">
-                            {totalBillAmount.toFixed(2)}
-                            <span className="text-xs text-gray-500 ml-2">
-                                ({totalOrdersCount} pending orders)
-                            </span>
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">{item?.supplierName}</p>
+                    {completedOrdersCount > 0 && (
+                        <p className="text-xs text-gray-500 mt-1">
+                            {completedOrdersCount} Product has voucher
                         </p>
-                    </td>
+                    )}
+                </td>
 
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        <p className="text-gray-900 whitespace-no-wrap">{item?.billStatus}</p>
-                    </td>
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    {allOrders.map((order, idx) => {
+                        const formattedDate = new Date(order.updatedAt).toISOString().split("T")[0];
+                        const formattedTime = new Date(order.updatedAt).toTimeString().slice(0, 5);
+                        return (
+                            <p key={idx} className="text-gray-900 whitespace-nowrap">
+                                {formattedDate}, {formattedTime}
+                            </p>
+                        );
+                    })}
+                </td>
 
-                    {/* Voucher Selection Column - Always show since we filtered to only pending orders */}
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        <ReactSelect
-                            options={formattedVoucher}
-                            placeholder="Select Voucher"
-                            className="w-full z-90 bg-transparent dark:bg-form-Field"
-                            styles={customStyles}
-                            menuPortalTarget={document.body}
-                            onChange={(selectedOption) => {
-                                setSelectedVouchers(prev => ({
-                                    ...prev,
-                                    [item?.billStatusId]: selectedOption?.value || null
-                                }));
-                            }}
-                            value={formattedVoucher.find(option => option.value === selectedVouchers[item?.billStatusId])}
-                            menuPosition="fixed"
-                        />
-                    </td>
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    {allOrders.map((order, idx) => (
+                        <p key={idx} className="text-gray-900 whitespace-nowrap">
+                            {order.productId}
+                        </p>
+                    ))}
+                </td>
 
-                    {/* Actions Column */}
-                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
-                        <div className="flex text-gray-900 whitespace-no-wrap">
-                            {selectedVouchers[item?.billStatusId] ? (
-                                <CgFileAdd
-                                    size={17}
-                                    className='text-teal-500 hover:text-teal-700 mx-2 cursor-pointer'
-                                    onClick={() => {
-                                        if (pendingOrders.length === 0) {
-                                            toast.error('No pending orders available');
-                                            return;
-                                        }
-                                        console.log(pendingOrders,"44444444444444444441");
-                                        
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    {allOrders.map((order, idx) => (
+                        <p key={idx} className="text-gray-900 whitespace-nowrap">
+                            {order.orderNo}
+                            {order.opVoucherCreated === true && (
+                                <span className="ml-2 text-xs bg-green-100 text-green-800 px-1 rounded">✓ OP</span>
+                            )}
+                        </p>
+                    ))}
+                </td>
 
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    {allOrders.map((order, idx) => (
+                        <p key={idx} className="text-gray-900 whitespace-nowrap">
+                            {order.productCost}
+                        </p>
+                    ))}
+                </td>
 
-                                        const orderDetails = pendingOrders?.map(order => ({
-                                           
-                                            
-                                            orderNo: order.orderNo,
-                                            orderId: order.orderId,
-                                            productId: order?.productId,
-                                            ProductIdString: order.stringProductId,
-                                            receivedQty: order.receivedQty,
-                                            totalAmount: order.totalAmount,
-                                            productCost: order.productCost,
-                                            opId:order.orderProductId,
-                                            igst: order?.Igst,
-                                            cgst: order?.Cgst,
-                                            sgst: order?.Sgst,
-                                            OPVoucherCreated: order.OPVoucherCreated 
-                                        }));
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    {allOrders.map((order, idx) => (
+                        <p key={idx} className="text-gray-900 whitespace-nowrap">
+                            {order.receivedQty}
+                        </p>
+                    ))}
+                </td>
 
-                                        navigate(`/Purchasevoucher/create/${selectedVouchers[item?.billStatusId]}`, {
-                                            state: {
-                                                sourcePage: 'PendingForBill',
-                                                supplierName: item?.supplierName,
-                                                supplierId: item?.supplierId,
-                                                billStatus: item?.billStatus,
-                                                billStatusId: item?.billStatusId,
-                                                orders: orderDetails,
-                                                totalBillAmount: totalBillAmount,
-                                                totalReceivedQty: totalReceivedQty,
-                                                totalCost: totalCost,
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    {allOrders.map((order, idx) => (
+                        <p key={idx} className="text-gray-900 whitespace-nowrap">
+                            {order.totalAmount}
+                        </p>
+                    ))}
+                </td>
 
-                                                ledgerIdd: item?.ledgerId,
-                                                pendingOrdersCount: pendingOrders.length,
-                                                completedOrdersCount: completedOrdersCount,
-                                                originalData: item
-                                            }
-                                        });
-                                    }}
-                                    title='Create Purchase Voucher'
-                                />
-                            ) : null}
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    <p className="text-gray-900 whitespace-nowrap font-semibold">
+                        {totalBillAmount.toFixed(2)}
+                        <span className="text-xs text-gray-500 ml-2">
+                            ({totalOrdersCount} orders)
+                        </span>
+                    </p>
+                </td>
 
-                            <FiEdit
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">{item?.billStatus}</p>
+                </td>
+
+                {/* Voucher Selection Column */}
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    <ReactSelect
+                        options={formattedVoucher}
+                        placeholder="Select Voucher"
+                        className="w-full z-90 bg-transparent dark:bg-form-Field"
+                        styles={customStyles}
+                        menuPortalTarget={document.body}
+                        onChange={(selectedOption) => {
+                            setSelectedVouchers(prev => ({
+                                ...prev,
+                                [item?.billStatusId]: selectedOption?.value || null
+                            }));
+                        }}
+                        value={formattedVoucher.find(option => option.value === selectedVouchers[item?.billStatusId])}
+                        menuPosition="fixed"
+                    />
+                </td>
+
+                {/* Actions Column */}
+                <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    <div className="flex text-gray-900 whitespace-no-wrap">
+                        {selectedVouchers[item?.billStatusId] ? (
+                            <CgFileAdd
                                 size={17}
                                 className='text-teal-500 hover:text-teal-700 mx-2 cursor-pointer'
-                                onClick={() => navigate(`/Order/updatependingforbill/${item?.billStatusId}`)}
-                                title='Edit Order'
+                                onClick={() => {
+                                    if (allOrders.length === 0) {
+                                        toast.error('No orders available');
+                                        return;
+                                    }
+                                    
+                                    const orderDetails = allOrders.map(order => ({
+                                        orderNo: order.orderNo,
+                                        orderId: order.orderId,
+                                        productId: order?.productId,
+                                        ProductIdString: order.stringProductId,
+                                        receivedQty: order.receivedQty,
+                                        totalAmount: order.totalAmount,
+                                        productCost: order.productCost,
+                                        opId: order.orderProductId,
+                                        igst: order?.igst,
+                                        cgst: order?.cgst,
+                                        sgst: order?.sgst,
+                                        opVoucherCreated: order.opVoucherCreated 
+                                    }));
+
+                                    navigate(`/Purchasevoucher/create/${selectedVouchers[item?.billStatusId]}`, {
+                                        state: {
+                                            sourcePage: 'PendingForBill',
+                                            supplierName: item?.supplierName,
+                                            supplierId: item?.supplierId,
+                                            billStatus: item?.billStatus,
+                                            billStatusId: item?.billStatusId,
+                                            orders: orderDetails,
+                                            totalBillAmount: totalBillAmount,
+                                            totalReceivedQty: totalReceivedQty,
+                                            totalCost: totalCost,
+                                            ledgerIdd: item?.ledgerId,
+                                            pendingOrdersCount: allOrders.length,
+                                            completedOrdersCount: completedOrdersCount,
+                                            originalData: item
+                                        }
+                                    });
+                                }}
+                                title='Create Purchase Voucher'
                             />
-                        </div>
-                    </td>
-                </tr>
-            );
-        });
-    };
+                        ) : null}
+
+                        <FiEdit
+                            size={17}
+                            className='text-teal-500 hover:text-teal-700 mx-2 cursor-pointer'
+                            onClick={() => navigate(`/Order/updatependingforbill/${item?.billStatusId}`)}
+                            title='Edit Order'
+                        />
+                    </div>
+                </td>
+            </tr>
+        );
+    });
+};
 
 
     const handleSubmit = (values) => {
