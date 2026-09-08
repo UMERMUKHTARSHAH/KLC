@@ -651,6 +651,10 @@ const ProductGroupDetails = () => {
         params.append('orderType', orderType);
       }
       
+      // Get all items at once
+      params.append('page', '0');
+      params.append('size', '1000');
+      
       const fullUrl = params.toString() 
         ? `${GET_PRODUCTDETAILS_URL}?${params.toString()}` 
         : GET_PRODUCTDETAILS_URL;
@@ -663,6 +667,15 @@ const ProductGroupDetails = () => {
       
       let ordersData = [];
       let totalElements = 0;
+      
+      // Log the response for debugging
+      console.log('Category Orders Response:', {
+        orderType,
+        totalCount: response.data?.totalCount,
+        totalElements: response.data?.totalElements,
+        contentLength: response.data?.content?.length,
+        klcCount: response.data?.klcCount
+      });
       
       if (response.data?.content && Array.isArray(response.data.content)) {
         response.data.content.forEach((order) => {
@@ -707,27 +720,30 @@ const ProductGroupDetails = () => {
             });
           }
         });
-        totalElements = response.data.totalElements || ordersData.length;
+        // Use the actual total from API
+        totalElements = response.data.totalCount || 
+                       response.data.totalElements || 
+                       response.data.klcCount || 
+                       ordersData.length;
       }
+      
+      console.log('Total orders data length:', ordersData.length);
+      console.log('Total elements:', totalElements);
       
       setAllCategoryOrders(ordersData);
       
-      const totalPages = Math.ceil(totalElements / categoryPagination.pageSize);
-      const startIndex = (page - 1) * categoryPagination.pageSize;
-      const endIndex = startIndex + categoryPagination.pageSize;
-      const paginatedData = ordersData.slice(startIndex, endIndex);
-      
-      const formattedOrders = paginatedData.map((item, idx) => ({
+      // SHOW ALL ITEMS ON ONE PAGE - No pagination
+      const paginatedData = ordersData.map((item, idx) => ({
         ...item,
-        sno: startIndex + idx + 1
+        sno: idx + 1
       }));
       
-      setCategoryOrders(formattedOrders);
+      setCategoryOrders(paginatedData);
       setCategoryPagination({
-        currentPage: page,
-        pageSize: categoryPagination.pageSize,
-        totalPages: totalPages,
-        totalItems: totalElements
+        currentPage: 1,
+        pageSize: ordersData.length, // Set pageSize to total items
+        totalPages: 1, // Only 1 page
+        totalItems: ordersData.length
       });
       setSelectedOrderType(orderType);
       setActiveView("category");
