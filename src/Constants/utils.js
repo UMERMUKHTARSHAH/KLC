@@ -148,6 +148,8 @@ export const DELETE_PRODUCT_SUBGROUPP_URL = `${BASE_URL}/subGroup/`;
 
 //notification
 export const NOTIF_COUNT = `${BASE_URL}/api/notifications/unread-count`;
+export const ALLNOTIF_COUNT = `${BASE_URL}/api/notifications/all-count`;
+
 export const NOTIF_ = `${BASE_URL}/api/notifications/unread`;
 export const NOTIF = `${BASE_URL}/api/notifications`;
 

@@ -13,6 +13,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { toast } from 'react-toastify';
 import { useSelector } from 'react-redux';
 import {
+  ALLNOTIF_COUNT,
   NOTIF,
   NOTIF_,
   NOTIF_COUNT,
@@ -24,6 +25,7 @@ const DropdownNotification = () => {
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0)
   const [loading, setLoading] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [markingAsRead, setMarkingAsRead] = useState(null);
@@ -285,6 +287,18 @@ const DropdownNotification = () => {
       console.error('Error fetching unread count:', error);
     }
   };
+  const getAllCount= async()=>{
+    try {
+      const data = await fetchWithAuth(`${ALLNOTIF_COUNT}`);
+      console.log(data,"55555555555552");
+      
+      setTotalCount(data.allCount || 0);
+    } catch (error) {
+      console.error('Error fetching all count:', error);
+    }
+  }
+
+  getAllCount()
 
   // =========================================================
   // FETCH NOTIFICATIONS BY TAB WITH PAGINATION
@@ -663,7 +677,7 @@ const DropdownNotification = () => {
             )}
           </div>
 
-          {activeTab === 'unread' && unreadCount > 0 && (
+          {/* {activeTab === 'unread' && unreadCount > 0 && (
             <button
               onClick={markAllAsRead}
               className="
@@ -683,7 +697,7 @@ const DropdownNotification = () => {
               <FaCheck className="text-[8px]" />
               Mark All Read
             </button>
-          )}
+          )} */}
         </div>
 
         {/* ===================================================
@@ -779,9 +793,9 @@ const DropdownNotification = () => {
           >
             <div className="flex items-center justify-center gap-1.5">
               <span>All Notifications</span>
-              {totalItems > 0 && (
+              {totalCount > 0 && (
                 <span className="text-[8px] text-gray-400 dark:text-gray-500">
-                  ({totalItems})
+                  ({totalCount})
                 </span>
               )}
             </div>
