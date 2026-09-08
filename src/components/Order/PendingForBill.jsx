@@ -438,11 +438,11 @@ const PendingForBill = () => {
 
     return (
         <DefaultLayout>
-            <Breadcrumb pageName="Order/ View Order" />
+            <Breadcrumb pageName="Order/ Pending For Bill" />
             <div className="container mx-auto px-4 sm:px-8 bg-white dark:bg-slate-800">
                 <div className="pt-5">
                     <div className='flex justify-between'>
-                        <h2 className="text-xl font-semibold leading-tight">IN PROGRESS ORDERS</h2>
+                        <h2 className="text-xl font-semibold leading-tight">Pending For Bill</h2>
                         {/* <p className={`inline-flex rounded-full bg-opacity-10 py-1 px-3 text-sm font-medium bg-success text-success dark:bg-white dark:text-slate-800`}>
                             TOTAL PRODUCTS: {pagination.totalItems}
                         </p> */}

@@ -311,6 +311,7 @@ const DropdownNotification = () => {
     try {
       let url = '';
       
+      
       // If tab is 'all', fetch all notifications with pagination
       if (tab === 'all') {
         url = `${NOTIF}?page=${pageNumber}&size=5`;
