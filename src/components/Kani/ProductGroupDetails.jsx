@@ -651,7 +651,7 @@ const ProductGroupDetails = () => {
         params.append('orderType', orderType);
       }
       
-      // Get all items at once
+      // Get all items at once (we'll paginate client-side)
       params.append('page', '0');
       params.append('size', '1000');
       
@@ -674,7 +674,6 @@ const ProductGroupDetails = () => {
         totalCount: response.data?.totalCount,
         totalElements: response.data?.totalElements,
         contentLength: response.data?.content?.length,
-        klcCount: response.data?.klcCount
       });
       
       if (response.data?.content && Array.isArray(response.data.content)) {
@@ -720,10 +719,8 @@ const ProductGroupDetails = () => {
             });
           }
         });
-        // Use the actual total from API
         totalElements = response.data.totalCount || 
                        response.data.totalElements || 
-                       response.data.klcCount || 
                        ordersData.length;
       }
       
@@ -732,17 +729,33 @@ const ProductGroupDetails = () => {
       
       setAllCategoryOrders(ordersData);
       
-      // SHOW ALL ITEMS ON ONE PAGE - No pagination
-      const paginatedData = ordersData.map((item, idx) => ({
+      // Calculate pagination with 10 items per page
+      const pageSize = 10;
+      const totalPages = Math.ceil(ordersData.length / pageSize);
+      
+      // Ensure current page is within bounds
+      let currentPage = page;
+      if (currentPage > totalPages) {
+        currentPage = totalPages;
+      }
+      if (currentPage < 1) {
+        currentPage = 1;
+      }
+      
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, ordersData.length);
+      const paginatedData = ordersData.slice(startIndex, endIndex).map((item, idx) => ({
         ...item,
-        sno: idx + 1
+        sno: startIndex + idx + 1
       }));
+      
+      console.log('Showing items:', startIndex + 1, 'to', endIndex, 'of', ordersData.length);
       
       setCategoryOrders(paginatedData);
       setCategoryPagination({
-        currentPage: 1,
-        pageSize: ordersData.length, // Set pageSize to total items
-        totalPages: 1, // Only 1 page
+        currentPage: currentPage,
+        pageSize: pageSize,
+        totalPages: totalPages,
         totalItems: ordersData.length
       });
       setSelectedOrderType(orderType);
