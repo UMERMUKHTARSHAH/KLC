@@ -651,6 +651,10 @@ const ProductGroupDetails = () => {
         params.append('orderType', orderType);
       }
       
+      // Get all items at once (we'll paginate client-side)
+      params.append('page', '0');
+      params.append('size', '1000');
+      
       const fullUrl = params.toString() 
         ? `${GET_PRODUCTDETAILS_URL}?${params.toString()}` 
         : GET_PRODUCTDETAILS_URL;
@@ -663,6 +667,14 @@ const ProductGroupDetails = () => {
       
       let ordersData = [];
       let totalElements = 0;
+      
+      // Log the response for debugging
+      console.log('Category Orders Response:', {
+        orderType,
+        totalCount: response.data?.totalCount,
+        totalElements: response.data?.totalElements,
+        contentLength: response.data?.content?.length,
+      });
       
       if (response.data?.content && Array.isArray(response.data.content)) {
         response.data.content.forEach((order) => {
@@ -707,27 +719,44 @@ const ProductGroupDetails = () => {
             });
           }
         });
-        totalElements = response.data.totalElements || ordersData.length;
+        totalElements = response.data.totalCount || 
+                       response.data.totalElements || 
+                       ordersData.length;
       }
+      
+      console.log('Total orders data length:', ordersData.length);
+      console.log('Total elements:', totalElements);
       
       setAllCategoryOrders(ordersData);
       
-      const totalPages = Math.ceil(totalElements / categoryPagination.pageSize);
-      const startIndex = (page - 1) * categoryPagination.pageSize;
-      const endIndex = startIndex + categoryPagination.pageSize;
-      const paginatedData = ordersData.slice(startIndex, endIndex);
+      // Calculate pagination with 10 items per page
+      const pageSize = 10;
+      const totalPages = Math.ceil(ordersData.length / pageSize);
       
-      const formattedOrders = paginatedData.map((item, idx) => ({
+      // Ensure current page is within bounds
+      let currentPage = page;
+      if (currentPage > totalPages) {
+        currentPage = totalPages;
+      }
+      if (currentPage < 1) {
+        currentPage = 1;
+      }
+      
+      const startIndex = (currentPage - 1) * pageSize;
+      const endIndex = Math.min(startIndex + pageSize, ordersData.length);
+      const paginatedData = ordersData.slice(startIndex, endIndex).map((item, idx) => ({
         ...item,
         sno: startIndex + idx + 1
       }));
       
-      setCategoryOrders(formattedOrders);
+      console.log('Showing items:', startIndex + 1, 'to', endIndex, 'of', ordersData.length);
+      
+      setCategoryOrders(paginatedData);
       setCategoryPagination({
-        currentPage: page,
-        pageSize: categoryPagination.pageSize,
+        currentPage: currentPage,
+        pageSize: pageSize,
         totalPages: totalPages,
-        totalItems: totalElements
+        totalItems: ordersData.length
       });
       setSelectedOrderType(orderType);
       setActiveView("category");
