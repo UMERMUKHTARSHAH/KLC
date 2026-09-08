@@ -441,11 +441,13 @@ const PendingForBill = () => {
             <Breadcrumb pageName="Order/ Pending For Bill" />
             <div className="container mx-auto px-4 sm:px-8 bg-white dark:bg-slate-800">
                 <div className="pt-5">
-                    <div className='flex justify-between'>
-                        <h2 className="text-xl font-semibold leading-tight">Pending For Bill</h2>
-                        {/* <p className={`inline-flex rounded-full bg-opacity-10 py-1 px-3 text-sm font-medium bg-success text-success dark:bg-white dark:text-slate-800`}>
-                            TOTAL PRODUCTS: {pagination.totalItems}
-                        </p> */}
+                     <div className='flex flex-row items-center justify-between w-full'>
+                        <h2 className="text-xl text-slate-500 font-semibold w-full flex items-center justify-between">
+                            <span>Pending For Bill</span>
+                            {/* <span className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-blue-900/20 px-4 py-2 rounded-lg border border-blue-200 dark:border-blue-800/30 text-sm font-semibold text-blue-700 dark:text-blue-300 ml-4">
+                                TOTAL LEDGERS: {pagination.totalItems}
+                            </span> */}
+                        </h2>
                     </div>
 
 
