@@ -282,7 +282,7 @@ const PendingForBill = () => {
                 <td className="px-5 py-5 border-b border-gray-200 text-sm">
                     {allOrders.map((order, idx) => (
                         <p key={idx} className="text-gray-900 whitespace-nowrap">
-                            {order.productId}
+                            {order.stringProductId}
                         </p>
                     ))}
                 </td>
