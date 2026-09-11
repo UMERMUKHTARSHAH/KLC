@@ -7,7 +7,7 @@ import DefaultLayout from "../../layout/DefaultLayout";
 import Breadcrumb from "../../components/Breadcrumbs/Breadcrumb";
 import Pagination from "../../components/Pagination/Pagination";
 import { GET_PRODUCTDETAILS_URL, GET_IMAGE, GET_SUPPLIERS_URL, GET_INPROGRESS_URL, UPDATE_ISSUECHALLAN } from "../../Constants/utils";
-import { FiEdit } from "react-icons/fi";
+import { FiEdit,FiEye  } from "react-icons/fi";
 
 const ProductGroupDetails = () => {
   const { id } = useParams();
@@ -1155,12 +1155,18 @@ const ProductGroupDetails = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <div className="flex items-center gap-3">
-                        <FiEdit
+                        {/* <FiEdit
                           size={18}
                           className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 cursor-pointer transition-colors duration-200"
                           onClick={(e) => handleUpdate(e, product, product.orderNo)}
                           title="Edit Product"
-                        />
+                        /> */}
+                        <FiEye
+  size={18}
+  className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300 cursor-pointer transition-colors duration-200"
+  onClick={(e) => handleUpdate(e, product, product.orderNo)}
+  title="View Order Product"
+/>
                       </div>
                     </td>
                   </tr>

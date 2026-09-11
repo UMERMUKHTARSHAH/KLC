@@ -17,6 +17,7 @@
     "@fullcalendar/list": "^6.1.15",
     "@fullcalendar/react": "^6.1.15",
     "@googleapis/calendar": "^14.2.0",
+    "@mui/icons-material": "^6.5.0",
     "@mui/x-date-pickers": "^7.23.1",
     "@reduxjs/toolkit": "^2.2.5",
     "apexcharts": "^3.41.0",

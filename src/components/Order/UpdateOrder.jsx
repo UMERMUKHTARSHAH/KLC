@@ -476,7 +476,11 @@ const UpdateOrder = () => {
       orderNo: values.orderNo,
       orderType: values.orderType ? { id: values.orderType.id } : null,
       location: values.locationId ? { id: values.locationId } : null,
-      customer: values.customer ? { id: values.customer.id } : null,
+customer: values.customer?.id
+  ? { id: values.customer.id }
+  : order?.customerId
+    ? { id: order.customerId }
+    : null,
       purchaseOrderNo: values.purchaseOrderNo,
       poDate: values.poDate,
       salesChannel: values.salesChannel,
@@ -820,7 +824,14 @@ const UpdateOrder = () => {
             orderNo: order?.orderNo || '',
             orderType: order?.orderType || '',
             locationId: order?.locationId || '',
-            customer: order?.customer || null,
+            // customer: order?.customer || null,
+            customer: (() => {
+  const cid = order?.customerId;
+  if (!cid) return null;
+  const match = customerOptions.find(o => o.value === cid);
+  if (match) return { id: match.value, customerName: match.label };
+  return { id: cid, customerName: '' };
+})(),
             purchaseOrderNo: order?.purchaseOrderNo || '',
             poDate: order?.poDate || '',
             salesChannel: order?.salesChannel || '',
@@ -1021,15 +1032,23 @@ const UpdateOrder = () => {
                               name="customer"
                               styles={customStyles}
                               className="bg-white dark:bg-form-Field"
-                              value={
-                                values.customer
-                                  ? {
-                                    label: values.customer.customerName,
-                                    value: values.customer.id,
-                                    data: values.customer
-                                  }
-                                  : null
-                              }
+                              value={(() => {
+  // Priority 1: Formik value
+  if (values.customer?.id) {
+    const match = customerOptions.find(o => o.value === values.customer.id);
+    if (match) return match;
+    return {
+      value: values.customer.id,
+      label: values.customer.customerName || `Customer #${values.customer.id}`,
+    };
+  }
+  // Priority 2: order.customerId directly
+  const cid = order?.customerId;
+  if (!cid) return null;
+  const match = customerOptions.find(o => o.value === cid);
+  if (match) return match;
+  return { value: cid, label: `Customer #${cid}` };
+})()}
                               onChange={(option) => setFieldValue("customer", option ? option.data : null)}
                               options={customerOptions}
                               classNamePrefix="react-select"
