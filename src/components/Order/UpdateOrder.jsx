@@ -48,14 +48,10 @@ const UpdateOrder = () => {
     // { id: 3, name: "Supplier C" },
   ])
 
-const [SelectedLocation, setSelectedLocation] = useState([])
-const {
-
+  const [SelectedLocation, setSelectedLocation] = useState([])
+  const {
     getLocation, Location
-
   } = useorder();
-
-
 
   useEffect(() => {
     if (Location) {
@@ -73,9 +69,7 @@ const {
     getLocation();
   }, []);
 
-
   console.log(SelectedLocation, "54545454545");
-
 
   const {
     getorderType,
@@ -98,10 +92,10 @@ const {
 
   const handleCheckboxChange = (selectedRowId, supplierId, supplierName) => {
     console.log('Adding supplier - RAW DATA:', { selectedRowId, supplierId, supplierName });
-    
+
     let actualSupplierId;
     let actualSupplierName;
-    
+
     if (supplierId && typeof supplierId === 'object') {
       actualSupplierId = supplierId.id;
       actualSupplierName = supplierId.supplierName || supplierName || '';
@@ -109,13 +103,13 @@ const {
       actualSupplierId = supplierId;
       actualSupplierName = supplierName || '';
     }
-    
-    console.log('Adding supplier - EXTRACTED:', { 
-      actualSupplierId, 
+
+    console.log('Adding supplier - EXTRACTED:', {
+      actualSupplierId,
       actualSupplierName,
       originalSupplierId: supplierId
     });
-    
+
     setSelectedSuppliers((prev) => {
       const updated = [...prev];
       const rowIndex = updated.findIndex(
@@ -141,7 +135,7 @@ const {
       } else {
         updated.push({
           selectedRowId,
-          supplierIds: [{ 
+          supplierIds: [{
             supplierId: actualSupplierId,
             supplierName: actualSupplierName,
             supplierOrderQty: 0
@@ -150,7 +144,7 @@ const {
       }
       return updated;
     });
-    
+
     toast.success(`Supplier ${actualSupplierName} added`);
   };
 
@@ -159,42 +153,36 @@ const {
     console.log("=== DEBUG: Adding supplier to product ===");
     console.log("selectedRowId:", selectedRowId);
     console.log("supplier object:", supplier);
-    
-    // SIMPLE AND DIRECT EXTRACTION
+
     let supplierId;
     let supplierName;
-    
-    // Check what kind of object we received
+
     if (supplier && typeof supplier === 'object') {
-      // Direct supplier object with id and name
       if (supplier.id !== undefined) {
         supplierId = supplier.id;
         supplierName = supplier.supplierName || supplier.name || `Supplier ${supplier.id}`;
       }
-      // Supplier wrapped in supplierId object
       else if (supplier.supplierId && typeof supplier.supplierId === 'object') {
         supplierId = supplier.supplierId.id;
         supplierName = supplier.supplierId.supplierName || supplier.supplierId.name || `Supplier ${supplierId}`;
       }
-      // Supplier has supplierId as primitive
       else if (supplier.supplierId) {
         supplierId = supplier.supplierId;
         supplierName = supplier.supplierName || supplier.name || `Supplier ${supplierId}`;
       }
     } else {
-      // Supplier is just an ID
       supplierId = supplier;
       supplierName = `Supplier ${supplierId}`;
     }
-    
+
     console.log("EXTRACTED VALUES:", { supplierId, supplierName });
-    
+
     if (!supplierId) {
       console.error("No supplier ID found!");
       toast.error("Invalid supplier data");
       return;
     }
-    
+
     setSelectedSuppliersProduct((prev) => {
       const updated = [...prev];
       const rowIndex = updated.findIndex(
@@ -202,7 +190,6 @@ const {
       );
 
       if (rowIndex !== -1) {
-        // Check if supplier already exists
         const supplierExists = updated[rowIndex].supplierIds.some(
           (s) => s.supplierId === supplierId
         );
@@ -254,7 +241,7 @@ const {
 
   const handleSupplierModalSubmit = () => {
     console.log("Selected Suppliers:", selectedSuppliers);
-    
+
     selectedSuppliers.forEach((item, idx) => {
       console.log(`Supplier group ${idx}:`, item);
       item.supplierIds.forEach((supplier, sIdx) => {
@@ -265,11 +252,11 @@ const {
         });
       });
     });
-    
+
     const suppliersForCurrentProduct = selectedSuppliers.filter(
       item => item.selectedRowId === selectedRowId
     );
-    
+
     closeSupplierModal();
   };
 
@@ -281,41 +268,37 @@ const {
   // FIXED: For new products - Prevents duplicate suppliers when updating quantity
   const handleSupplierQuantityUpdate = (productIndex, supplierIndex, quantity, setFieldValue, values) => {
     const qty = parseInt(quantity) || 0;
-    
-    // First update the local state
+
     setSelectedSuppliersProduct(prev => {
       const updated = [...prev];
       const productSuppliers = updated.find(
         item => item.selectedRowId === productIndex
       );
-      
+
       if (productSuppliers && productSuppliers.supplierIds[supplierIndex]) {
         productSuppliers.supplierIds[supplierIndex].supplierOrderQty = qty;
       }
-      
+
       return updated;
     });
-    
-    // Then update Formik values
+
     const startingIndex = order?.orderProducts?.length || 0;
     const actualIndex = startingIndex + productIndex;
-    
+
     const productSuppliers = selectedSuppliersProduct.find(
       item => item.selectedRowId === productIndex
     );
-    
+
     if (productSuppliers && productSuppliers.supplierIds[supplierIndex]) {
       const supplier = productSuppliers.supplierIds[supplierIndex];
-      
+
       const currentSuppliers = values.orderProducts[actualIndex]?.productSuppliers || [];
-      
-      // Check if supplier already exists in Formik state
+
       const existingIndex = currentSuppliers.findIndex(
         s => s.supplier?.id === supplier.supplierId
       );
-      
+
       if (existingIndex !== -1) {
-        // UPDATE existing supplier - DON'T create new entry
         const updatedSuppliers = [...currentSuppliers];
         updatedSuppliers[existingIndex] = {
           ...updatedSuppliers[existingIndex],
@@ -323,11 +306,10 @@ const {
         };
         setFieldValue(`orderProducts[${actualIndex}].productSuppliers`, updatedSuppliers);
       } else {
-        // ADD new supplier
         setFieldValue(`orderProducts[${actualIndex}].productSuppliers`, [
           ...currentSuppliers,
           {
-            supplier: { 
+            supplier: {
               id: supplier.supplierId
             },
             supplierOrderQty: qty
@@ -340,38 +322,34 @@ const {
   // FIXED: For existing products - Prevents duplicate suppliers when updating quantity
   const handleSupplierQuantityUpdateExisting = (productIndex, supplierIndex, quantity, setFieldValue, values) => {
     const qty = parseInt(quantity) || 0;
-    
-    // First update the local state
+
     setSelectedSuppliers(prev => {
       const updated = [...prev];
       const productSuppliers = updated.find(
         item => item.selectedRowId === productIndex
       );
-      
+
       if (productSuppliers && productSuppliers.supplierIds[supplierIndex]) {
         productSuppliers.supplierIds[supplierIndex].supplierOrderQty = qty;
       }
-      
+
       return updated;
     });
-    
-    // Then update Formik values
+
     const productSuppliers = selectedSuppliers.find(
       item => item.selectedRowId === productIndex
     );
-    
+
     if (productSuppliers && productSuppliers.supplierIds[supplierIndex]) {
       const supplier = productSuppliers.supplierIds[supplierIndex];
-      
+
       const currentSuppliers = values.orderProducts[productIndex]?.productSuppliers || [];
-      
-      // Check if supplier already exists in Formik state
+
       const existingIndex = currentSuppliers.findIndex(
         s => s.supplier?.id === supplier.supplierId
       );
-      
+
       if (existingIndex !== -1) {
-        // UPDATE existing supplier - DON'T create new entry
         const updatedSuppliers = [...currentSuppliers];
         updatedSuppliers[existingIndex] = {
           ...updatedSuppliers[existingIndex],
@@ -379,11 +357,10 @@ const {
         };
         setFieldValue(`orderProducts[${productIndex}].productSuppliers`, updatedSuppliers);
       } else {
-        // ADD new supplier
         setFieldValue(`orderProducts[${productIndex}].productSuppliers`, [
           ...currentSuppliers,
           {
-            supplier: { 
+            supplier: {
               id: supplier.supplierId
             },
             supplierOrderQty: qty
@@ -397,42 +374,42 @@ const {
     const productSuppliers = selectedSuppliersProduct.find(
       item => item.selectedRowId === productIndex
     );
-    
+
     if (!productSuppliers || !productSuppliers.supplierIds[supplierIndex]) {
       return;
     }
-    
+
     const supplierId = productSuppliers.supplierIds[supplierIndex].supplierId;
-    
+
     setSelectedSuppliersProduct(prev => {
       const updated = [...prev];
       const productRowIndex = updated.findIndex(
         row => row.selectedRowId === productIndex
       );
-      
+
       if (productRowIndex !== -1) {
         updated[productRowIndex].supplierIds = updated[productRowIndex].supplierIds.filter(
           (_, idx) => idx !== supplierIndex
         );
-        
+
         if (updated[productRowIndex].supplierIds.length === 0) {
           updated.splice(productRowIndex, 1);
         }
       }
-      
+
       return updated;
     });
-    
+
     const startingIndex = order?.orderProducts?.length || 0;
     const actualIndex = startingIndex + productIndex;
-    
+
     const currentSuppliers = values.orderProducts[actualIndex]?.productSuppliers || [];
     const updatedSuppliers = currentSuppliers.filter(
       s => s.supplier?.id !== supplierId
     );
-    
+
     setFieldValue(`orderProducts[${actualIndex}].productSuppliers`, updatedSuppliers);
-    
+
     toast.success('Supplier removed successfully');
   };
 
@@ -440,39 +417,39 @@ const {
     const productSuppliers = selectedSuppliers.find(
       item => item.selectedRowId === productIndex
     );
-    
+
     if (!productSuppliers || !productSuppliers.supplierIds[supplierIndex]) {
       return;
     }
-    
+
     const supplierId = productSuppliers.supplierIds[supplierIndex].supplierId;
-    
+
     setSelectedSuppliers(prev => {
       const updated = [...prev];
       const productRowIndex = updated.findIndex(
         row => row.selectedRowId === productIndex
       );
-      
+
       if (productRowIndex !== -1) {
         updated[productRowIndex].supplierIds = updated[productRowIndex].supplierIds.filter(
           (_, idx) => idx !== supplierIndex
         );
-        
+
         if (updated[productRowIndex].supplierIds.length === 0) {
           updated.splice(productRowIndex, 1);
         }
       }
-      
+
       return updated;
     });
-    
+
     const currentSuppliers = values.orderProducts[productIndex]?.productSuppliers || [];
     const updatedSuppliers = currentSuppliers.filter(
       s => s.supplier?.id !== supplierId
     );
-    
+
     setFieldValue(`orderProducts[${productIndex}].productSuppliers`, updatedSuppliers);
-    
+
     toast.success('Supplier removed successfully');
   };
 
@@ -484,186 +461,182 @@ const {
 
   const { id } = useParams();
 
- const handleUpdateSubmit = async (values) => {
-  console.log("=== DEBUG: Checking Formik values BEFORE submission ===");
-  values.orderProducts.forEach((product, index) => {
-    console.log(`Product ${index} (isNew: ${isNewProduct(index)}):`, {
-      productId: product.products?.productId,
-      sourceProductId: product.sourceProductId,  // ✅ Changed from product.products?.sourceProductId
-      hasIdField: !!product.id,
-      suppliersCount: product.productSuppliers?.length || 0,
+  const handleUpdateSubmit = async (values) => {
+    console.log("=== DEBUG: Checking Formik values BEFORE submission ===");
+    values.orderProducts.forEach((product, index) => {
+      console.log(`Product ${index} (isNew: ${isNewProduct(index)}):`, {
+        productId: product.products?.productId,
+        sourceProductId: product.sourceProductId,
+        hasIdField: !!product.id,
+        suppliersCount: product.productSuppliers?.length || 0,
+      });
     });
-  });
 
-  const formattedData = {
-    orderNo: values.orderNo,
-    orderType: values.orderType ? { id: values.orderType.id } : null,
-    location: values.locationId ? { id: values.locationId } : null,
-    customer: values.customer ? { id: values.customer.id } : null,
-    purchaseOrderNo: values.purchaseOrderNo,
-    poDate: values.poDate,
-    salesChannel: values.salesChannel,
-    employeeName: values.employeeName,
-    customisationDetails: values.customisationDetails,
-    orderDate: values.orderDate,
-    expectingDate: values.expectingDate,
-    shippingDate: values.shippingDate,
-    tagsAndLabels: values.tagsAndLabels,
-    logoNo: values.logoNo,
-    clientInstruction: values.clientInstruction,
-    
-    orderProducts: values.orderProducts.map((product, index) => {
-      const isNew = isNewProduct(index);
-      
-      const productSuppliers = (product.productSuppliers || []).map(supplier => {
-        const supplierId = supplier.supplier?.id;
-        
-        if (!supplierId) return null;
-        
+    const formattedData = {
+      orderNo: values.orderNo,
+      orderType: values.orderType ? { id: values.orderType.id } : null,
+      location: values.locationId ? { id: values.locationId } : null,
+      customer: values.customer ? { id: values.customer.id } : null,
+      purchaseOrderNo: values.purchaseOrderNo,
+      poDate: values.poDate,
+      salesChannel: values.salesChannel,
+      employeeName: values.employeeName,
+      customisationDetails: values.customisationDetails,
+      orderDate: values.orderDate,
+      expectingDate: values.expectingDate,
+      shippingDate: values.shippingDate,
+      tagsAndLabels: values.tagsAndLabels,
+      logoNo: values.logoNo,
+      clientInstruction: values.clientInstruction,
+
+      orderProducts: values.orderProducts.map((product, index) => {
+        const isNew = isNewProduct(index);
+
+        const productSuppliers = (product.productSuppliers || []).map(supplier => {
+          const supplierId = supplier.supplier?.id;
+
+          if (!supplierId) return null;
+
+          return {
+            supplier: {
+              id: Number(supplierId)
+            },
+            supplierOrderQty: Number(supplier.supplierOrderQty) || 0
+          };
+        }).filter(Boolean);
+
+        let sourceProductIdValue = null;
+        const sourceProduct = product.sourceProductId;
+
+        if (sourceProduct && typeof sourceProduct === 'object') {
+          sourceProductIdValue = sourceProduct.id ? Number(sourceProduct.id) : null;
+        } else if (sourceProduct && !isNaN(Number(sourceProduct))) {
+          sourceProductIdValue = Number(sourceProduct);
+        } else {
+          sourceProductIdValue = null;
+        }
+
         return {
-          supplier: { 
-            id: Number(supplierId) 
+          products: {
+            id: product.products?.id || product.products?.productId || product.id || ''
           },
-          supplierOrderQty: Number(supplier.supplierOrderQty) || 0
+          sourceProductId: sourceProductIdValue,
+          sourceProductName: product.sourceProductName || '',
+          orderCategory: product.orderCategory || '',
+          inStockQuantity: Number(product.inStockQuantity) || 0,
+          clientOrderQuantity: String(product.clientOrderQuantity || ''),
+          quantityToManufacture: Number(product.quantityToManufacture) || 0,
+          units: product.units || 'Pcs',
+          value: Number(product.value) || 0,
+          clientShippingDate: product.clientShippingDate || null,
+          expectedDate: product.expectedDate || null,
+          productSuppliers: productSuppliers
         };
-      }).filter(Boolean);
-      
-      // ✅ FIX: Get sourceProductId from root level, not from products
-      let sourceProductIdValue = null;
-      const sourceProduct = product.sourceProductId;  // ✅ Changed from product.products?.sourceProductId
-      
-      if (sourceProduct && typeof sourceProduct === 'object') {
-        // If it's an object, extract the id
-        sourceProductIdValue = sourceProduct.id ? Number(sourceProduct.id) : null;
-      } else if (sourceProduct && !isNaN(Number(sourceProduct))) {
-        // If it's a number or numeric string, convert to number
-        sourceProductIdValue = Number(sourceProduct);
-      } else {
-        sourceProductIdValue = null;
-      }
-      
-      return {
-        products: {
-          id: product.products?.id || product.products?.productId || product.id || ''
-          // ✅ REMOVE sourceProductId from here - it goes at root level
+      })
+    };
+
+    console.log("=== PAYLOAD BEING SENT TO BACKEND ===");
+    console.log("Location being sent:", formattedData.location);
+    console.log("Total products:", formattedData.orderProducts.length);
+    formattedData.orderProducts.forEach((product, index) => {
+      console.log(`Product ${index}:`, {
+        hasIdField: !!product.id,
+        productId: product.products?.id,
+        sourceProductId: product.sourceProductId,
+        sourceProductName: product.sourceProductName,
+        supplierCount: product.productSuppliers?.length || 0,
+      });
+    });
+    console.log("Full JSON payload:", JSON.stringify(formattedData, null, 2));
+
+    try {
+      const url = `${UPDATE_ORDER_URL}/${id}`;
+      const response = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         },
-        sourceProductId: sourceProductIdValue,  // ✅ Add at root level (as number)
-        sourceProductName: product.sourceProductName || '',  // ✅ Add the display name too
-        orderCategory: product.orderCategory || '',
-        inStockQuantity: Number(product.inStockQuantity) || 0,
-        clientOrderQuantity: String(product.clientOrderQuantity || ''),
-        quantityToManufacture: Number(product.quantityToManufacture) || 0,
-        units: product.units || 'Pcs',
-        value: Number(product.value) || 0,
-        clientShippingDate: product.clientShippingDate || null,
-        expectedDate: product.expectedDate || null,
-        productSuppliers: productSuppliers
-      };
-    })
+        body: JSON.stringify(formattedData)
+      });
+
+      if (!response.ok) {
+        let errorMessage = "Failed to update order";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorData.errorMessage || errorMessage;
+        } catch (e) {
+          console.error("Could not parse error response:", e);
+        }
+        throw new Error(errorMessage);
+      }
+
+      const data = await response.json();
+      console.log("=== BACKEND RESPONSE ===", data);
+
+      await getOrderById();
+
+      const totalSuppliers = formattedData.orderProducts.reduce((acc, product) => acc + (product.productSuppliers?.length || 0), 0);
+      toast.success(`Order Updated Successfully`);
+      navigate('/Order/ViewOrder');
+
+    } catch (error) {
+      console.error("Update error:", error);
+      toast.error(error.message || "An error occurred while updating the order");
+    }
   };
 
-  console.log("=== PAYLOAD BEING SENT TO BACKEND ===");
-  console.log("Location being sent:", formattedData.location);
-  console.log("Total products:", formattedData.orderProducts.length);
-  formattedData.orderProducts.forEach((product, index) => {
-    console.log(`Product ${index}:`, {
-      hasIdField: !!product.id,
-      productId: product.products?.id,
-      sourceProductId: product.sourceProductId,  // ✅ Updated
-      sourceProductName: product.sourceProductName,  // ✅ Added
-      supplierCount: product.productSuppliers?.length || 0,
-    });
-  });
-  console.log("Full JSON payload:", JSON.stringify(formattedData, null, 2));
-
-  try {
-    const url = `${UPDATE_ORDER_URL}/${id}`;
-    const response = await fetch(url, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`
-      },
-      body: JSON.stringify(formattedData)
-    });
-
-    if (!response.ok) {
-      let errorMessage = "Failed to update order";
-      try {
-        const errorData = await response.json();
-        errorMessage = errorData.message || errorData.errorMessage || errorMessage;
-      } catch (e) {
-        console.error("Could not parse error response:", e);
-      }
-      throw new Error(errorMessage);
-    }
-    
-    const data = await response.json();
-    console.log("=== BACKEND RESPONSE ===", data);
-    
-    await getOrderById();
-    
-    const totalSuppliers = formattedData.orderProducts.reduce((acc, product) => acc + (product.productSuppliers?.length || 0), 0);
-    toast.success(`Order Updated Successfully`);
-    navigate('/Order/ViewOrder');
-
-  } catch (error) {
-    console.error("Update error:", error);
-    toast.error(error.message || "An error occurred while updating the order");
-  }
-};
-
   const getOrderById = async () => {
-  try {
-    const response = await fetch(`${GET_ORDERBYIDDD_URL}/${id}`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    try {
+      const response = await fetch(`${GET_ORDERBYIDDD_URL}/${id}`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch order');
-    }
+      if (!response.ok) {
+        throw new Error('Failed to fetch order');
+      }
 
-    const data = await response.json();
-    
-    
-    // Fetch source product names for products that have sourceProductId
-    const updatedOrderProducts = await Promise.all(
-      data.orderProducts.map(async (product) => {
-        if (product.sourceProductId) {
-          try {
-            const sourceProductRes = await fetch(`${GET_PRODUCTBYID_URL}/${product.sourceProductId}`, {
-              headers: { Authorization: `Bearer ${token}` }
-            });
-            const sourceProductData = await sourceProductRes.json();
-            return {
-              ...product,
-              sourceProductName: sourceProductData.productId
-            };
-          } catch (error) {
-            console.error("Failed to fetch source product:", error);
-            return { ...product, sourceProductName: null };
+      const data = await response.json();
+
+      const updatedOrderProducts = await Promise.all(
+        data.orderProducts.map(async (product) => {
+          if (product.sourceProductId) {
+            try {
+              const sourceProductRes = await fetch(`${GET_PRODUCTBYID_URL}/${product.sourceProductId}`, {
+                headers: { Authorization: `Bearer ${token}` }
+              });
+              const sourceProductData = await sourceProductRes.json();
+              return {
+                ...product,
+                sourceProductName: sourceProductData.productId
+              };
+            } catch (error) {
+              console.error("Failed to fetch source product:", error);
+              return { ...product, sourceProductName: null };
+            }
           }
-        }
-        return { ...product, sourceProductName: null };
-      })
-    );
-    
-    setOrder({ ...data, orderProducts: updatedOrderProducts });
-  } catch (error) {
-    console.error('Error fetching order:', error);
-  } finally {
-    setIsLoading(false);
-  }
-};
+          return { ...product, sourceProductName: null };
+        })
+      );
+
+      setOrder({ ...data, orderProducts: updatedOrderProducts });
+    } catch (error) {
+      console.error('Error fetching order:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     getOrderById();
   }, [id]);
 
+  // ✅ FIXED: Split into two effects so prodIdOptions populates when productId arrives
   useEffect(() => {
-    if (orderTypee) {
+    if (orderTypee?.length) {
       const formattedOptions = orderTypee.map(order => ({
         value: order.id,
         label: order?.orderTypeName,
@@ -672,8 +645,10 @@ const {
       }));
       setorderTypeOptions(formattedOptions);
     }
+  }, [orderTypee]);
 
-    if (productId) {
+  useEffect(() => {
+    if (productId?.length) {
       const formattedProdIdOptions = productId.map(prodId => ({
         value: prodId.id,
         label: prodId?.productId,
@@ -682,8 +657,7 @@ const {
       }));
       setprodIdOptions(formattedProdIdOptions);
     }
-
-  }, [orderTypee]);
+  }, [productId]);
 
   useEffect(() => {
     if (customer && Array.isArray(customer)) {
@@ -744,7 +718,9 @@ const {
     customer: orderType ? Yup.string().required('Customer is required') : Yup.string(),
   });
 
+  // ✅ FIXED: Guard against null option (ReactSelect fires onChange(null) when cleared)
   const handleProductIdChange = (option, setFieldValue) => {
+    if (!option) return;
     setFieldValue('productId', option.prodId);
     setprodIdd(option.prodId)
     setIsModalOpen(true);
@@ -770,67 +746,67 @@ const {
     console.log('Supplier Index to delete:', supplierIndex);
     console.log('Product data:', values.orderProducts[rowIndex]);
     console.log('Suppliers before deletion:', values.orderProducts[rowIndex]?.productSuppliers);
-    
+
     const currentSuppliers = values.orderProducts[rowIndex]?.productSuppliers || [];
-    
+
     if (supplierIndex < 0 || supplierIndex >= currentSuppliers.length) {
       console.error('Invalid supplier index:', supplierIndex);
       toast.error('Cannot delete supplier: Invalid index');
       return;
     }
-    
+
     const supplierToDelete = currentSuppliers[supplierIndex];
     const supplierName = supplierToDelete?.supplier?.name || supplierToDelete?.supplierId || 'Unknown Supplier';
-    
+
     const updatedProductSuppliers = currentSuppliers.filter(
       (_, idx) => idx !== supplierIndex
     );
-    
+
     console.log('Suppliers after deletion:', updatedProductSuppliers);
-    
+
     setOrder(prevOrder => {
       if (!prevOrder || !prevOrder.orderProducts) return prevOrder;
-      
+
       const updatedOrder = { ...prevOrder };
       updatedOrder.orderProducts = [...updatedOrder.orderProducts];
       updatedOrder.orderProducts[rowIndex] = {
         ...updatedOrder.orderProducts[rowIndex],
         productSuppliers: updatedProductSuppliers
       };
-      
+
       return updatedOrder;
     });
-    
+
     setFieldValue(`orderProducts[${rowIndex}].productSuppliers`, updatedProductSuppliers);
-    
+
     toast.success(`Supplier "${supplierName}" removed successfully`);
   };
 
   const handleDeleteRow = (index) => {
     const updatedRows = prodIdModal.filter((_, i) => i !== index);
     setprodIdModal(updatedRows);
-    
-    setSelectedSuppliersProduct(prev => 
+
+    setSelectedSuppliersProduct(prev =>
       prev.filter(item => item.selectedRowId !== index)
     );
   };
 
   const getSupplierName = (supplierId) => {
     if (!supplierId) return '';
-    
+
     const supplierFromList = suppliers.find(s => s.id === supplierId);
     if (supplierFromList) return supplierFromList.name;
-    
+
     for (const supplierGroup of selectedSuppliers) {
       const supplier = supplierGroup.supplierIds.find(s => s.supplierId === supplierId);
       if (supplier) return supplier.supplierName;
     }
-    
+
     for (const supplierGroup of selectedSuppliersProduct) {
       const supplier = supplierGroup.supplierIds.find(s => s.supplierId === supplierId);
       if (supplier) return supplier.supplierName;
     }
-    
+
     return 'Unknown Supplier';
   };
 
@@ -840,84 +816,81 @@ const {
       <div>
         <Formik
           enableReinitialize={true}
-        initialValues={{
-  orderNo: order?.orderNo || '',
-  orderType: order?.orderType || '',
-  locationId: order?.locationId || '',
-  customer: order?.customer || null,
-  purchaseOrderNo: order?.purchaseOrderNo || '',
-  poDate: order?.poDate || '',
-  salesChannel: order?.salesChannel || '',
-  employeeName: order?.employeeName || '',
-  customisationDetails: order?.customisationDetails || '',
-  orderDate: order?.orderDate || '',
-  expectingDate: order?.expectingDate || '',
-  shippingDate: order?.shippingDate || '',
-  tagsAndLabels: order?.tagsAndLabels || '',
-  logoNo: order?.logoNo || '',
-  clientInstruction: order?.clientInstruction || '',
-  orderProducts: [
-    ...(order?.orderProducts?.map(product => ({
-      products: {
-        id: product.productId,
-        productId: product.productIdName,
-        // ❌ REMOVE sourceProductId from here - it doesn't belong inside products
-      },
-      // ✅ ADD sourceProductId at root level (as shown in your API response)
-      sourceProductId: product.sourceProductId || null,      // This is a number from API
-      sourceProductName: product.sourceProductName || '',    // This is the display name
-      orderCategory: product.orderCategory || '',
-      inStockQuantity: product.inStockQuantity || 0,
-      clientOrderQuantity: String(product.clientOrderQuantity || ''),
-      quantityToManufacture: product.quantityToManufacture || 0,
-      units: product.units || 'Pcs',
-      value: product.value || 0,
-      clientShippingDate: product.clientShippingDate || '',
-      expectedDate: product.expectedDate || '',
-      productSuppliers: product.productSuppliers?.map(supplier => ({
-        supplier: { 
-          id: supplier?.supplier?.id || '',
-          name: supplier?.supplier?.name || ''
-        },
-        supplierOrderQty: supplier.supplierOrderQty || 0
-      })) || []
-    })) || []),
-    
-    ...(prodIdModal?.map(item => ({
-      products: {
-        id: item.id || item.productId || '',
-        productId: item.productId || item.id || '',
-      },
-      sourceProductId: item.sourceProductId?.id || null,      // Store the ID (number)
-      sourceProductName: item.sourceProductId?.productId || '', // Store the display name
-      orderCategory: item.orderCatagory || '',
-      inStockQuantity: 0,
-      clientOrderQuantity: '',
-      quantityToManufacture: 0,
-      units: item.units || 'Pcs',
-      value: 0,
-      clientShippingDate: '',
-      expectedDate: '',
-      productSuppliers: []
-    })) || [])
-  ]
-}}
+          initialValues={{
+            orderNo: order?.orderNo || '',
+            orderType: order?.orderType || '',
+            locationId: order?.locationId || '',
+            customer: order?.customer || null,
+            purchaseOrderNo: order?.purchaseOrderNo || '',
+            poDate: order?.poDate || '',
+            salesChannel: order?.salesChannel || '',
+            employeeName: order?.employeeName || '',
+            customisationDetails: order?.customisationDetails || '',
+            orderDate: order?.orderDate || '',
+            expectingDate: order?.expectingDate || '',
+            shippingDate: order?.shippingDate || '',
+            tagsAndLabels: order?.tagsAndLabels || '',
+            logoNo: order?.logoNo || '',
+            clientInstruction: order?.clientInstruction || '',
+            productId: '',   // ✅ ADDED: needed so the Product Id select can track selection
+            orderProducts: [
+              ...(order?.orderProducts?.map(product => ({
+                products: {
+                  id: product.productId,
+                  productId: product.productIdName,
+                },
+                sourceProductId: product.sourceProductId || null,
+                sourceProductName: product.sourceProductName || '',
+                orderCategory: product.orderCategory || '',
+                inStockQuantity: product.inStockQuantity || 0,
+                clientOrderQuantity: String(product.clientOrderQuantity || ''),
+                quantityToManufacture: product.quantityToManufacture || 0,
+                units: product.units || 'Pcs',
+                value: product.value || 0,
+                clientShippingDate: product.clientShippingDate || '',
+                expectedDate: product.expectedDate || '',
+                productSuppliers: product.productSuppliers?.map(supplier => ({
+                  supplier: {
+                    id: supplier?.supplier?.id || '',
+                    name: supplier?.supplier?.name || ''
+                  },
+                  supplierOrderQty: supplier.supplierOrderQty || 0
+                })) || []
+              })) || []),
+
+              ...(prodIdModal?.map(item => ({
+                products: {
+                  id: item.id || item.productId || '',
+                  productId: item.productId || item.id || '',
+                },
+                sourceProductId: item.sourceProductId?.id || null,
+                sourceProductName: item.sourceProductId?.productId || '',
+                orderCategory: item.orderCatagory || '',
+                inStockQuantity: 0,
+                clientOrderQuantity: '',
+                quantityToManufacture: 0,
+                units: item.units || 'Pcs',
+                value: 0,
+                clientShippingDate: '',
+                expectedDate: '',
+                productSuppliers: []
+              })) || [])
+            ]
+          }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
           {({ values, setFieldValue, handleBlur }) => {
-            
-            // =============================================
+
             // EFFECT 1: FETCH INVENTORY FOR NEW PRODUCTS WHEN LOCATION CHANGES
-            // =============================================
             useEffect(() => {
               if (values.locationId && prodIdModal.length > 0) {
                 const startingIndex = order?.orderProducts?.length || 0;
-                
+
                 prodIdModal.forEach((item, index) => {
                   const adjustedIndex = startingIndex + index;
                   const productId = item?.id;
-                  
+
                   if (!productId) return;
 
                   const fetchInventory = async () => {
@@ -941,8 +914,6 @@ const {
 
                       if (data && data.closingBalance !== undefined && data.instockRecieve !== undefined) {
                         const inStockValue = data.closingBalance - data.instockRecieve;
-                        
-                        // Update inStockQuantity (auto-populate but still editable)
                         setFieldValue(`orderProducts[${adjustedIndex}].inStockQuantity`, inStockValue);
                       }
                     } catch (error) {
@@ -956,19 +927,17 @@ const {
               }
             }, [values.locationId, prodIdModal.length, order?.orderProducts?.length, token, setFieldValue]);
 
-            // =============================================
             // EFFECT 2: CALCULATE VALUE FOR NEW PRODUCTS
-            // =============================================
             useEffect(() => {
               if (prodIdModal.length > 0) {
                 const startingIndex = order?.orderProducts?.length || 0;
-                
+
                 prodIdModal.forEach((item, index) => {
                   const adjustedIndex = startingIndex + index;
                   const cost = item?.cost || 0;
                   const clientQty = Number(values.orderProducts[adjustedIndex]?.clientOrderQuantity) || 0;
                   const inStockQty = Number(values.orderProducts[adjustedIndex]?.inStockQuantity) || 0;
-                  
+
                   let calculatedValue = 0;
                   if (clientQty <= inStockQty) {
                     calculatedValue = clientQty * cost;
@@ -976,7 +945,7 @@ const {
                     const qtyToManufacture = clientQty - inStockQty;
                     calculatedValue = qtyToManufacture * cost;
                   }
-                  
+
                   setFieldValue(`orderProducts[${adjustedIndex}].value`, calculatedValue);
                 });
               }
@@ -999,7 +968,6 @@ const {
                     </div>
                     <div className="p-6.5">
 
-                      
                       <div className="flex flex-wrap gap-4">
 
                         <div className="flex-1 min-w-[200px]">
@@ -1185,9 +1153,9 @@ const {
                         <table className="min-w-full leading-normal overflow-auto">
                           <thead>
                             <tr className='bg-slate-300 dark:bg-slate-700 dark:text-white'>
-                            <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-      Source Product Id
-    </th>
+                              <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                                Source Product Id
+                              </th>
                               <th className="px-2 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                                 Product Id
                               </th>
@@ -1227,34 +1195,32 @@ const {
                           <tbody>
                             {values.orderProducts?.map((product, index) => {
                               if (isNewProduct(index)) return null;
-                              
+
                               return (
                                 <tr key={index}>
                                   {/* EXISTING */}
-                            <td className="px-5 py-5 border-b border-gray-200 text-sm">
-  {product.orderCategory?.toLowerCase() === 'dyeing' || product.orderCategory?.toLowerCase() === 'embroidery' ? (
-    <div>
-      {/* Store the ID for backend (hidden) */}
-      <Field
-        type="hidden"
-        name={`orderProducts[${index}].sourceProductId`}
-        value={product.sourceProductId || ""}
-      />
-      {/* Display the Name in a read-only field */}
-      <Field
-        name={`orderProducts[${index}].sourceProductName`}
-        value={product.sourceProductName || ""}
-        className="w-[130px] bg-white dark:bg-form-input rounded border-[1.5px] border-stroke py-3 px-5 text-black"
-        placeholder="Source Product ID"
-        readOnly
-      />
-    </div>
-  ) : (
-    <div className="w-[130px] bg-gray-100 dark:bg-gray-700 rounded border py-2 px-3 text-center">
-      Plain Order
-    </div>
-  )}
-</td>
+                                  <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                                    {product.orderCategory?.toLowerCase() === 'dyeing' || product.orderCategory?.toLowerCase() === 'embroidery' ? (
+                                      <div>
+                                        <Field
+                                          type="hidden"
+                                          name={`orderProducts[${index}].sourceProductId`}
+                                          value={product.sourceProductId || ""}
+                                        />
+                                        <Field
+                                          name={`orderProducts[${index}].sourceProductName`}
+                                          value={product.sourceProductName || ""}
+                                          className="w-[130px] bg-white dark:bg-form-input rounded border-[1.5px] border-stroke py-3 px-5 text-black"
+                                          placeholder="Source Product ID"
+                                          readOnly
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="w-[130px] bg-gray-100 dark:bg-gray-700 rounded border py-2 px-3 text-center">
+                                        Plain Order
+                                      </div>
+                                    )}
+                                  </td>
                                   <td className="px-5 py-5 border-b border-gray-200 text-sm">
                                     <Field
                                       name={`orderProducts[${index}].products.productId`}
@@ -1364,7 +1330,7 @@ const {
                                             {values.orderProducts[index]?.productSuppliers?.map((supplierData, supplierIndex) => {
                                               const supplierId = supplierData.supplier?.id;
                                               const supplierName = supplierData.supplier?.name || getSupplierName(supplierId);
-                                              
+
                                               return (
                                                 <tr key={supplierIndex}>
                                                   <td className="px-5 py-5 border-b border-gray-200 text-sm">
@@ -1401,11 +1367,10 @@ const {
                                               .find((supplierRow) => supplierRow.selectedRowId === index)
                                               ?.supplierIds
                                               .map((supplier, supplierIndex) => {
-                                                // ✅ CHECK IF THIS SUPPLIER ALREADY EXISTS IN FORMIK
                                                 const existsInFormik = values.orderProducts[index]?.productSuppliers?.some(
                                                   s => s.supplier?.id === supplier.supplierId
                                                 );
-                                                
+
                                                 const startingIndex = values.orderProducts[index]?.productSuppliers?.length || 0;
                                                 const adjustedIndex = startingIndex + supplierIndex;
 
@@ -1431,8 +1396,8 @@ const {
                                                         onChange={(e) => {
                                                           const newQuantity = Number(e.target.value) || 0;
                                                           handleSupplierQuantityUpdateExisting(
-                                                            index, 
-                                                            supplierIndex, 
+                                                            index,
+                                                            supplierIndex,
                                                             newQuantity,
                                                             setFieldValue,
                                                             values
@@ -1474,38 +1439,32 @@ const {
                               return (
                                 <tr key={`new-${index}`} className="bg-white dark:bg-slate-700 dark:text-white px-5 py-3">
 
-                               {/* In UpdateOrder.js - New Products section */}
-{/* In UpdateOrder.js - New Products section */}
-<td className="px-5 py-5 border-b border-gray-200 text-sm">
-  {item?.orderCatagory?.toLowerCase() === 'dyeing' || item?.orderCatagory?.toLowerCase() === 'embroidery' ? (
-    <div>
-      {/* Store the ID for backend (hidden) */}
-      <Field
-        type="hidden"
-        name={`orderProducts[${adjustedIndex}].sourceProductId`}
-        value={item?.sourceProductId?.id || values.orderProducts[adjustedIndex]?.sourceProductId || ""}
-      />
-      {/* Display the Name */}
-      <Field
-        type="text"
-        name={`orderProducts[${adjustedIndex}].sourceProductName`}
-        value={item?.sourceProductId?.productId || item?.sourceProductName || values.orderProducts[adjustedIndex]?.sourceProductName || ""}
-        placeholder="Enter Source Product ID"
-        onChange={(e) => {
-          // When manually entering, you'd need to look up the product
-          const enteredValue = e.target.value;
-          setFieldValue(`orderProducts[${adjustedIndex}].sourceProductName`, enteredValue);
-          // You might want to search for the product and set the ID here
-        }}
-        className="w-[130px] bg-white dark:bg-form-input rounded border-[1.5px] border-stroke py-3 px-5 text-black"
-      />
-    </div>
-  ) : (
-    <div className="w-[130px] bg-gray-100 dark:bg-gray-700 rounded border py-2 px-3 text-center">
-      Plain Order
-    </div>
-  )}
-</td>
+                                  <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                                    {item?.orderCatagory?.toLowerCase() === 'dyeing' || item?.orderCatagory?.toLowerCase() === 'embroidery' ? (
+                                      <div>
+                                        <Field
+                                          type="hidden"
+                                          name={`orderProducts[${adjustedIndex}].sourceProductId`}
+                                          value={item?.sourceProductId?.id || values.orderProducts[adjustedIndex]?.sourceProductId || ""}
+                                        />
+                                        <Field
+                                          type="text"
+                                          name={`orderProducts[${adjustedIndex}].sourceProductName`}
+                                          value={item?.sourceProductId?.productId || item?.sourceProductName || values.orderProducts[adjustedIndex]?.sourceProductName || ""}
+                                          placeholder="Enter Source Product ID"
+                                          onChange={(e) => {
+                                            const enteredValue = e.target.value;
+                                            setFieldValue(`orderProducts[${adjustedIndex}].sourceProductName`, enteredValue);
+                                          }}
+                                          className="w-[130px] bg-white dark:bg-form-input rounded border-[1.5px] border-stroke py-3 px-5 text-black"
+                                        />
+                                      </div>
+                                    ) : (
+                                      <div className="w-[130px] bg-gray-100 dark:bg-gray-700 rounded border py-2 px-3 text-center">
+                                        Plain Order
+                                      </div>
+                                    )}
+                                  </td>
                                   <td className="px-5 py-5 border-b border-gray-200 text-sm">
                                     <div>
                                       <Field
@@ -1603,9 +1562,7 @@ const {
                                           const cost = item?.cost || 0;
                                           const clientQty = Number(values.orderProducts[adjustedIndex]?.clientOrderQuantity) || 0;
                                           const inStockQty = Number(values.orderProducts[adjustedIndex]?.inStockQuantity) || 0;
-                                          
-                                          // If client quantity is less than or equal to in stock, value is based on client quantity
-                                          // Otherwise, value is based on the shortfall (quantity to manufacture)
+
                                           if (clientQty <= inStockQty) {
                                             return clientQty * cost;
                                           } else {
@@ -1656,13 +1613,13 @@ const {
 
                                   <td className="px-5 py-5 border-b border-gray-200 text-sm">
                                     <div>
-                                      <IoIosAdd 
-                                        size={30} 
+                                      <IoIosAdd
+                                        size={30}
                                         className="cursor-pointer hover:text-blue-600"
                                         onClick={() => {
                                           setSelectedRowIdProduct(index);
                                           openSupplierModalProduct(item?.id, index);
-                                        }} 
+                                        }}
                                       />
                                     </div>
                                   </td>
@@ -1706,10 +1663,10 @@ const {
                                                     onChange={(e) => {
                                                       const newQuantity = Number(e.target.value) || 0;
                                                       handleSupplierQuantityUpdate(
-                                                        index, 
-                                                        supplierIndex, 
-                                                        newQuantity, 
-                                                        setFieldValue, 
+                                                        index,
+                                                        supplierIndex,
+                                                        newQuantity,
+                                                        setFieldValue,
                                                         values
                                                       );
                                                     }}
@@ -1728,7 +1685,7 @@ const {
                                                 </td>
                                               </tr>
                                             ))}
-                                            
+
                                             {(!productSuppliers || productSuppliers.supplierIds.length === 0) && (
                                               <tr>
                                                 <td colSpan="3" className="px-5 py-5 text-center text-gray-500">
@@ -1741,12 +1698,12 @@ const {
                                       </div>
                                     </div>
                                   </td>
-                                  
+
                                   <td className="px-5 py-5 border-b items-center justify-center">
-                                    <MdDelete 
-                                      className='text-red-700 cursor-pointer hover:text-red-900' 
-                                      size={30} 
-                                      onClick={() => handleDeleteRow(index)} 
+                                    <MdDelete
+                                      className='text-red-700 cursor-pointer hover:text-red-900'
+                                      size={30}
+                                      onClick={() => handleDeleteRow(index)}
                                     />
                                   </td>
                                 </tr>
