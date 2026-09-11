@@ -17,25 +17,35 @@ const PaymentSummary = () => {
 
     const customStyles = createCustomStyles(theme?.mode);
     const { token } = currentUser;
-    const [summaryData, setSummaryData] = useState({
-        bankDebitTotal: 0,
-        cashDebitTotal: 0,
-        supplierCreditTotal: 0,
-        customerCreditTotal: 0,
-        customerDebitTotal: 0,
+
+    const initialSummary = {
+        bankAvailable: 0,
+        cashAvailable: 0,
+        supplierPayable: 0,
+        supplierAdvance: 0,
+        customerReceivable: 0,
+        customerAdvance: 0,
+        bankDetails: { debit: 0, credit: 0, net: 0, debitEntries: [], creditEntries: [] },
+        cashDetails: { debit: 0, credit: 0, net: 0, debitEntries: [], creditEntries: [] },
+        supplierDetails: { debit: 0, credit: 0, net: 0, payable: 0, advance: 0, debitEntries: [], creditEntries: [] },
+        customerDetails: { debit: 0, credit: 0, net: 0, receivable: 0, advance: 0, debitEntries: [], creditEntries: [] },
         totalDebit: 0,
         totalCredit: 0,
         netBalance: 0,
-        entries: []
-    });
+        totalAvailableFunds: 0,
+        rawData: null,
+    };
+
+    const [summaryData, setSummaryData] = useState(initialSummary);
 
     // Modal states
     const [modalOpen, setModalOpen] = useState(false);
     const [modalData, setModalData] = useState({
         title: '',
         entries: [],
-        type: '', // bank, cash, supplier, customer
-        totalAmount: 0
+        type: '',
+        totalAmount: 0,
+        nature: '' // 'payable' | 'advance' | 'receivable' | 'customerAdvance' | ''
     });
 
     const navigate = useNavigate();
@@ -57,103 +67,102 @@ const PaymentSummary = () => {
                 const processedData = processSummaryData(data);
                 setSummaryData({
                     ...processedData,
-                    rawData: data // Store raw data for modal display
+                    rawData: data
                 });
             } else {
-                setSummaryData({
-                    bankDebitTotal: 0,
-                    cashDebitTotal: 0,
-                    supplierCreditTotal: 0,
-                    customerCreditTotal: 0,
-                    customerDebitTotal: 0,
-                    totalDebit: 0,
-                    totalCredit: 0,
-                    netBalance: 0,
-                    entries: [],
-                    rawData: null
-                });
+                setSummaryData(initialSummary);
             }
         } catch (error) {
             console.error("Error fetching Payment Summary:", error);
             toast.error("Failed to fetch Payment Summary");
-            setSummaryData({
-                bankDebitTotal: 0,
-                cashDebitTotal: 0,
-                supplierCreditTotal: 0,
-                customerCreditTotal: 0,
-                customerDebitTotal: 0,
-                totalDebit: 0,
-                totalCredit: 0,
-                netBalance: 0,
-                entries: [],
-                rawData: null
-            });
+            setSummaryData(initialSummary);
         }
     };
 
     const processSummaryData = (data) => {
-        const bankDebitTotal = parseFloat(data?.bankTotalDebitBalance || 0);
+        // ---------- RAW TOTALS ----------
+        const bankDebitTotal  = parseFloat(data?.bankTotalDebitBalance || 0);
         const bankCreditTotal = parseFloat(data?.bankTotalCreditBalance || 0);
-        const bankClosing = parseFloat(data?.bankTotalOpeningBalance || 0);
-        const cashDebitTotal = parseFloat(data?.cashTotalDebitBalance || 0);
+        const bankOpening     = parseFloat(data?.bankTotalOpeningBalance || 0);
+
+        const cashDebitTotal  = parseFloat(data?.cashTotalDebitBalance || 0);
         const cashCreditTotal = parseFloat(data?.cashTotalCreditBalance || 0);
-        const cashClosing = parseFloat(data?.cashTotalOpeningBalance || 0);
-        const supplierDebitTotal = parseFloat(data?.supplierTotalDebitBalance || 0);
+        const cashOpening     = parseFloat(data?.cashTotalOpeningBalance || 0);
+
+        const supplierDebitTotal  = parseFloat(data?.supplierTotalDebitBalance || 0);
         const supplierCreditTotal = parseFloat(data?.supplierTotalCreditBalance || 0);
-        const supplierClosing = parseFloat(data?.supplierTotalOpeningBalance || 0);
-        const customerDebitTotal = parseFloat(data?.customerTotalDebitBalance || 0);
+
+        const customerDebitTotal  = parseFloat(data?.customerTotalDebitBalance || 0);
         const customerCreditTotal = parseFloat(data?.customerTotalCreditBalance || 0);
 
-        const totalDebit = bankDebitTotal + cashDebitTotal + supplierDebitTotal + customerDebitTotal;
-        const totalCredit = bankCreditTotal + cashCreditTotal + supplierCreditTotal + customerCreditTotal;
-        const netBalance = totalDebit - totalCredit;
+        // ---------- NET BALANCES ----------
+        // Bank & Cash: Opening balance = closing balance you actually have
+        const bankNet = bankOpening;
+        const cashNet = cashOpening;
 
-        const totalBankBalance = bankClosing;
-        const totalCashBalance = cashClosing;
-        const totalSupplierPayable = supplierCreditTotal - supplierDebitTotal;
-        const totalCustomerReceivable = customerDebitTotal - customerCreditTotal;
+        // Supplier: Credit = you owe them. Positive → Payable (Cr). Negative → Advance (Dr)
+        const supplierNet = supplierCreditTotal - supplierDebitTotal;
+
+        // Customer: Debit = they owe you. Positive → Receivable (Dr). Negative → Advance (Cr)
+        const customerNet = customerDebitTotal - customerCreditTotal;
+
+        // ---------- OVERALL ----------
+        const totalDebit  = bankDebitTotal + cashDebitTotal + supplierDebitTotal + customerDebitTotal;
+        const totalCredit = bankCreditTotal + cashCreditTotal + supplierCreditTotal + customerCreditTotal;
+        const netBalance  = totalDebit - totalCredit;
 
         return {
-            bankDebitTotal: totalBankBalance > 0 ? totalBankBalance : 0,
-            cashDebitTotal: totalCashBalance > 0 ? totalCashBalance : 0,
-            supplierCreditTotal: totalSupplierPayable > 0 ? totalSupplierPayable : 0,
-            customerCreditTotal: totalCustomerReceivable > 0 ? totalCustomerReceivable : 0,
-            customerDebitTotal: Math.abs(customerDebitTotal) > 0 ? Math.abs(customerDebitTotal) : 0,
+            // Availability (positive only)
+            bankAvailable: bankNet > 0 ? bankNet : 0,
+            cashAvailable: cashNet > 0 ? cashNet : 0,
+
+            // Supplier — split payable vs advance
+            supplierPayable: supplierNet > 0 ? supplierNet : 0,
+            supplierAdvance: supplierNet < 0 ? Math.abs(supplierNet) : 0,
+
+            // Customer — split receivable vs advance
+            customerReceivable: customerNet > 0 ? customerNet : 0,
+            customerAdvance:    customerNet < 0 ? Math.abs(customerNet) : 0,
+
+            // Raw details for modals
             bankDetails: {
                 debit: bankDebitTotal,
                 credit: bankCreditTotal,
-                net: totalBankBalance,
-                entries: data?.bankDebitEntries || [],
-                creditEntries: data?.bankCreditEntries || []
+                net: bankNet,
+                debitEntries:  data?.bankDebitEntries  || [],
+                creditEntries: data?.bankCreditEntries || [],
             },
             cashDetails: {
                 debit: cashDebitTotal,
                 credit: cashCreditTotal,
-                net: totalCashBalance,
-                entries: data?.cashDebitEntries || [],
-                creditEntries: data?.cashCreditEntries || []
+                net: cashNet,
+                debitEntries:  data?.cashDebitEntries  || [],
+                creditEntries: data?.cashCreditEntries || [],
             },
             supplierDetails: {
                 debit: supplierDebitTotal,
                 credit: supplierCreditTotal,
-                net: totalSupplierPayable,
-                entries: data?.supplierDebitEntries || [],
-                creditEntries: data?.supplierCreditEntries || []
+                net: supplierNet,
+                payable: supplierNet > 0 ? supplierNet : 0,
+                advance: supplierNet < 0 ? Math.abs(supplierNet) : 0,
+                debitEntries:  data?.supplierDebitEntries  || [],
+                creditEntries: data?.supplierCreditEntries || [],
             },
             customerDetails: {
                 debit: customerDebitTotal,
                 credit: customerCreditTotal,
-                net: totalCustomerReceivable,
-                entries: data?.customerDebitEntries || [],
-                creditEntries: data?.customerCreditEntries || []
+                net: customerNet,
+                receivable: customerNet > 0 ? customerNet : 0,
+                advance: customerNet < 0 ? Math.abs(customerNet) : 0,
+                debitEntries:  data?.customerDebitEntries  || [],
+                creditEntries: data?.customerCreditEntries || [],
             },
+
             totalDebit,
             totalCredit,
             netBalance,
-            totalAvailableFunds: (totalBankBalance + totalCashBalance),
-            totalLiabilities: (totalSupplierPayable + Math.abs(totalCustomerReceivable < 0 ? totalCustomerReceivable : 0)),
-            totalAssets: (totalBankBalance + totalCashBalance + totalCustomerReceivable),
-            rawData: data
+            totalAvailableFunds: bankNet + cashNet,
+            rawData: data,
         };
     };
 
@@ -179,28 +188,28 @@ const PaymentSummary = () => {
     };
 
     // Open modal with specific data
-    const openModal = (title, entries, totalAmount, type) => {
+    const openModal = (title, entries, totalAmount, type, nature = '') => {
         setModalData({
             title,
             entries: entries || [],
             type,
-            totalAmount
+            totalAmount,
+            nature
         });
         setModalOpen(true);
     };
 
-    // Close modal
     const closeModal = () => {
         setModalOpen(false);
         setModalData({
             title: '',
             entries: [],
             type: '',
-            totalAmount: 0
+            totalAmount: 0,
+            nature: ''
         });
     };
 
-    // Format date for display
     const formatDate = (dateString) => {
         if (!dateString) return '—';
         const date = new Date(dateString);
@@ -213,74 +222,107 @@ const PaymentSummary = () => {
         });
     };
 
-    // Get entries based on type
-    const getEntriesForModal = () => {
-        const rawData = summaryData.rawData;
-        if (!rawData) return [];
+    // Pick entries for modal based on card type and its nature
+    const getEntriesForModal = (type, nature) => {
+        const raw = summaryData.rawData;
+        if (!raw) return [];
 
-        switch (modalData.type) {
+        switch (type) {
             case 'bank':
-                return rawData.bankDebitEntries || [];
+                return raw.bankDebitEntries || [];
             case 'cash':
-                return rawData.cashDebitEntries || [];
+                return raw.cashDebitEntries || [];
             case 'supplier':
-                // For suppliers, show credit entries (money you owe)
-                return rawData.supplierCreditEntries || [];
+                // If payable → show credit entries (what you owe)
+                // If advance → show debit entries (what you overpaid)
+                return nature === 'advance'
+                    ? (raw.supplierDebitEntries || [])
+                    : (raw.supplierCreditEntries || []);
             case 'customer':
-                // For customers, show debit entries (money customers owe you)
-                return rawData.customerDebitEntries || [];
+                // If receivable → show debit entries (what they owe)
+                // If advance → show credit entries (what they prepaid)
+                return nature === 'customerAdvance'
+                    ? (raw.customerCreditEntries || [])
+                    : (raw.customerDebitEntries || []);
             default:
                 return [];
         }
     };
 
-    const modalEntries = getEntriesForModal();
-
-    // Summary Cards Data with onClick handlers
+    // ---------- Summary Cards ----------
     const summaryCards = [
         {
             title: "Bank Balance",
-            amount: summaryData.bankDebitTotal,
+            amount: summaryData.bankAvailable,
             icon: <RiBankFill className="text-blue-500 text-2xl" />,
             color: "bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30",
             textColor: "text-blue-700 dark:text-blue-300",
             borderColor: "border-blue-200 dark:border-blue-700",
             description: "Total money in bank accounts",
             modalType: "bank",
-            entries: summaryData.rawData?.bankDebitEntries || []
+            nature: ""
         },
         {
             title: "Cash in Hand",
-            amount: summaryData.cashDebitTotal,
+            amount: summaryData.cashAvailable,
             icon: <RiMoneyDollarCircleFill className="text-green-500 text-2xl" />,
             color: "bg-gradient-to-r from-green-50 to-green-100 dark:from-green-900/30 dark:to-green-800/30",
             textColor: "text-green-700 dark:text-green-300",
             borderColor: "border-green-200 dark:border-green-700",
             description: "Physical cash available",
             modalType: "cash",
-            entries: summaryData.rawData?.cashDebitEntries || []
+            nature: ""
         },
         {
-            title: "Payable to Suppliers",
-            amount: summaryData.supplierCreditTotal,
-            icon: <FaUsers className="text-red-500 text-2xl" />,
-            color: "bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30",
-            textColor: "text-red-700 dark:text-red-300",
-            borderColor: "border-red-200 dark:border-red-700",
-            description: "Total amount owed to suppliers",
+            title: summaryData.supplierAdvance > 0 ? "Advance Paid to Suppliers" : "Payable to Suppliers",
+            amount: summaryData.supplierAdvance > 0 ? summaryData.supplierAdvance : summaryData.supplierPayable,
+            // Show the "other side" as sub-line when meaningful
+            subAmount: summaryData.supplierAdvance > 0 ? summaryData.supplierPayable : summaryData.supplierAdvance,
+            subLabel: summaryData.supplierAdvance > 0
+                ? `Payable: ${formatCurrency(summaryData.supplierPayable)}`
+                : (summaryData.supplierAdvance > 0
+                    ? `Advance paid: ${formatCurrency(summaryData.supplierAdvance)}`
+                    : null),
+            icon: <FaUsers className={summaryData.supplierAdvance > 0 ? "text-amber-500 text-2xl" : "text-red-500 text-2xl"} />,
+            color: summaryData.supplierAdvance > 0
+                ? "bg-gradient-to-r from-amber-50 to-amber-100 dark:from-amber-900/30 dark:to-amber-800/30"
+                : "bg-gradient-to-r from-red-50 to-red-100 dark:from-red-900/30 dark:to-red-800/30",
+            textColor: summaryData.supplierAdvance > 0
+                ? "text-amber-700 dark:text-amber-300"
+                : "text-red-700 dark:text-red-300",
+            borderColor: summaryData.supplierAdvance > 0
+                ? "border-amber-200 dark:border-amber-700"
+                : "border-red-200 dark:border-red-700",
+            description: summaryData.supplierAdvance > 0
+                ? "You have overpaid your suppliers"
+                : "Total amount owed to suppliers",
             modalType: "supplier",
-            entries: summaryData.rawData?.supplierCreditEntries || []
+            nature: summaryData.supplierAdvance > 0 ? "advance" : "payable"
         },
         {
-            title: "Receivable from Customers",
-            amount: summaryData.customerDebitTotal,
-            icon: <FaHandHoldingUsd className="text-purple-500 text-2xl" />,
-            color: "bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30",
-            textColor: "text-purple-700 dark:text-purple-300",
-            borderColor: "border-purple-200 dark:border-purple-700",
-            description: "Total amount customers owe",
+            title: summaryData.customerAdvance > 0 ? "Advance from Customers" : "Receivable from Customers",
+            amount: summaryData.customerAdvance > 0 ? summaryData.customerAdvance : summaryData.customerReceivable,
+            subAmount: summaryData.customerAdvance > 0 ? summaryData.customerReceivable : summaryData.customerAdvance,
+            subLabel: summaryData.customerAdvance > 0
+                ? `Receivable: ${formatCurrency(summaryData.customerReceivable)}`
+                : (summaryData.customerAdvance > 0
+                    ? `Customer advance: ${formatCurrency(summaryData.customerAdvance)}`
+                    : null),
+            icon: <FaHandHoldingUsd className={summaryData.customerAdvance > 0 ? "text-teal-500 text-2xl" : "text-purple-500 text-2xl"} />,
+            color: summaryData.customerAdvance > 0
+                ? "bg-gradient-to-r from-teal-50 to-teal-100 dark:from-teal-900/30 dark:to-teal-800/30"
+                : "bg-gradient-to-r from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30",
+            textColor: summaryData.customerAdvance > 0
+                ? "text-teal-700 dark:text-teal-300"
+                : "text-purple-700 dark:text-purple-300",
+            borderColor: summaryData.customerAdvance > 0
+                ? "border-teal-200 dark:border-teal-700"
+                : "border-purple-200 dark:border-purple-700",
+            description: summaryData.customerAdvance > 0
+                ? "Customers have prepaid you"
+                : "Total amount customers owe",
             modalType: "customer",
-            entries: summaryData.rawData?.customerDebitEntries || []
+            nature: summaryData.customerAdvance > 0 ? "customerAdvance" : "receivable"
         }
     ];
 
@@ -320,6 +362,9 @@ const PaymentSummary = () => {
         }
     ];
 
+    // Entries for the currently open modal
+    const modalEntries = getEntriesForModal(modalData.type, modalData.nature);
+
     return (
         <DefaultLayout>
             <Breadcrumb pageName="Finance / Payment Summary" />
@@ -340,10 +385,7 @@ const PaymentSummary = () => {
                     {/* Date Filter Form */}
                     <div className="mb-8">
                         <Formik
-                            initialValues={{
-                                fromDate: '',
-                                toDate: '',
-                            }}
+                            initialValues={{ fromDate: '', toDate: '' }}
                             onSubmit={handleSubmit}
                         >
                             {({ setFieldValue, values }) => (
@@ -359,7 +401,6 @@ const PaymentSummary = () => {
                                                     className="form-datepicker w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 py-3 px-4 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 outline-none transition"
                                                 />
                                             </div>
-
                                             <div>
                                                 <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">End Date</label>
                                                 <Field
@@ -368,7 +409,6 @@ const PaymentSummary = () => {
                                                     className="form-datepicker w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 py-3 px-4 text-slate-800 dark:text-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200 dark:focus:ring-blue-800 outline-none transition"
                                                 />
                                             </div>
-
                                             <div className="flex items-end">
                                                 <button
                                                     type="submit"
@@ -391,7 +431,13 @@ const PaymentSummary = () => {
                             {summaryCards.map((card, index) => (
                                 <div
                                     key={index}
-                                    onClick={() => openModal(card.title, card.entries, card.amount, card.modalType)}
+                                    onClick={() => openModal(
+                                        card.title,
+                                        getEntriesForModal(card.modalType, card.nature),
+                                        card.amount,
+                                        card.modalType,
+                                        card.nature
+                                    )}
                                     className={`${card.color} rounded-2xl border ${card.borderColor} p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 cursor-pointer`}
                                 >
                                     <div className="flex items-center justify-between mb-4">
@@ -407,13 +453,18 @@ const PaymentSummary = () => {
                                         <p className={`text-xl font-bold ${card.textColor}`}>
                                             {formatCurrency(card.amount)}
                                         </p>
+                                        {card.subLabel && (
+                                            <p className="text-xs mt-1 text-slate-500 dark:text-slate-400">
+                                                {card.subLabel}
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             ))}
                         </div>
                     </div>
 
-                    {/* Overview Cards - Totals and Net Balance */}
+                    {/* Overview Cards */}
                     <div className="mb-8">
                         <h3 className="text-xl font-semibold mb-4 text-slate-800 dark:text-white">📊 Financial Overview</h3>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -450,13 +501,13 @@ const PaymentSummary = () => {
                                     <div className="flex items-center justify-between mb-2">
                                         <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Liquidity Ratio</span>
                                         <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                                            {((summaryData.bankDebitTotal + summaryData.cashDebitTotal) / (summaryData.supplierCreditTotal + 1)).toFixed(2)}:1
+                                            {((summaryData.bankAvailable + summaryData.cashAvailable) / (summaryData.supplierPayable || 1)).toFixed(2)}:1
                                         </span>
                                     </div>
                                     <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
                                         <div
                                             className="bg-blue-600 h-2.5 rounded-full"
-                                            style={{ width: `${Math.min(100, ((summaryData.bankDebitTotal + summaryData.cashDebitTotal) / (summaryData.supplierCreditTotal + 1)) * 10)}%` }}
+                                            style={{ width: `${Math.min(100, ((summaryData.bankAvailable + summaryData.cashAvailable) / (summaryData.supplierPayable || 1)) * 10)}%` }}
                                         ></div>
                                     </div>
                                 </div>
@@ -492,7 +543,7 @@ const PaymentSummary = () => {
                                 <div>
                                     <p className="text-sm text-slate-600 dark:text-slate-400">Total Bank Balance</p>
                                     <p className="text-2xl font-bold text-slate-800 dark:text-white">
-                                        {formatCurrency(summaryData.bankDebitTotal)}
+                                        {formatCurrency(summaryData.bankAvailable)}
                                     </p>
                                 </div>
                             </div>
@@ -500,14 +551,21 @@ const PaymentSummary = () => {
 
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 p-5">
                             <div className="flex items-center">
-                                <div className="p-3 rounded-lg bg-red-100 dark:bg-red-900/30 mr-4">
-                                    <FaUsers className="text-red-600 dark:text-red-400 text-xl" />
+                                <div className={`p-3 rounded-lg mr-4 ${summaryData.supplierAdvance > 0 ? 'bg-amber-100 dark:bg-amber-900/30' : 'bg-red-100 dark:bg-red-900/30'}`}>
+                                    <FaUsers className={`text-xl ${summaryData.supplierAdvance > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`} />
                                 </div>
                                 <div>
-                                    <p className="text-sm text-slate-600 dark:text-slate-400">Total Payables</p>
-                                    <p className="text-2xl font-bold text-slate-800 dark:text-white">
-                                        {formatCurrency(summaryData.supplierCreditTotal)}
+                                    <p className="text-sm text-slate-600 dark:text-slate-400">
+                                        {summaryData.supplierAdvance > 0 ? 'Advance Paid' : 'Total Payables'}
                                     </p>
+                                    <p className="text-2xl font-bold text-slate-800 dark:text-white">
+                                        {formatCurrency(summaryData.supplierAdvance > 0 ? summaryData.supplierAdvance : summaryData.supplierPayable)}
+                                    </p>
+                                    {summaryData.supplierAdvance > 0 && (
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                                            Payable: {formatCurrency(summaryData.supplierPayable)}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -520,7 +578,7 @@ const PaymentSummary = () => {
                                 <div>
                                     <p className="text-sm text-slate-600 dark:text-slate-400">Total Money Available</p>
                                     <p className="text-2xl font-bold text-slate-800 dark:text-white">
-                                        {formatCurrency(summaryData.cashDebitTotal + summaryData.bankDebitTotal)}
+                                        {formatCurrency(summaryData.cashAvailable + summaryData.bankAvailable)}
                                     </p>
                                 </div>
                             </div>
@@ -531,15 +589,10 @@ const PaymentSummary = () => {
 
             {/* Modal Component */}
             {modalOpen && (
-                <div
-                    className="fixed inset-0 overflow-y-auto"
-                    style={{ zIndex: 9999 }}
-                >
+                <div className="fixed inset-0 overflow-y-auto" style={{ zIndex: 9999 }}>
                     <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-                        {/* Background overlay */}
                         <div className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-90" onClick={closeModal}></div>
 
-                        {/* Modal panel */}
                         <div className="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white dark:bg-slate-800 rounded-2xl shadow-xl sm:my-8 sm:align-middle sm:max-w-5xl sm:w-full">
                             {/* Modal Header */}
                             <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200 dark:border-slate-700">
@@ -548,7 +601,20 @@ const PaymentSummary = () => {
                                         {modalData.title} Details
                                     </h3>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                                        Total Amount: <span className="font-semibold">{formatCurrency(modalData.totalAmount)}</span>
+                                        {/* Show what the number actually means */}
+                                        {modalData.type === 'supplier' && (
+                                            modalData.nature === 'advance'
+                                                ? <>Advance Paid (Dr): <span className="font-semibold">{formatCurrency(modalData.totalAmount)}</span></>
+                                                : <>Payable (Cr): <span className="font-semibold">{formatCurrency(modalData.totalAmount)}</span></>
+                                        )}
+                                        {modalData.type === 'customer' && (
+                                            modalData.nature === 'customerAdvance'
+                                                ? <>Customer Advance (Cr): <span className="font-semibold">{formatCurrency(modalData.totalAmount)}</span></>
+                                                : <>Receivable (Dr): <span className="font-semibold">{formatCurrency(modalData.totalAmount)}</span></>
+                                        )}
+                                        {(modalData.type === 'bank' || modalData.type === 'cash') && (
+                                            <>Balance: <span className="font-semibold">{formatCurrency(modalData.totalAmount)}</span></>
+                                        )}
                                     </p>
                                 </div>
                                 <button
@@ -559,7 +625,7 @@ const PaymentSummary = () => {
                                 </button>
                             </div>
 
-                            {/* Modal Body - Table */}
+                            {/* Modal Body */}
                             <div className="px-6 py-4 max-h-[70vh] overflow-y-auto">
                                 {modalEntries.length === 0 ? (
                                     <div className="text-center py-12">
@@ -570,40 +636,20 @@ const PaymentSummary = () => {
                                         <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
                                             <thead className="bg-gray-50 dark:bg-slate-900">
                                                 <tr>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                        S.No
-                                                    </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                        Date
-                                                    </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                        Description
-                                                    </th>
-                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                        Debit (₹)
-                                                    </th>
-                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                        Credit (₹)
-                                                    </th>
-                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                        Voucher Type
-                                                    </th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">S.No</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Date</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Description</th>
+                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Debit (₹)</th>
+                                                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Credit (₹)</th>
+                                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Voucher Type</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                                                 {modalEntries.map((entry, idx) => (
                                                     <tr key={entry.id || idx} className="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                                                            {
-                                                                idx + 1
-                                                            }
-                                                        </td>
-                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                                            {formatDate(entry.receivedDate)}
-                                                        </td>
-                                                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-md truncate">
-                                                            {entry.description || '—'}
-                                                        </td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{idx + 1}</td>
+                                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{formatDate(entry.receivedDate)}</td>
+                                                        <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400 max-w-md truncate">{entry.description || '—'}</td>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-green-600 dark:text-green-400">
                                                             {entry.debit > 0 ? formatCurrency(entry.debit) : '—'}
                                                         </td>
@@ -618,12 +664,9 @@ const PaymentSummary = () => {
                                                     </tr>
                                                 ))}
                                             </tbody>
-                                            {/* Table Footer with Total */}
                                             <tfoot className="bg-gray-50 dark:bg-slate-900 sticky bottom-0">
                                                 <tr>
-                                                    <th colSpan="3" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                                        Total
-                                                    </th>
+                                                    <th colSpan="3" className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</th>
                                                     <th className="px-6 py-3 text-right text-sm font-bold text-green-600 dark:text-green-400">
                                                         {formatCurrency(modalEntries.reduce((sum, e) => sum + (e.debit || 0), 0))}
                                                     </th>
