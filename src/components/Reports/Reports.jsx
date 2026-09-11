@@ -303,7 +303,7 @@ const Reports = () => {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.href = url;
-            link.setAttribute("download", "report.pdf");
+            link.setAttribute("download", "report.xlsx");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -529,7 +529,7 @@ const Reports = () => {
                                             onClick={() => handlegenerateReport(values)}
                                             className="px-6 py-2.5 rounded-lg bg-primary text-white font-medium hover:bg-green-700 transition-colors"
                                         >
-                                            Generate PDF
+                                            Generate XLSX FILE
                                         </button>
                                         <button
                                             type="button"

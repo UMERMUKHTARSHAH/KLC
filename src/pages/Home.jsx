@@ -217,15 +217,15 @@ const Home = () => {
         iconBg: 'bg-orange-100',
         iconColor: 'text-orange-600'
       },
-      {
-        title: 'All Reports',
-        link: '/allReports',
-        icon: <RiAlignItemBottomFill className="w-5 h-5" />,
-        levelUp: true,
-        description: 'The full library of report views for this workspace.',
-        iconBg: 'bg-indigo-100',
-        iconColor: 'text-indigo-600'
-      },
+      // {
+      //   title: 'All Reports',
+      //   link: '/allReports',
+      //   icon: <RiAlignItemBottomFill className="w-5 h-5" />,
+      //   levelUp: true,
+      //   description: 'The full library of report views for this workspace.',
+      //   iconBg: 'bg-indigo-100',
+      //   iconColor: 'text-indigo-600'
+      // },
       {
         title: 'Retail/Wholesale Reports',
         link: '/report/wsRetailReport',
@@ -574,7 +574,7 @@ const Home = () => {
     cardsToShow.forEach(card => {
       if (['Production Dashboard', 'Orders Dashboard', 'Monthly Order Calendar'].includes(card.title)) {
         operations.push(card);
-      } else if (['Reports', 'All Reports', 'Retail/Wholesale Reports', 'Financial Reports', 
+      } else if (['Reports',  'Retail/Wholesale Reports', 'Financial Reports', 
                   'Customer Report', 'Product Report', 'All Groups Product Report'].includes(card.title)) {
         reports.push(card);
       } else if (['Upload Excel'].includes(card.title)) {
