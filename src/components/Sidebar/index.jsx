@@ -28,6 +28,7 @@ import { LuTornado } from 'react-icons/lu';
 import { FaShopify } from "react-icons/fa";
 import { toast } from 'react-toastify';
 import { GET_Vouchersearch_URL } from '../../Constants/utils';
+
 const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   const [role, setrole] = useState('');
   const location = useLocation();
@@ -43,16 +44,25 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
   const { currentUser } = useSelector((state) => state?.persisted?.user);
   const appMode = useSelector((state) => state?.persisted?.appMode);
-   const [isSalesOpen, setIsSalesOpen] = useState(false);
+  const [isSalesOpen, setIsSalesOpen] = useState(false);
   const [isPurchaseOpen, setIsPurchaseOpen] = useState(false);
-   const [salesVouchers, setSalesVouchers] = useState([]);
+  const [salesVouchers, setSalesVouchers] = useState([]);
   const [purchaseVouchers, setPurchaseVouchers] = useState([]);
 
   const { mode } = appMode;
-    const { token } = currentUser;
+  const { token } = currentUser;
 
   const { user } = currentUser || {};
   const roles = user?.authorities.map((auth) => auth.authority) || []; // Ensure it's always an array
+
+  // Helper: true if the current URL matches any of the given fragments.
+  // Used so a dropdown auto-opens (and stays open) whenever one of its
+  // own links is the active route, instead of relying on a single
+  // hard-coded '/forms' check that never matched most routes.
+  const isPathActive = (keywords = []) => {
+    const lower = pathname.toLowerCase();
+    return keywords.some((k) => lower.includes(k.toLowerCase()));
+  };
 
   // close on click outside
   useEffect(() => {
@@ -69,8 +79,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     document.addEventListener('click', clickHandler);
     return () => document.removeEventListener('click', clickHandler);
   });
-
-  
 
   // close if the esc key is pressed
   useEffect(() => {
@@ -91,7 +99,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     }
   }, [sidebarExpanded]);
 
-   const getVouchersByType = async (type) => {
+  const getVouchersByType = async (type) => {
     try {
       const response = await fetch(`${GET_Vouchersearch_URL}?page=1&size=1000`, {
         method: "POST",
@@ -118,7 +126,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
     }
   };
 
-   const handleSalesClick = async (e) => {
+  const handleSalesClick = async (e) => {
     e.preventDefault();
     if (!isSalesOpen) {
       const data = await getVouchersByType("Sales");
@@ -157,7 +165,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               className="w-full h-40 justify-center rounded-full  "
               alt="Logo"
             />
-            {/* <h2 className='mt-7 ml-4 text-3xl text-slate-300 font-bold stroke-form-input'>KANI</h2> */}
           </NavLink>
         </div>
 
@@ -238,9 +245,11 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               {/*Accounts*/}
 
               <SidebarLinkGroup
-              // activeCondition={
-              //   pathname === '/configurator' || pathname.includes('configurator')
-              // }
+                activeCondition={isPathActive([
+                  '/configurator/groups',
+                  '/configurator/vouchers',
+                  '/configurator/addlut',
+                ])}
               >
                 {(handleClick, open) => {
                   return (
@@ -250,9 +259,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -314,18 +321,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                               Vouchers
                             </NavLink>
                           </li>
-                          {/* <li>
-                            <NavLink
-                              to="/configurator/dayBook"
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              <MdBook/>
-                              Day Book
-                            </NavLink>
-                          </li> */}
 
                           <li>
                             <NavLink
@@ -348,7 +343,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
               {/* Kani */}
 
-              <SidebarLinkGroup>
+              <SidebarLinkGroup activeCondition={isPathActive(['/kaniorders'])}>
                 {(handleClick, open) => {
                   return (
                     <>
@@ -356,7 +351,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                       roles.some((role) => ['ROLE_ADMIN'].includes(role)) ? (
                         <NavLink
                           to="#"
-                          className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4`}
+                          className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
+                            open && 'bg-graydark dark:bg-meta-4'
+                          }`}
                           onClick={(e) => {
                             e.preventDefault();
                             sidebarExpanded
@@ -406,11 +403,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 }}
               </SidebarLinkGroup>
 
-              <SidebarLinkGroup
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
+              <SidebarLinkGroup activeCondition={isPathActive(['/ledger'])}>
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
@@ -419,9 +412,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -458,17 +449,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         }`}
                       >
                         <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                          {/* <li>
-                            <NavLink
-                              to="/inventory/addProductInventory"
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              Add Inventory
-                            </NavLink>
-                          </li> */}
                           <li>
                             <NavLink
                               to="/Ledger/CreateLedger"
@@ -510,7 +490,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 }}
               </SidebarLinkGroup>
 
-           <SidebarLinkGroup>
+              <SidebarLinkGroup
+                activeCondition={isPathActive(['/voucher', '/configurator/vouchers'])}
+              >
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
@@ -520,7 +502,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                           <NavLink
                             to="#"
                             className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                              (pathname === '/configurator' || pathname.includes('configurator')) && 'bg-graydark dark:bg-meta-4'
+                              open && 'bg-graydark dark:bg-meta-4'
                             }`}
                             onClick={(e) => {
                               e.preventDefault();
@@ -567,7 +549,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                                   Add New Voucher
                                 </NavLink>
                               </li>
-                              
+
                               {/* Sales Dropdown */}
                               <li>
                                 <div
@@ -694,18 +676,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 </NavLink>
               ) : null}
 
-              <SidebarLinkGroup
-                className={`${
-                  roles.some((role) =>
-                    ['supervsior', 'executor', 'director'].includes(role),
-                  )
-                    ? 'hidden'
-                    : 'hidden'
-                }`}
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
+              <SidebarLinkGroup activeCondition={isPathActive(['/product/'])}>
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
@@ -716,9 +687,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -813,181 +782,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 }}
               </SidebarLinkGroup>
 
-              {/* <SidebarLinkGroup
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
-                {(handleClick, open) => {
-                  return (
-                    <React.Fragment>
-                      {mode === "production" && roles.some(role => ['ROLE_ADMIN'].includes(role)) ? (
-                        <NavLink
-                          to="#"
-                          className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${(pathname === '/forms' ||
-                            pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
-                            }`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            sidebarExpanded
-                              ? handleClick()
-                              : setSidebarExpanded(true);
-                          }}
-                        >
-                          <MdAddHome size={24} />
-                          Godown
-                          <svg
-                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && 'rotate-180'
-                              }`}
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
-                              fill=""
-                            />
-                          </svg>
-                        </NavLink>
-                      ) : null}
+              {/* Suppplier Ledger (kept commented as in original) */}
 
-                      <div
-                        className={`translate transform overflow-hidden ${!open && 'hidden'
-                          }`}
-                      >
-
-                        <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                          <li>
-                            <NavLink
-                              to="/inventory/addProductInventory"
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              Add Inventory
-                            </NavLink>
-                          </li>
-
-
-                          <li>
-                            <NavLink
-                              to="/godown/viewGodown"
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              View Godown
-                            </NavLink>
-                          </li>
-
-                        </ul>
-                      </div>
-                    </React.Fragment>
-                  );
-                }}
-              </SidebarLinkGroup> */}
-
-              {/* Suppplier Ledger */}
-              {/* <SidebarLinkGroup
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
-                {(handleClick, open) => {
-                  return (
-                    <React.Fragment>
-                      {mode === "production" && roles.some(role => ['ROLE_ADMIN'].includes(role)) ? (
-                        <NavLink
-                          to="#"
-                          className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${(pathname === '/forms' ||
-                            pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
-                            }`}
-                          onClick={(e) => {
-                            e.preventDefault();
-                            sidebarExpanded
-                              ? handleClick()
-                              : setSidebarExpanded(true);
-                          }}
-                        >
-                          <FaBook size={24} />
-                          Ledger
-                          <svg
-                            className={`absolute right-4 top-1/2 -translate-y-1/2 fill-current ${open && 'rotate-180'
-                              }`}
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M4.41107 6.9107C4.73651 6.58527 5.26414 6.58527 5.58958 6.9107L10.0003 11.3214L14.4111 6.91071C14.7365 6.58527 15.2641 6.58527 15.5896 6.91071C15.915 7.23614 15.915 7.76378 15.5896 8.08922L10.5896 13.0892C10.2641 13.4147 9.73651 13.4147 9.41107 13.0892L4.41107 8.08922C4.08563 7.76378 4.08563 7.23614 4.41107 6.9107Z"
-                              fill=""
-                            />
-                          </svg>
-                        </NavLink>
-                      ) : null}
-
-                      <div
-                        className={`translate transform overflow-hidden ${!open && 'hidden'
-                          }`}
-                      >
-
-                        <ul className="mt-4 mb-5.5 flex flex-col gap-2.5 pl-6">
-                          <li>
-                            <NavLink
-                              to="/inventory/addProductInventory"
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              Add Inventory
-                            </NavLink>
-                          </li>
-
-
-                          <li>
-                            <NavLink
-                              to="/ledger/view"
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              View Ledger
-                            </NavLink>
-                          </li>
-
-                        </ul>
-                      </div>
-                    </React.Fragment>
-                  );
-                }}
-              </SidebarLinkGroup> */}
-
-              <SidebarLinkGroup
-                className={`${
-                  roles.some((role) =>
-                    ['supervsior', 'executor', 'director'].includes(role),
-                  )
-                    ? 'hidden'
-                    : 'hidden'
-                }`}
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
+              <SidebarLinkGroup activeCondition={isPathActive(['/budget'])}>
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
@@ -998,9 +795,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -1071,18 +866,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 }}
               </SidebarLinkGroup>
 
-              <SidebarLinkGroup
-                className={`${
-                  roles.some((role) =>
-                    ['supervsior', 'executor', 'director'].includes(role),
-                  )
-                    ? 'hidden'
-                    : 'hidden'
-                }`}
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
+              <SidebarLinkGroup activeCondition={isPathActive(['/shopify'])}>
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
@@ -1093,9 +877,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -1157,7 +939,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                               }
                             >
                               Fetch Inventory
-                              
                             </NavLink>
                           </li>
                         </ul>
@@ -1179,8 +960,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               ) ? (
                 <NavLink
                   to="/Reports"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 
-                  }`}
+                  className={({ isActive }) =>
+                    'group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ' +
+                    (isActive ? 'bg-graydark dark:bg-meta-4' : '')
+                  }
                 >
                   <TbReport size={24} />
                   Reports
@@ -1195,8 +978,10 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               ) ? (
                 <NavLink
                   to="/Order/ViewOrder"
-                  className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 
-                  }`}
+                  className={({ isActive }) =>
+                    'group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ' +
+                    (isActive ? 'bg-graydark dark:bg-meta-4' : '')
+                  }
                 >
                   <FcSearch size={24} />
                   Search Order
@@ -1205,11 +990,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
               {/* inventory */}
 
-              <SidebarLinkGroup
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
+              <SidebarLinkGroup activeCondition={isPathActive(['/inventory'])}>
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
@@ -1218,9 +999,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -1299,11 +1078,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 }}
               </SidebarLinkGroup>
 
-              <SidebarLinkGroup
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
+              <SidebarLinkGroup activeCondition={isPathActive(['/order/'])}>
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
@@ -1314,9 +1089,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -1396,11 +1169,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               </SidebarLinkGroup>
 
               {/* stock journal */}
-              <SidebarLinkGroup
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
+              <SidebarLinkGroup activeCondition={isPathActive(['/stock'])}>
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
@@ -1411,9 +1180,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -1473,18 +1240,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                               View Stock Transfer
                             </NavLink>
                           </li>
-
-                          {/* <li>
-                            <NavLink
-                              to="/Order/ViewOrderCreated"
-                              className={({ isActive }) =>
-                                'group relative flex items-center gap-2.5 rounded-md px-4 font-small text-bodydark2 duration-300 ease-in-out hover:text-white ' +
-                                (isActive && '!text-white')
-                              }
-                            >
-                              Edit Order
-                            </NavLink>
-                          </li> */}
                         </ul>
                       </div>
                     </React.Fragment>
@@ -1493,9 +1248,22 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               </SidebarLinkGroup>
 
               <SidebarLinkGroup
-              // activeCondition={
-              //   pathname === '/configurator' || pathname.includes('configurator')
-              // }
+                activeCondition={isPathActive([
+                  '/configurator/addunit',
+                  '/configurator/location',
+                  '/configurator/addcurrency',
+                  '/configurator/addsize',
+                  '/configurator/adddesign',
+                  '/configurator/addstyle',
+                  '/configurator/addproductgroup',
+                  '/configurator/addproductsubgroup',
+                  '/configurator/adddesigngroup',
+                  '/configurator/addproductstatus',
+                  '/configurator/addcustomergroup',
+                  '/configurator/addordertype',
+                  '/configurator/weave',
+                  '/configurator/addgstclassification',
+                ])}
               >
                 {(handleClick, open) => {
                   return (
@@ -1505,9 +1273,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -1710,15 +1476,9 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                 }}
               </SidebarLinkGroup>
 
-              {/* <!-- Menu Item Tables --> */}
-
               {/* customer */}
 
-              <SidebarLinkGroup
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
+              <SidebarLinkGroup activeCondition={isPathActive(['/customer'])}>
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
@@ -1729,9 +1489,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -1810,11 +1568,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
               {/* weaver embroider  */}
 
-              <SidebarLinkGroup
-                activeCondition={
-                  pathname === '/forms' || pathname.includes('forms')
-                }
-              >
+              <SidebarLinkGroup activeCondition={isPathActive(['/supplier'])}>
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
@@ -1823,9 +1577,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/forms' ||
-                              pathname.includes('forms')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -1903,7 +1655,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
               </SidebarLinkGroup>
 
               <li></li>
-              {/* <!-- Menu Item Settings --> */}
             </ul>
           </div>
 
@@ -1918,11 +1669,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
 
             <ul className="mb-6 flex flex-col gap-1.5">
               {/* <!-- Auth  --> */}
-              <SidebarLinkGroup
-                activeCondition={
-                  pathname === '/auth' || pathname.includes('auth')
-                }
-              >
+              <SidebarLinkGroup activeCondition={isPathActive(['/auth'])}>
                 {(handleClick, open) => {
                   return (
                     <React.Fragment>
@@ -1931,9 +1678,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                         <NavLink
                           to="#"
                           className={`group relative flex items-center gap-2.5 rounded-sm py-2 px-4 font-small text-bodydark1 duration-300 ease-in-out hover:bg-graydark dark:hover:bg-meta-4 ${
-                            (pathname === '/auth' ||
-                              pathname.includes('auth')) &&
-                            'bg-graydark dark:bg-meta-4'
+                            open && 'bg-graydark dark:bg-meta-4'
                           }`}
                           onClick={(e) => {
                             e.preventDefault();
@@ -2009,7 +1754,7 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                               Add User
                             </NavLink>
                           </li>
-                           <li>
+                          <li>
                             <NavLink
                               to="/auth/viewUsers"
                               className={({ isActive }) =>
@@ -2026,7 +1771,6 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
                   );
                 }}
               </SidebarLinkGroup>
-              {/* <!-- Menu Item Auth Pages --> */}
             </ul>
           </div>
         </nav>

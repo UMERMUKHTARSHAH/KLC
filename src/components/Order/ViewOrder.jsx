@@ -209,18 +209,34 @@ const ViewOrder = () => {
             {item.customerName}
           </p>
         </td>
-        <td className="px-5 py-5 border-b border-gray-200 text-sm tracking-wider whitespace-nowrap">
-          {item?.products?.map((prodId, idx) => (
-            <div key={idx} className="mb-1">
-              <span className="text-gray-900 whitespace-no-wrap tracking-wider">
-                {prodId.productId}
-              </span>
-            <span className="text-red-600 whitespace-no-wrap ml-1 animate-blink">
-  ({prodId.productStatus})
-</span>
-            </div>
-          ))}
-        </td>
+  <td className="px-5 py-5 border-b border-gray-200 text-sm tracking-wider whitespace-nowrap">
+  {item?.products?.map((prodId, idx) => {
+    const status = (prodId.productStatus || '').toLowerCase();
+
+    let badgeClasses = 'bg-gray-50 text-gray-600 border border-gray-200 dark:bg-slate-800 dark:text-gray-400 dark:border-slate-700';
+
+    if (status.includes('closed')) {
+      badgeClasses = 'bg-green-50 text-green-600 border border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800';
+    } else if (status.includes('pending')) {
+      badgeClasses = 'bg-amber-50 text-amber-600 border border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800';
+    } else if (status.includes('approved')) {
+      badgeClasses = 'bg-blue-50 text-blue-600 border border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800';
+    } else if (status.includes('cancelled') || status.includes('canceled')) {
+      badgeClasses = 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800';
+    }
+
+    return (
+      <div key={idx} className="mb-1 flex items-center gap-2">
+        <span className="text-gray-900 whitespace-no-wrap tracking-wider">
+          {prodId.productId}
+        </span>
+        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${badgeClasses}`}>
+          {prodId.productStatus}
+        </span>
+      </div>
+    );
+  })}
+</td>
           <td className="px-5 py-5 border-b border-gray-200 text-sm tracking-wider whitespace-nowrap">
           {item?.products?.map((prodId, idx) => (
             <div key={idx} className="mb-1">
