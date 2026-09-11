@@ -511,8 +511,8 @@ const ViewOrderShippingDate = () => {
                                 </tbody>
                             </table>
                         </div>
-                        <Pagination totalPages={pagination.totalPages} currentPage={pagination.currentPage} handlePageChange={handlePageChange} />
                     </div>
+                        <Pagination totalPages={pagination.totalPages} currentPage={pagination.currentPage} handlePageChange={handlePageChange} />
 
 
                 </div>
