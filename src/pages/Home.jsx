@@ -609,7 +609,7 @@ const Home = () => {
                 className={`cursor-pointer relative ${isDownloading ? 'cursor-not-allowed opacity-75' : 'cursor-pointer'}`}
               >
                 {isDownloading && <SpinnerOverlay />}
-                <div className="bg-white rounded-xl shadow-sm p-5 hover:border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
+                <div className="bg-white dark:bg-black/10 rounded-xl shadow-sm p-5 hover:border dark:border border-gray-200 dark:border-white-300 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
                   <div className="flex items-start justify-between">
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
                       <div className={`w-10 h-10 rounded-xl ${card.iconBg || 'bg-gray-100'} flex items-center justify-center`}>
@@ -634,7 +634,7 @@ const Home = () => {
               </div>
             ) : (
               <Link to={card.link} key={index}>
-                <div className="bg-white rounded-xl shadow-sm p-5 hover:border border-gray-200 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
+                <div className="bg-white dark:bg-black/10 rounded-xl shadow-sm p-5 hover:border dark:border border-gray-200 dark:border-white-300 hover:shadow-lg hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1">
                   <div className="flex items-start justify-between">
                     <div className="flex flex-col gap-1 flex-1 min-w-0">
                       <div className={`w-10 h-10 rounded-xl ${card.iconBg || 'bg-gray-100'} flex items-center justify-center`}>
