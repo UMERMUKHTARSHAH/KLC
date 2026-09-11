@@ -278,6 +278,7 @@ const Chart = () => {
   ];
 
   // Group cards by categories
+   // Group cards by categories
   const getGroupedCards = () => {
     const needsAttention = [];
     const fiberProformaSuppliers = [];
@@ -291,9 +292,9 @@ const Chart = () => {
 
     filteredCards.forEach(card => {
       // Needs Attention category
-      if (['Update Shipping Date', 'Delayed Order Products', 'Pending Orders', , 
+      if (['Update Shipping Date', 'Delayed Order Products', 'Forced Closed Orders', 
            'Edit Received Quantity', 'Update Challan', 
-           'Need Modification Orders', 'Cancelled Orders', ].includes(card.title)) {
+           'Need Modification Orders', 'Cancelled Orders'].includes(card.title)) {
         needsAttention.push(card);
       }
       // Fiber, Proforma & Suppliers category
