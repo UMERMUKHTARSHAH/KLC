@@ -381,7 +381,7 @@ const Chart = () => {
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-lg font-semibold text-gray-800">{heading}</h2>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
+        <div className="bg-white dark:bg-black/10 rounded-xl shadow-sm border border-gray-200 p-4">
           <div className="flex flex-nowrap items-start w-full">
             {steps.map((step, index) => {
               const isCompleted = step.title.toLowerCase().includes('complet');
@@ -398,7 +398,7 @@ const Chart = () => {
               }
 
               return (
-                <div key={index} className="flex items-start flex-1 min-w-0">
+                <div key={index} className=" flex items-start flex-1 min-w-0">
                   <div className="flex flex-col items-center text-center flex-1 min-w-0 px-0.5">
                     <Link to={step.link} className="flex flex-col items-center group w-full">
                       <div
@@ -437,7 +437,7 @@ const Chart = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           {summaryCards.map((card, idx) => (
             <Link to={card.link} key={idx}>
-              <div className="bg-white rounded-xl shadow-sm p-4 border border-gray-200 hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 ease-in-out cursor-pointer hover:scale-[1.02] hover:-translate-y-1">
+              <div className="bg-white dark:bg-black/10 rounded-xl shadow-sm p-4 border border-gray-200 hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 ease-in-out cursor-pointer hover:scale-[1.02] hover:-translate-y-1 dark">
   <div className="flex items-center justify-between tracking-wider whitespace-nowrap">
     <div>
       <p className={`text-6px font-sm ${card.textColor} uppercase tracking-wider`}>
