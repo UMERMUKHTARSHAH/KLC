@@ -269,8 +269,26 @@ const ViewOrderShippingDate = () => {
                     <p className="text-gray-900 whitespace-no-wrap">{item.supplierName}</p>
                 </td>
 
+{
+    item.updateShippingDate!==null && item.updateShippingDate!=="" ? (
+        <>
 
+     <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">
+                        -
+                    </p>
+                </td>
                 <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                    <p className="text-gray-900 whitespace-no-wrap">
+                        {item.updateShippingDate ? item.updateShippingDate : ""}
+                    </p>
+                </td>
+                </>
+
+    ):(
+        <>
+
+     <td className="px-5 py-5 border-b border-gray-200 text-sm">
                     <p className="text-gray-900 whitespace-no-wrap">
                         { item.shippingDate}
                     </p>
@@ -280,6 +298,11 @@ const ViewOrderShippingDate = () => {
                         {item.updateShippingDate ? item.updateShippingDate : ""}
                     </p>
                 </td>
+</>
+    )
+    
+}
+           
 
 
                 {/* <td className="px-5 py-5 border-b border-gray-200 text-sm">
