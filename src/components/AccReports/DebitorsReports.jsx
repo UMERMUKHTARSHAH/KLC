@@ -1,8 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import DefaultLayout from '../../layout/DefaultLayout'
 import Breadcrumb from '../Breadcrumbs/Breadcrumb'
 import { Field, Formik, Form } from 'formik'
-import { DELETE_ORDER_URL, DOWNLOADACCCSVDebi_REPORT, DOWNLOADACCCSV_REPORT, DOWNLOADCSV_REPORT, DOWNLOAD_REPORT, VIEW_ALL_ORDERS, VIEW_CREATED_ORDERS, VIEW_REPORT } from "../../Constants/utils";
+import {
+    DELETE_ORDER_URL,
+    DOWNLOADACCCSVDebi_REPORT,
+    DOWNLOADACCCSV_REPORT,
+    DOWNLOADCSV_REPORT,
+    DOWNLOAD_REPORT,
+    VIEW_ALL_ORDERS,
+    VIEW_CREATED_ORDERS,
+    VIEW_REPORT
+} from "../../Constants/utils";
 import ReactSelect from 'react-select';
 import useorder from '../../hooks/useOrder';
 import { FiEdit, FiTrash2, FiEye } from 'react-icons/fi';
@@ -14,16 +23,10 @@ import { customStyles as createCustomStyles } from '../../Constants/utils';
 import useReports from '../../hooks/useReports';
 import { FaDownload } from 'react-icons/fa6';
 
-const productgrp = [
-    { value: 'BrandA', label: 'Brand A' },
-    { value: 'BrandB', label: 'Brand B' },
-    { value: 'BrandC', label: 'Brand C' },
-];
+const PAGE_SIZE = 20; // Must match backend default
 
 const DebitorsReports = () => {
     const [loading, setLoading] = useState(false);
-    const [reportData, setReportData] = useState([]);
-    const [filteredData, setFilteredData] = useState([]);
     const [isDataFetched, setIsDataFetched] = useState(false);
     const [currentPageData, setCurrentPageData] = useState([]);
 
@@ -38,25 +41,28 @@ const DebitorsReports = () => {
         data: [],
         totalPages: 0,
         currentPage: 1,
-        itemsPerPage: 10,
+        itemsPerPage: PAGE_SIZE,
     });
 
-    // Store current filters for pagination
-    const [currentFilters, setCurrentFilters] = useState({
-        fromDate: '',
-        toDate: ''
-    });
+    // Keep filters in a ref so handlePageChange always sees the latest values
+    const currentFiltersRef = useRef({ fromDate: '', toDate: '' });
 
-    // Function to fetch a specific page from API
+    // ---------------------------------------------------------------
+    // Fetch a specific page from the API
+    // ---------------------------------------------------------------
     const fetchPageData = async (page, filters) => {
-        if (!filters.fromDate || !filters.toDate) return;
+        console.log("📤 Fetching page:", page, "filters:", filters);
+
+        if (!filters.fromDate || !filters.toDate) {
+            console.warn("⚠️ Missing dates, aborting fetch");
+            return;
+        }
 
         setLoading(true);
-        const groupName = "Sundry Debitors";
 
         try {
             const response = await fetch(
-                `${DOWNLOADACCCSVDebi_REPORT}/preview`,
+                `${DOWNLOADACCCSVDebi_REPORT}/preview?page=${page - 1}`,  // backend is 0-indexed
                 {
                     method: "POST",
                     headers: {
@@ -66,11 +72,9 @@ const DebitorsReports = () => {
                     body: JSON.stringify({
                         fromDate: filters.fromDate,
                         toDate: filters.toDate,
-                       
-                        page: page - 1,
-                        size: pagination.itemsPerPage
+                          // backend is 0-indexed
+                        size: PAGE_SIZE
                     })
-
                 }
             );
 
@@ -79,9 +83,15 @@ const DebitorsReports = () => {
             }
 
             const data = await response.json();
+            console.log("📥 Response meta:", {
+                number: data.number,
+                size: data.size,
+                totalPages: data.totalPages,
+                totalElements: data.totalElements,
+                first: data.first,
+                last: data.last
+            });
 
-            setReportData(data.content || []);
-            setFilteredData(data.content || []);
             setCurrentPageData(data.content || []);
 
             setPagination({
@@ -89,7 +99,7 @@ const DebitorsReports = () => {
                 data: data?.content || [],
                 totalPages: data?.totalPages || 0,
                 currentPage: (data?.number || 0) + 1,
-                itemsPerPage: data?.size || 10,
+                itemsPerPage: PAGE_SIZE,   // keep constant
             });
 
         } catch (error) {
@@ -101,23 +111,30 @@ const DebitorsReports = () => {
         }
     };
 
-    // Handle View button click with server-side pagination
+    // ---------------------------------------------------------------
+    // View button handler (first fetch)
+    // ---------------------------------------------------------------
     const handleViewReport = async (values) => {
         if (!values.fromDate || !values.toDate) {
             toast.warning("Please select both From Date and To Date");
             return;
         }
 
-        setCurrentFilters({
+        const filters = {
             fromDate: values.fromDate,
             toDate: values.toDate
-        });
+        };
 
-        await fetchPageData(1, values);
+        // Save to ref AND state
+        currentFiltersRef.current = filters;
+
+        await fetchPageData(1, filters);
         setIsDataFetched(true);
     };
 
-    // Handle CSV download
+    // ---------------------------------------------------------------
+    // CSV download handler
+    // ---------------------------------------------------------------
     const handlegenerateCsv = async (values) => {
         if (!values.fromDate || !values.toDate) {
             toast.warning("Please select both From Date and To Date");
@@ -127,7 +144,6 @@ const DebitorsReports = () => {
         const filters = {
             fromDate: values.fromDate,
             toDate: values.toDate,
-
         };
 
         try {
@@ -138,8 +154,7 @@ const DebitorsReports = () => {
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(filters),
-            },
-            );
+            });
 
             if (!response.ok) {
                 const errorText = await response.text();
@@ -163,17 +178,26 @@ const DebitorsReports = () => {
         }
     };
 
-    // Handle pagination
+    // ---------------------------------------------------------------
+    // Pagination handler — reads from ref, always fresh
+    // ---------------------------------------------------------------
     const handlePageChange = async (page) => {
-        await fetchPageData(page, currentFilters);
+        console.log("🖱️ Page clicked:", page, "current:", pagination.currentPage, "filters:", currentFiltersRef.current);
+
+        if (page === pagination.currentPage) return;              // no-op
+        if (page < 1 || page > pagination.totalPages) return;     // bounds
+
+        await fetchPageData(page, currentFiltersRef.current);
     };
 
-    // Render table rows
+    // ---------------------------------------------------------------
+    // Table rows
+    // ---------------------------------------------------------------
     const renderTableRows = () => {
         if (loading) {
             return (
                 <tr>
-                    <td colSpan="9" className="px-5 py-10 text-center">
+                    <td colSpan="7" className="px-5 py-10 text-center">
                         <div className="flex justify-center items-center">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                             <span className="ml-2 text-gray-600 dark:text-gray-300">Loading...</span>
@@ -186,7 +210,7 @@ const DebitorsReports = () => {
         if (!isDataFetched) {
             return (
                 <tr>
-                    <td colSpan="9" className="px-5 py-10 text-center">
+                    <td colSpan="7" className="px-5 py-10 text-center">
                         <p className="text-gray-500 dark:text-gray-400">Select dates and click "View" to load report</p>
                     </td>
                 </tr>
@@ -196,24 +220,28 @@ const DebitorsReports = () => {
         if (!currentPageData.length) {
             return (
                 <tr>
-                    <td colSpan="9" className="px-5 py-10 text-center">
+                    <td colSpan="7" className="px-5 py-10 text-center">
                         <p className="text-gray-500 dark:text-gray-400">No data found for the selected date range</p>
                     </td>
                 </tr>
             );
         }
 
-        const startingSerialNumber = (pagination.currentPage - 1) * pagination.itemsPerPage + 1;
+        const startingSerialNumber =
+            (pagination.currentPage - 1) * pagination.itemsPerPage + 1;
 
         return currentPageData.map((item, index) => (
-            <tr key={item.ledgerId || index} className="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors">
+            <tr
+                key={item.ledgerId || index}
+                className="hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+            >
                 <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-sm">
                     {startingSerialNumber + index}
                 </td>
                 <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-900 dark:text-white">
                     {item.ledgerName || '-'}
                 </td>
-                <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300">
+                <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-right text-gray-700 dark:text-gray-300">
                     {item.previousOpeningBalance || '-'}
                 </td>
                 <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-right text-gray-700 dark:text-gray-300">
@@ -222,20 +250,19 @@ const DebitorsReports = () => {
                 <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-right text-gray-700 dark:text-gray-300">
                     {Number(item.creditTransaction || 0)}
                 </td>
-
                 <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300">
                     {item.openingBalance || '-'}
                 </td>
-
                 <td className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 text-sm text-gray-700 dark:text-gray-300">
-                    {item.createdDate? new Date(item.createdDate).toLocaleDateString() : '-'}
+                    {item.createdDate ? new Date(item.createdDate).toLocaleDateString() : '-'}
                 </td>
-
-
             </tr>
         ));
     };
 
+    // ---------------------------------------------------------------
+    // Render
+    // ---------------------------------------------------------------
     return (
         <DefaultLayout>
             <Breadcrumb pageName="/Report/DebitorsReports" />
@@ -260,7 +287,7 @@ const DebitorsReports = () => {
                                 groupName: "Sundry Debitors"
                             }}
                         >
-                            {({ setFieldValue, values, handleBlur }) => (
+                            {({ values }) => (
                                 <Form>
                                     <div className="mb-4.5 flex flex-wrap gap-6 mt-12">
                                         <div className="flex-1 min-w-[300px]">
@@ -323,8 +350,7 @@ const DebitorsReports = () => {
                                     <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Total Debit</th>
                                     <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Total Credit</th>
                                     <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Closing Balance</th>
-
-                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Age Of  Debt</th>
+                                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider">Age Of Debt</th>
                                 </tr>
                             </thead>
                             <tbody>
