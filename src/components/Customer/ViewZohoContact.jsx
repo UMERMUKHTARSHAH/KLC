@@ -174,7 +174,7 @@ const ViewZohoContact = () => {
         </td>
            <td className="px-5 py-5 border-b border-gray-200 text-sm">
           <p className="text-gray-900 whitespace-no-wrap dark:text-white">
-            {item?.openingBalances }
+            {item?.shippingAddress }
           </p>
         </td>
       
@@ -261,7 +261,7 @@ const ViewZohoContact = () => {
 
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                      Opening balances
+                     Shipping Address
                     </th>
                     
                     
