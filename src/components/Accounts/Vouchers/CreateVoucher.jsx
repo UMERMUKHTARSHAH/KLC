@@ -78,6 +78,7 @@ const CreateVoucher = () => {
 
   const [newShippingState, setnewShippingState] = useState('');
 
+
   // Filter ledgers based on voucher type
   const getFilteredLedgers = () => {
     if (!Ledger) return [];
@@ -568,10 +569,15 @@ const CreateVoucher = () => {
 const calculateLineTotal = (entry) => {
   const quantity = entry.quantity || 1;
   const discount = entry.discount || 0;
-  
-  // Handle export case first
+
   if (entry.gstCalculation?.type === 'EXPORT') {
+    // Use the already-correctly-computed exclusive-of-GST price if we have it
+    if (typeof entry.gstCalculation.finalPrice === 'number') {
+      return (entry.gstCalculation.finalPrice * quantity).toFixed(2);
+    }
+
     const wholesalePrice = entry.wholesalePrice || entry.mrp || 0;
+    // Discount is always % of actual MRP (incl. GST), subtracted from wholesale price (excl. GST)
     const mrp = entry.mrp || wholesalePrice;
     const discountAmount = (mrp * discount) / 100;
     const discountedWholesale = wholesalePrice - discountAmount;
@@ -579,16 +585,12 @@ const calculateLineTotal = (entry) => {
     return (finalDiscounted * quantity).toFixed(2);
   }
 
-  // For non-export, use rate (exclusive of GST)
-  // If rate is not available, calculate it from MRP and GST
+  // ... rest unchanged (non-export branch)
   let rate = entry.rate || 0;
-  
-  // If rate is 0 but we have MRP and GST calculation, calculate rate
   if (rate === 0 && entry.mrp && entry.gstCalculation) {
     const totalGstAmount = entry.gstCalculation.totalGstAmount || 0;
     rate = Math.max(entry.mrp - totalGstAmount, 0);
   }
-  
   const discountedRate = rate * (1 - discount / 100);
   return (discountedRate * quantity).toFixed(2);
 };
@@ -623,7 +625,7 @@ const calculateLineTotal = (entry) => {
     
     if (entry.gstCalculation?.type === 'EXPORT') {
       const wholesalePrice = entry.wholesalePrice || entry.mrp || 0;
-      const mrp = entry.mrp || wholesalePrice;
+      const mrp = entry.rate || wholesalePrice;
       const discountAmount = (mrp * discount) / 100;
       const discountedWholesale = wholesalePrice - discountAmount;
       const lineTotal = (discountedWholesale > 0 ? discountedWholesale : 0) * quantity;
@@ -1230,9 +1232,13 @@ const calculateLineTotal = (entry) => {
                 Vouchers?.typeOfVoucher?.toLowerCase() || '';
               const defGstRegist = Vouchers?.defGstRegist || '';
               if (isExport) {
+                console.log(destinationledgerOptions,"44444444444444444441");
+                
                 const exportOption = destinationledgerOptions?.find((option) =>
                   option.label?.toLowerCase().includes('export'),
-                );
+                
+              );
+              console.log(exportOption,"ll88888888888888888888888888884");
                 return exportOption?.value || null;
               }
 
@@ -2397,6 +2403,8 @@ const calculateGST = (
                          rate: Math.max(entry.mrp - (gstCalculation.totalGstAmount || 0), 0),
                           quantity: entry.quantity || 1,
                         });
+                        console.log(lineTotal,"4444444444444444444444444444444444444444llllk");
+                        
 
                         setFieldValue(
                           `paymentDetails.${index}.value`,
@@ -2495,6 +2503,8 @@ const calculateGST = (
     gstCalculation,
     rate: displayRate,
   });
+
+  
 
   setFieldValue(`paymentDetails.${index}.value`, lineTotal);
   setFieldValue(`paymentDetails.${index}.voucherAmount`, lineTotal);
@@ -3317,9 +3327,7 @@ onChange={(option) => {
     wholesalePrice,
   );
 
-  // FIX: Calculate rate as MRP - GST (exclusive price)
-  // For Sales: Rate = MRP - GST Amount
-  // For Purchase: Rate = MRP - GST Amount (for regular suppliers)
+
   let displayRate;
   if (isExport) {
     displayRate = wholesalePrice;
@@ -3617,6 +3625,8 @@ if (entry.productsId) {
     quantity:       entry.quantity || 1,
     gstCalculation,
   });
+  console.log(lineTotal,"5521qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqa");
+  
 
   setFieldValue(`paymentDetails.${index}.value`,         lineTotal);
   setFieldValue(`paymentDetails.${index}.voucherAmount`, lineTotal);
@@ -3662,11 +3672,13 @@ if (entry.productsId) {
     type="number"
     name={`paymentDetails.${index}.value`}
     value={(() => {
-      if (entry.gstCalculation?.type === 'EXPORT') {
+     if (entry.gstCalculation?.type === 'EXPORT') {
+        if (typeof entry.gstCalculation.finalPrice === 'number') {
+          return (entry.gstCalculation.finalPrice * qty).toFixed(2);
+        }
         const ws = entry.wholesalePrice || entry.mrp || 0;
-        const mrp = entry.mrp || ws;
+        const mrp = entry.mrp || ws; // <-- was entry.rate, now correctly entry.mrp
         const discount = entry.discount || 0;
-        const qty = entry.quantity || 1;
         const discountAmt = (mrp * discount) / 100;
         const discountedWS = ws - discountAmt;
         return ((discountedWS > 0 ? discountedWS : 0) * qty).toFixed(2);

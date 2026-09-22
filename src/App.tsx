@@ -317,6 +317,7 @@ import ViewOrderr from './components/Order/ViewOrderr.jsx';
 import UpdateOrderShippingDate from './components/Order/UpdateOrderShippingDate.jsx';
 
 import AddCustomer from './components/Customer/AddCustomer';
+import ViewZohoContact from './components/Customer/ViewZohoContact.jsx';
 import ExcelUploadCustomer from './components/Customer/AddCustomerBulk.jsx';
 import ExcelUploadLedger from './components/Ledger/BulkLedgerUpload.jsx'
 
@@ -2134,6 +2135,16 @@ function App() {
               <>
                 <PageTitle title="Add Customer" />
                 <AddCustomer />
+              </>
+            }
+          />
+
+             <Route
+            path="/customer/viewzoho"
+            element={
+              <>
+                <PageTitle title="Zoho Contacts" />
+                <ViewZohoContact />
               </>
             }
           />
