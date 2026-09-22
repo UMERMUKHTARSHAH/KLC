@@ -193,19 +193,9 @@ const PrintEntryPayment = () => {
             (item.igstRate || item.cgstRate + item.sgstRate || 0);
 
         if (gstRate > 0) {
-            // MRP is inclusive of GST, so taxable value = MRP / (1 + GST rate/100)
             return mrp / (1 + (gstRate / 100));
         }
         return mrp;
-    };
-
-    // Helper function to get GST amount
-    const calculateGSTAmount = (item) => {
-        const taxableValue = calculateTaxableValue(item);
-        const gstRate = item.gstCalculation?.totalGstRate ||
-            (item.igstRate || item.cgstRate + item.sgstRate || 0);
-
-        return (taxableValue * gstRate / 100);
     };
 
     const styles = {
@@ -273,7 +263,6 @@ const PrintEntryPayment = () => {
             borderTop: '1px solid #000',
             paddingTop: '15px'
         },
-
     };
 
     if (loading) return (
@@ -296,18 +285,11 @@ const PrintEntryPayment = () => {
 
     console.log(paymentData, "okok");
 
+    // ✅ Single source of truth: when isExport is true, hide ALL GST-related UI.
+    const showGst = !paymentData.isExport;
+
     return (
         <Container style={styles.container}>
-            {/* Print Button */}
-            {/* <div style={styles.printHide} className="text-center mb-3">
-                <button
-                    onClick={() => window.print()}
-                    className="btn btn-primary"
-                >
-                    Print Invoice
-                </button>
-            </div> */}
-
             {/* Header Section */}
             <div style={styles.header}>
                 <Row className="align-items-start">
@@ -331,18 +313,6 @@ const PrintEntryPayment = () => {
                                 <strong>E-Mail:</strong> {companyAddress.email}
                             </div>
                         </div>
-
-                        {/* <div style={{ marginLeft: '20px', marginTop: '0' }}>
-                            <img
-                                src="/img/logo.png"
-                                alt="Company Logo"
-                                style={{
-                                    width: '200px',
-                                    height: '200px',
-                                    objectFit: 'contain'
-                                }}
-                            />
-                        </div> */}
                     </Col>
 
                     <Col md={4} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%' }}>
@@ -362,11 +332,11 @@ const PrintEntryPayment = () => {
                         <tr>
                             <td style={styles.tableCell}>
                                 <strong>{paymentData.ledgerName}</strong> <br />
-                                {paymentData.shippingAddress || paymentData.shippingAddress}
+                                {paymentData.shippingAddress}
                             </td>
                             <td style={styles.tableCell}>
                                 <strong>{paymentData.ledgerName}</strong> <br />
-                                {paymentData.billingAddress || paymentData.billingAddress}
+                                {paymentData.billingAddress}
                             </td>
                         </tr>
                     </tbody>
@@ -404,7 +374,7 @@ const PrintEntryPayment = () => {
                             </td>
                             <td style={styles.tableCell}>
                                 <strong>{paymentData.ledgerName}</strong> <br />
-                                {paymentData.billingAddress || paymentData.billingAddress}
+                                {paymentData.billingAddress}
                             </td>
                         </tr>
                     </tbody>
@@ -449,7 +419,7 @@ const PrintEntryPayment = () => {
                 </tbody>
             </table>
 
-            {/* Products Table - Updated with GST breakdown */}
+            {/* Products Table — GST columns only when showGst */}
             <table style={styles.table}>
                 <thead>
                     <tr>
@@ -457,11 +427,18 @@ const PrintEntryPayment = () => {
                         <th style={styles.tableHeader} width="25%">Description of Goods</th>
                         <th style={styles.tableHeader} width="7%">HSN/SAC</th>
                         <th style={styles.tableHeader} width="5%">Qty</th>
+                         {showGst && (
                         <th style={styles.tableHeader} width="8%">MRP (Inc. GST)</th>
-                        <th style={styles.tableHeader} width="8%">Taxable Value</th>
-                        <th style={styles.tableHeader} width="8%">CGST</th>
-                        <th style={styles.tableHeader} width="8%">SGST</th>
-                        <th style={styles.tableHeader} width="8%">IGST</th>
+                         )}
+                        <th style={styles.tableHeader} width="8%">Rate</th>
+                        {showGst && (
+                            <>
+                                <th style={styles.tableHeader} width="8%">CGST</th>
+                                <th style={styles.tableHeader} width="8%">SGST</th>
+                                <th style={styles.tableHeader} width="8%">IGST</th>
+                            </>
+                        )}
+
                         <th style={styles.tableHeader} width="8%">Disc. %</th>
                         <th style={styles.tableHeader} width="8%">Amount</th>
                     </tr>
@@ -472,23 +449,19 @@ const PrintEntryPayment = () => {
                         const mrp = product.mrp || 0;
                         const discount = product.discount || 0;
 
-                        // Calculate taxable value (exclusive of GST)
                         const taxableValue = calculateTaxableValue(product) * quantity;
 
-                        // Get GST rates
                         const gstCalc = product.gstCalculation || {};
-                        const cgstRate = gstCalc.cgstRate || product.cgstRate || 0;
-                        const sgstRate = gstCalc.sgstRate || product.sgstRate || 0;
-                        const igstRate = gstCalc.igstRate || product.igstRate || 0;
+                        const cgstRate = gstCalc.cgstRate ?? product.cgstRate ?? 0;
+                        const sgstRate = gstCalc.sgstRate ?? product.sgstRate ?? 0;
+                        const igstRate = gstCalc.igstRate ?? product.igstRate ?? 0;
 
-                        // Calculate GST amounts
                         const cgstAmount = taxableValue * (cgstRate / 100);
                         const sgstAmount = taxableValue * (sgstRate / 100);
                         const igstAmount = taxableValue * (igstRate / 100);
 
-                        // Calculate total amount after discount
                         const discountMultiplier = (100 - discount) / 100;
-                        const totalAmount = mrp * quantity * discountMultiplier;
+                        const totalAmount = product.value;
 
                         return (
                             <tr key={index}>
@@ -496,26 +469,24 @@ const PrintEntryPayment = () => {
                                 <td style={styles.tableCell}>{product.productDescription}</td>
                                 <td style={styles.tableCell}>{product?.hsnCode?.hsnCodeName}</td>
                                 <td style={styles.tableCell}>{quantity} {product.unit}</td>
+                                {showGst && (
                                 <td style={styles.tableCell}>₹{formatCurrency(mrp)}</td>
+                                )}
                                 <td style={styles.tableCell}>₹{formatCurrency(taxableValue)}</td>
-                                <td style={styles.tableCell}>
-                                    {cgstRate > 0 ?
-                                        `₹${formatCurrency(cgstAmount)} (${cgstRate}%)` :
-                                        '-'
-                                    }
-                                </td>
-                                <td style={styles.tableCell}>
-                                    {sgstRate > 0 ?
-                                        `₹${formatCurrency(sgstAmount)} (${sgstRate}%)` :
-                                        '-'
-                                    }
-                                </td>
-                                <td style={styles.tableCell}>
-                                    {igstRate > 0 ?
-                                        `₹${formatCurrency(igstAmount)} (${igstRate}%)` :
-                                        '-'
-                                    }
-                                </td>
+                                {showGst && (
+                                    <>
+                                        <td style={styles.tableCell}>
+                                            {cgstRate > 0 ? `₹${formatCurrency(cgstAmount)} (${cgstRate}%)` : '-'}
+                                        </td>
+                                        <td style={styles.tableCell}>
+                                            {sgstRate > 0 ? `₹${formatCurrency(sgstAmount)} (${sgstRate}%)` : '-'}
+                                        </td>
+                                        <td style={styles.tableCell}>
+                                            {igstRate > 0 ? `₹${formatCurrency(igstAmount)} (${igstRate}%)` : '-'}
+                                        </td>
+                                    </>
+                                )}
+
                                 <td style={styles.tableCell}>{discount}%</td>
                                 <td style={styles.tableCell}>₹{formatCurrency(totalAmount)}</td>
                             </tr>
@@ -529,22 +500,26 @@ const PrintEntryPayment = () => {
                             {paymentData.paymentDetails?.reduce((sum, item) => sum + (item.quantity || 1), 0)}
                         </td>
                         <td style={styles.tableCell}>-</td>
-                        <td style={styles.tableCell}>
-                            ₹{formatCurrency(
-                                paymentData.paymentDetails?.reduce((sum, item) => {
-                                    return sum + (calculateTaxableValue(item) * (item.quantity || 1));
-                                }, 0)
-                            )}
-                        </td>
-                        <td style={styles.tableCell} colSpan="5" className="text-right">
+
+                        {showGst && (
+                            <td style={styles.tableCell}>
+                                ₹{formatCurrency(
+                                    paymentData.paymentDetails?.reduce((sum, item) => {
+                                        return sum + (calculateTaxableValue(item) * (item.quantity || 1));
+                                    }, 0)
+                                )}
+                            </td>
+                        )}
+
+                        <td style={styles.tableCell} colSpan={showGst ? 5 : 2} className="text-right">
                             ₹{formatCurrency(paymentData.totalAmount || 0)}
                         </td>
                     </tr>
                 </tbody>
             </table>
 
-            {/* Tax Summary Section */}
-            {paymentData.typeOfVoucher == "Sales" && (
+            {/* Tax Summary Section — only when showGst */}
+            {showGst && paymentData.typeOfVoucher == "Sales" && (
                 <>
                     <table style={styles.table}>
                         <tbody>
@@ -638,8 +613,8 @@ const PrintEntryPayment = () => {
                 </>
             )}
 
-            {/* HSN Summary Section */}
-            {paymentData.typeOfVoucher == "Sales" && (
+            {/* HSN Summary Section — only when showGst */}
+            {showGst && paymentData.typeOfVoucher == "Sales" && (
                 (() => {
                     const cgstSgstItems = [];
                     const igstItems = [];
@@ -748,9 +723,6 @@ const PrintEntryPayment = () => {
                         <div style={styles.companyAddress}>
                             Unused goods can be exchanged within 14 days from date of invoice.
                         </div>
-                        {/* <div style={{ marginTop: '40px' }}>
-                            <strong>Customer's Seal and Signature</strong>
-                        </div> */}
                     </Col>
                     <Col md={6} className="text-end">
                         <div style={{ marginTop: '40px' }}>
