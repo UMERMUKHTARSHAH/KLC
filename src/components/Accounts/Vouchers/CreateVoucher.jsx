@@ -1527,6 +1527,9 @@ const CreateVoucher = () => {
             }, [isPaymentInParts]);
 
             useEffect(() => {
+                const totalAmountWithGst = (
+    parseFloat(totals.subtotal) + parseFloat(totals.totalGST)
+  ).toFixed(2);
               if (
                 Vouchers?.typeOfVoucher === 'Purchase' &&
                 regType?.toLowerCase() === 'regular'
@@ -1546,7 +1549,7 @@ const CreateVoucher = () => {
                 setFieldValue('totalIgst', totals.totalIGST);
                 setFieldValue('totalSgst', totals.totalSGST);
               } else if (Vouchers?.typeOfVoucher === 'Sales') {
-                setFieldValue('totalAmount', totals.subtotal);
+                setFieldValue('totalAmount', totalAmountWithGst);
                 setFieldValue('totalGst', totals.totalGST);
                 setFieldValue('totalCgst', totals.totalCGST);
                 setFieldValue('totalIgst', totals.totalIGST);

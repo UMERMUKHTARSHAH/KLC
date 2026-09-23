@@ -123,7 +123,7 @@ const ViewCustomer = () => {
     const filters = {
       customerName: values.customerName || undefined,
     };
-    getCustomer(pagination.currentPage, filters);
+    getCustomer(pagination.currentPage-1, filters);
   };
 
   return (
