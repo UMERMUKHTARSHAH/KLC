@@ -179,8 +179,10 @@ const CreateCreditNote = () => {
         let totalQuantity = 0;
 
         values.items.forEach(entry => {
+            console.log(entry,"entryyyyyyyyyyyyyyyyyyyyyyyyyyyyyy");
+            
             if (entry.gstCalculation) {
-                const lineTotal = parseFloat(entry.exclusiveGst || 0) * (entry.quantity || 1);
+                const lineTotal = parseFloat(entry.mrp || 0) * (entry.quantity || 1);
                 subtotal += lineTotal;
 
                 const mrpTotal = (entry.mrp || 0) * (entry.quantity || 1);
@@ -266,35 +268,35 @@ const CreateCreditNote = () => {
     const handleCreateVoucher = async (values) => {
         console.log(values, "vouchercreate");
 
-        try {
-            const response = await fetch(`${CREATE_CREDITNOTE_URL}/${id}/create`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(values)
-            });
+        // try {
+        //     const response = await fetch(`${CREATE_CREDITNOTE_URL}/${id}/create`, {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //             "Authorization": `Bearer ${token}`
+        //         },
+        //         body: JSON.stringify(values)
+        //     });
 
-            let data;
-            try {
-                data = await response.json();
-            } catch {
-                console.log(data, "catccccccch");
-                data = { errorMessage: response.errorMessage };
-            }
+        //     let data;
+        //     try {
+        //         data = await response.json();
+        //     } catch {
+        //         console.log(data, "catccccccch");
+        //         data = { errorMessage: response.errorMessage };
+        //     }
             
-            if (response.ok) {
-                toast.success(`Voucher Entry added successfully`);
-                navigate("/Vouchers/view");
-            } else {
-                console.log("i am in error else ");
-                toast.error(`${data.errorMessage}`);
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error("An error occurred");
-        }
+        //     if (response.ok) {
+        //         toast.success(`Voucher Entry added successfully`);
+        //         navigate("/Vouchers/view");
+        //     } else {
+        //         console.log("i am in error else ");
+        //         toast.error(`${data.errorMessage}`);
+        //     }
+        // } catch (error) {
+        //     console.error(error);
+        //     toast.error("An error occurred");
+        // }
     };
     console.log(Vouchers,"....0");
     
@@ -346,14 +348,17 @@ const CreateCreditNote = () => {
                 >
                     {({ isSubmitting, setFieldValue, values }) => {
                         const totals = calculateTotals(values);
+const totalAmounts = totals.subtotal - totals.totalGST;
+console.log(totalAmounts,"4545454");
+const totlWithOutGst= totals.totalMRP-totals.totalGST
 
                         useEffect(() => {
-                            setFieldValue('totalAmount', totals.subtotal);
+                            setFieldValue('totalAmount', totalAmounts);
                             setFieldValue('totalGst', totals.totalGST);
                             setFieldValue('totalCgst', totals.totalCGST);
                             setFieldValue('totalIgst', totals.totalIGST);
                             setFieldValue('totalSgst', totals.totalSGST);
-                            setFieldValue("totalwithoutGst", totals.totalMRP)
+                            setFieldValue("totalwithoutGst", totlWithOutGst)
                         }, [totals.subtotal,
                         totals.totalGST,
                         totals.totalCGST,
