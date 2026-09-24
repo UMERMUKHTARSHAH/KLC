@@ -155,7 +155,7 @@ const ViewZohoContact = () => {
           </p>
         </td>
         <td className="px-5 py-5 border-b border-gray-200 text-sm">
-          <p className="text-gray-900 whitespace-no-wrap dark:text-white">
+          <p className="text-gray-900 capitalize whitespace-no-wrap dark:text-white">
             {item?.customerName || item?.name}
           </p>
         </td>
@@ -186,17 +186,17 @@ const ViewZohoContact = () => {
         </td>
            <td className="px-5 py-5 border-b border-gray-200 text-sm">
           <p className="text-gray-900 whitespace-no-wrap dark:text-white">
-            {item?.totalPurchase }
+          ₹{item?.totalPurchase }
           </p>
         </td>
            <td className="px-5 py-5 border-b border-gray-200 text-sm">
           <p className="text-gray-900 whitespace-no-wrap dark:text-white">
-            {item?.totalReturn }
+           ₹ {item?.totalReturn }
           </p>
         </td>
            <td className="px-5 py-5 border-b border-gray-200 text-sm">
           <p className="text-gray-900 whitespace-no-wrap dark:text-white">
-            {item?.totalBalance }
+            ₹{item?.totalBalance }
           </p>
         </td>
            <td className="px-5 py-5 border-b border-gray-200 text-sm">
@@ -218,7 +218,7 @@ const ViewZohoContact = () => {
             : 'text-gray-400'
         }`}
       />
-      <span className="font-medium text-gray-900 dark:text-white capitalize">
+      <span className="font-semibold text-gray-900 dark:text-white capitalize">
         {item.loyaltyLevel}
       </span>
     </div>
@@ -325,7 +325,7 @@ const ViewZohoContact = () => {
                      Total Return
                     </th>
                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                     Total Balance
+                     Net Purchase
                     </th>
                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                      Loyality Level
