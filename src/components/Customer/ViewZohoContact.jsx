@@ -177,6 +177,51 @@ const ViewZohoContact = () => {
             {item?.shippingAddress }
           </p>
         </td>
+           <td className="px-5 py-5 border-b border-gray-200 text-sm">
+          <p className="text-gray-900 whitespace-no-wrap dark:text-white">
+            {item?.totalVouchers }
+          </p>
+        </td>
+           <td className="px-5 py-5 border-b border-gray-200 text-sm">
+          <p className="text-gray-900 whitespace-no-wrap dark:text-white">
+            {item?.totalPurchase }
+          </p>
+        </td>
+           <td className="px-5 py-5 border-b border-gray-200 text-sm">
+          <p className="text-gray-900 whitespace-no-wrap dark:text-white">
+            {item?.totalReturn }
+          </p>
+        </td>
+           <td className="px-5 py-5 border-b border-gray-200 text-sm">
+          <p className="text-gray-900 whitespace-no-wrap dark:text-white">
+            {item?.totalBalance }
+          </p>
+        </td>
+            <td className="px-5 py-5 border-b border-gray-200 text-sm">
+  {item?.loyaltyLevel ? (
+    <span
+      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+        item.loyaltyLevel.toLowerCase() === 'bronze'
+          ? 'bg-amber-700 text-white'
+          : item.loyaltyLevel.toLowerCase() === 'silver'
+          ? 'bg-gray-300 text-gray-800'
+          : item.loyaltyLevel.toLowerCase() === 'gold'
+          ? 'bg-yellow-400 text-yellow-900'
+          : item.loyaltyLevel.toLowerCase() === 'platinum'
+          ? 'bg-gradient-to-r from-slate-300 via-slate-100 to-slate-400 text-slate-800'
+          : item.loyaltyLevel.toLowerCase() === 'diamond'
+          ? 'bg-gradient-to-r from-cyan-400 via-blue-300 to-purple-400 text-white'
+          : 'bg-gray-200 text-gray-700'
+      }`}
+    >
+      {item.loyaltyLevel}
+    </span>
+  ) : (
+    <span className="text-gray-400">—</span>
+  )}
+</td>
+        
+        
       
       </tr>
     ));
@@ -262,6 +307,22 @@ const ViewZohoContact = () => {
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                      Shipping Address
+                    </th>
+
+                     <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                     total Vouchers
+                    </th>
+                     <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                     Total Purchase
+                    </th>
+                     <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                     Total Return
+                    </th>
+                     <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                     Total Balance
+                    </th>
+                     <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                     Loyality Level
                     </th>
                     
                     
