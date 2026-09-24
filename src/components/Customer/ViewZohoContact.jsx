@@ -346,12 +346,12 @@ const ViewZohoContact = () => {
                 <tbody>{renderTableRows()}</tbody>
               </table>
             </div>
+          </div>
             <Pagination
               totalPages={pagination.totalPages}
               currentPage={pagination.currentPage}
               handlePageChange={handlePageChange}
             />
-          </div>
         </div>
       </div>
     </DefaultLayout>
