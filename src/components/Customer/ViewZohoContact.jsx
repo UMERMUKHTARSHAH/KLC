@@ -10,6 +10,8 @@ import { ImCross } from 'react-icons/im';
 import { useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import reactSelect from 'react-select';
+import { FaMedal } from 'react-icons/fa';
+import { GiMedal, GiMedalSkull } from 'react-icons/gi';
 import { customStyles as createCustomStyles, CUSTOMERCONTACT_URL } from '../../Constants/utils';
 
 const ViewZohoContact = () => {
@@ -197,25 +199,29 @@ const ViewZohoContact = () => {
             {item?.totalBalance }
           </p>
         </td>
-            <td className="px-5 py-5 border-b border-gray-200 text-sm">
+           <td className="px-5 py-5 border-b border-gray-200 text-sm">
   {item?.loyaltyLevel ? (
-    <span
-      className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
-        item.loyaltyLevel.toLowerCase() === 'bronze'
-          ? 'bg-amber-700 text-white'
-          : item.loyaltyLevel.toLowerCase() === 'silver'
-          ? 'bg-gray-300 text-gray-800'
-          : item.loyaltyLevel.toLowerCase() === 'gold'
-          ? 'bg-yellow-400 text-yellow-900'
-          : item.loyaltyLevel.toLowerCase() === 'platinum'
-          ? 'bg-gradient-to-r from-slate-300 via-slate-100 to-slate-400 text-slate-800'
-          : item.loyaltyLevel.toLowerCase() === 'diamond'
-          ? 'bg-gradient-to-r from-cyan-400 via-blue-300 to-purple-400 text-white'
-          : 'bg-gray-200 text-gray-700'
-      }`}
-    >
-      {item.loyaltyLevel}
-    </span>
+    <div className="flex items-center gap-2">
+      <FaMedal
+        size={26}
+        className={`drop-shadow-md ${
+          item.loyaltyLevel.toLowerCase() === 'bronze'
+            ? 'text-amber-700'
+            : item.loyaltyLevel.toLowerCase() === 'silver'
+            ? 'text-gray-400'
+            : item.loyaltyLevel.toLowerCase() === 'gold'
+            ? 'text-yellow-400'
+            : item.loyaltyLevel.toLowerCase() === 'platinum'
+            ? 'text-slate-300'
+            : item.loyaltyLevel.toLowerCase() === 'diamond'
+            ? 'text-cyan-400'
+            : 'text-gray-400'
+        }`}
+      />
+      <span className="font-medium text-gray-900 dark:text-white capitalize">
+        {item.loyaltyLevel}
+      </span>
+    </div>
   ) : (
     <span className="text-gray-400">—</span>
   )}
