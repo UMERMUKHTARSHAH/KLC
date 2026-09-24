@@ -203,7 +203,7 @@ export const VIEW_ALL_CUSTOMERGROUP = `${BASE_URL}/customer-group`;
 export const DELETE_CUSTOMERGROUP_URL = `${BASE_URL}/customer-group/`;
 
 export const CUSTOMERSHOPIFY_URL = `${BASE_URL}/customer/shopify/sync`;
-
+export const CUSTOMERCONTACT_URL = `${BASE_URL}/api/zoho/contacts`;
 //STYLE
 export const ADD_STYLE_URL = `${BASE_URL}/styles`;
 export const GET_STYLE_URL = `${BASE_URL}/styles`;

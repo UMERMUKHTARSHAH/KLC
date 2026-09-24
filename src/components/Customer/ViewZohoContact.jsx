@@ -10,7 +10,7 @@ import { ImCross } from 'react-icons/im';
 import { useSelector } from 'react-redux';
 import { Formik, Form, Field } from 'formik';
 import reactSelect from 'react-select';
-import { customStyles as createCustomStyles } from '../../Constants/utils';
+import { customStyles as createCustomStyles, CUSTOMERCONTACT_URL } from '../../Constants/utils';
 
 const ViewZohoContact = () => {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ const ViewZohoContact = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:8081/api/zoho/contacts',{
+      const response = await fetch(CUSTOMERCONTACT_URL,{
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`, // Adjust based on your auth method
@@ -86,7 +86,7 @@ const ViewZohoContact = () => {
     e.preventDefault();
     if (!window.confirm('Are you sure you want to delete this contact?')) return;
     try {
-      const response = await fetch(`http://localhost:8081/api/zoho/contacts/${id}`, {
+      const response = await fetch(`${CUSTOMERCONTACT_URL}/${id}`, {
         method: 'DELETE',
       });
       if (!response.ok) throw new Error('Delete failed');
