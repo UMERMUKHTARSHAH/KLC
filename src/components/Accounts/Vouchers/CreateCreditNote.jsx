@@ -268,35 +268,35 @@ const CreateCreditNote = () => {
     const handleCreateVoucher = async (values) => {
         console.log(values, "vouchercreate");
 
-        // try {
-        //     const response = await fetch(`${CREATE_CREDITNOTE_URL}/${id}/create`, {
-        //         method: "POST",
-        //         headers: {
-        //             "Content-Type": "application/json",
-        //             "Authorization": `Bearer ${token}`
-        //         },
-        //         body: JSON.stringify(values)
-        //     });
+        try {
+            const response = await fetch(`${CREATE_CREDITNOTE_URL}/${id}/create`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(values)
+            });
 
-        //     let data;
-        //     try {
-        //         data = await response.json();
-        //     } catch {
-        //         console.log(data, "catccccccch");
-        //         data = { errorMessage: response.errorMessage };
-        //     }
+            let data;
+            try {
+                data = await response.json();
+            } catch {
+                console.log(data, "catccccccch");
+                data = { errorMessage: response.errorMessage };
+            }
             
-        //     if (response.ok) {
-        //         toast.success(`Voucher Entry added successfully`);
-        //         navigate("/Vouchers/view");
-        //     } else {
-        //         console.log("i am in error else ");
-        //         toast.error(`${data.errorMessage}`);
-        //     }
-        // } catch (error) {
-        //     console.error(error);
-        //     toast.error("An error occurred");
-        // }
+            if (response.ok) {
+                toast.success(`Voucher Entry added successfully`);
+                navigate("/Vouchers/view");
+            } else {
+                console.log("i am in error else ");
+                toast.error(`${data.errorMessage}`);
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error("An error occurred");
+        }
     };
     console.log(Vouchers,"....0");
     
@@ -348,8 +348,8 @@ const CreateCreditNote = () => {
                 >
                     {({ isSubmitting, setFieldValue, values }) => {
                         const totals = calculateTotals(values);
-const totalAmounts = totals.subtotal - totals.totalGST;
-console.log(totalAmounts,"4545454");
+const totalAmounts = totals.subtotal;
+console.log(totals,"4545454");
 const totlWithOutGst= totals.totalMRP-totals.totalGST
 
                         useEffect(() => {
