@@ -184,21 +184,30 @@ const ViewZohoContact = () => {
             {item?.totalVouchers }
           </p>
         </td>
-           <td className="px-5 py-5 border-b border-gray-200 text-sm">
-          <p className="text-gray-900 whitespace-no-wrap dark:text-white">
-          ₹{item?.totalPurchase }
-          </p>
-        </td>
-           <td className="px-5 py-5 border-b border-gray-200 text-sm">
-          <p className="text-gray-900 whitespace-no-wrap dark:text-white">
-           ₹ {item?.totalReturn }
-          </p>
-        </td>
-           <td className="px-5 py-5 border-b border-gray-200 text-sm">
-          <p className="text-gray-900 whitespace-no-wrap dark:text-white">
-            ₹{item?.totalBalance }
-          </p>
-        </td>
+         
+<td className="px-5 py-5 border-b border-gray-200 text-sm">
+  <p className="text-green-600 whitespace-nowrap dark:text-green-400 font-medium">
+    ₹{item?.totalPurchase}
+  </p>
+</td>
+
+<td className="px-5 py-5 border-b border-gray-200 text-sm">
+  <p className="text-red-600 whitespace-nowrap dark:text-red-400 font-medium">
+    ₹{item?.totalReturn}
+  </p>
+</td>
+
+<td className="px-5 py-5 border-b border-gray-200 text-sm">
+  <p
+    className={`whitespace-nowrap font-medium ${
+      Number(item?.totalBalance) >= 0
+        ? "text-green-600 dark:text-green-400"
+        : "text-red-600 dark:text-red-400"
+    }`}
+  >
+    ₹{item?.totalBalance}
+  </p>
+</td>
            <td className="px-5 py-5 border-b border-gray-200 text-sm">
   {item?.loyaltyLevel ? (
     <div className="flex items-center gap-2">
