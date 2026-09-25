@@ -202,22 +202,22 @@ const ViewZohoContact = () => {
            <td className="px-5 py-5 border-b border-gray-200 text-sm">
   {item?.loyaltyLevel ? (
     <div className="flex items-center gap-2">
-      <FaMedal
-        size={26}
-        className={`drop-shadow-md ${
-          item.loyaltyLevel.toLowerCase() === 'bronze'
-            ? 'text-amber-700'
-            : item.loyaltyLevel.toLowerCase() === 'silver'
-            ? 'text-gray-400'
-            : item.loyaltyLevel.toLowerCase() === 'gold'
-            ? 'text-yellow-400'
-            : item.loyaltyLevel.toLowerCase() === 'platinum'
-            ? 'text-slate-300'
-            : item.loyaltyLevel.toLowerCase() === 'diamond'
-            ? 'text-cyan-400'
-            : 'text-gray-400'
-        }`}
-      />
+<FaMedal
+  size={26}
+  className={`drop-shadow-md ${
+    item.loyaltyLevel.toLowerCase() === 'bronze'
+      ? 'text-amber-700'
+      : item.loyaltyLevel.toLowerCase() === 'silver'
+      ? 'text-[#C0C0C0]'       // ← true silver (metallic grey)
+      : item.loyaltyLevel.toLowerCase() === 'gold'
+      ? 'text-yellow-400'
+      : item.loyaltyLevel.toLowerCase() === 'platinum'
+      ? 'text-[#E5E4E2]'       // ← platinum (near-white, cool grey)
+      : item.loyaltyLevel.toLowerCase() === 'diamond'
+      ? 'text-[#B9F2FF]'       // ← diamond (icy cyan-white sparkle)
+      : 'text-gray-400'
+  }`}
+/>
       <span className="font-semibold text-gray-900 dark:text-white capitalize">
         {item.loyaltyLevel}
       </span>
