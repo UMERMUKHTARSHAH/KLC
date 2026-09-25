@@ -235,7 +235,7 @@ const ViewZohoContact = () => {
 
   return (
     <DefaultLayout>
-      <Breadcrumb pageName="Customer / View Customer" />
+      <Breadcrumb pageName="Customer / Zoho Contacts" />
       <div className="container mx-auto px-4 sm:px-8 bg-white dark:bg-slate-800">
         <div className="pt-5">
           <div className="items-center justify-center">
