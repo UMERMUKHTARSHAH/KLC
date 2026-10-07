@@ -263,51 +263,49 @@ const VoucherEntriesView = () => {
                 <td>
                     <span onClick={() => navigate(`/voucher/create/${item.id}`)} className="bg-blue-100 text-green-800 text-[10px] font-medium me-2 text-center py-2 px-4 rounded dark:bg-gray-700 dark:text-green-400 border border-green-400 cursor-pointer w-[210px]"> View Entries</span>
                 </td> */}
+<td className="px-5 py-5 bVoucher-b bVoucher-gray-200 text-sm">
+  <p className="flex text-gray-900 whitespace-no-wrap">
+    {item.posInvoicing === true ? (
+      <FaPrint
+        size={17}
+        className="text-teal-500 hover:text-teal-700 mx-2"
+        onClick={() =>
+          navigate(
+            `/printentrypaymentPos/${item.id}/${item.gstRegistration}`,
+          )
+        }
+        title="Print Entry"
+      />
+    ) : (
+      <FaPrint
+        size={17}
+        className="text-teal-500 hover:text-teal-700 mx-2"
+        onClick={() =>
+          navigate(
+            `/printentrypayment/${item.id}/${item.gstRegistration}`,
+          )
+        }
+        title="Print Entry"
+      />
+    )}
 
-        <td className="px-5 py-5 bVoucher-b bVoucher-gray-200 text-sm">
-          <p className="flex text-gray-900 whitespace-no-wrap">
-            {item.posInvoicing === true && (
-              <FaPrint
-                size={17}
-                className="text-teal-500 hover:text-teal-700 mx-2"
-                onClick={() =>
-                  navigate(
-                    `/printentrypaymentPos/${item.id}/${item.gstRegistration}`,
-                  )
-                }
-                title="Print Entry"
-              />
-            )}
+    {item?.typeOfVoucher?.toLowerCase() === 'purchase' ||
+    item?.typeOfVoucher?.toLowerCase() === 'sales' ? (
+      <FiEdit
+        onClick={() => navigate(`/entrypayment/edit/${item.id}`)}
+        size={17}
+        className="text-teal-500 hover:text-teal-700 mx-2"
+      />
+    ) : null}
 
-            {}
-            <FaPrint
-              size={17}
-              className="text-teal-500 hover:text-teal-700 mx-2"
-              onClick={() =>
-                navigate(
-                  `/printentrypayment/${item.id}/${item.gstRegistration}`,
-                )
-              }
-              title="Print Entry"
-            />
-
-           {item?.typeOfVoucher?.toLowerCase() === 'purchase' ||
-item?.typeOfVoucher?.toLowerCase() === 'sales' ? (
-  <FiEdit 
-    onClick={() => navigate(`/entrypayment/edit/${item.id}`)} 
-    size={17} 
-    className="text-teal-500 hover:text-teal-700 mx-2" 
-  />
-) : null}
-
-            <FiTrash2
-                            size={17}
-                            className="text-red-500 hover:text-red-700 mx-2"
-                            onClick={(e) => handleDelete(e, item?.id)}
-                            title="Delete Entry"
-                        />
-          </p>
-        </td>
+    <FiTrash2
+      size={17}
+      className="text-red-500 hover:text-red-700 mx-2"
+      onClick={(e) => handleDelete(e, item?.id)}
+      title="Delete Entry"
+    />
+  </p>
+</td>
       </tr>
     ));
   };

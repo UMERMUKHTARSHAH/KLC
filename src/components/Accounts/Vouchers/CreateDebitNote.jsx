@@ -265,35 +265,35 @@ const CreateDebitNote = () => {
     const handleCreateVoucher = async (values) => {
         console.log(values, "vouchercreate");
 
-        try {
-            const response = await fetch(`${CREATE_DEBITNOTE_URL}/${id}/create`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${token}`
-                },
-                body: JSON.stringify(values)
-            });
+        // try {
+        //     const response = await fetch(`${CREATE_DEBITNOTE_URL}/${id}/create`, {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-Type": "application/json",
+        //             "Authorization": `Bearer ${token}`
+        //         },
+        //         body: JSON.stringify(values)
+        //     });
 
-            let data;
-            try {
-                data = await response.json();
-            } catch {
-                console.log(data, "catccccccch");
-                data = { errorMessage: response.errorMessage };
-            }
+        //     let data;
+        //     try {
+        //         data = await response.json();
+        //     } catch {
+        //         console.log(data, "catccccccch");
+        //         data = { errorMessage: response.errorMessage };
+        //     }
             
-            if (response.ok) {
-                toast.success(`Debit Note Entry added successfully`);
-                navigate("/Vouchers/view");
-            } else {
-                console.log("i am in error else ");
-                toast.error(`${data.errorMessage}`);
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error("An error occurred");
-        }
+        //     if (response.ok) {
+        //         toast.success(`Debit Note Entry added successfully`);
+        //         navigate("/Vouchers/view");
+        //     } else {
+        //         console.log("i am in error else ");
+        //         toast.error(`${data.errorMessage}`);
+        //     }
+        // } catch (error) {
+        //     console.error(error);
+        //     toast.error("An error occurred");
+        // }
     };
 
     return (
@@ -343,9 +343,10 @@ const CreateDebitNote = () => {
                 >
                     {({ isSubmitting, setFieldValue, values }) => {
                         const totals = calculateTotals(values);
+                        const totalAmountt= parseFloat(totals.totalMRP) - parseFloat(totals.totalGST);
 
                         useEffect(() => {
-                            setFieldValue('totalAmount', totals.subtotal);
+                            setFieldValue('totalAmount', totalAmountt);
                             setFieldValue('totalGst', totals.totalGST);
                             setFieldValue('totalCgst', totals.totalCGST);
                             setFieldValue('totalIgst', totals.totalIGST);
