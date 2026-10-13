@@ -78,7 +78,6 @@ const CreateVoucher = () => {
 
   const [newShippingState, setnewShippingState] = useState('');
 
-
   // Filter ledgers based on voucher type
   const getFilteredLedgers = () => {
     if (!Ledger) return [];
@@ -448,81 +447,81 @@ const CreateVoucher = () => {
 
   // Calculate totals for the summary
   const calculateTotals = (values) => {
-  let subtotal = 0;
-  let totalCGST = 0;
-  let totalSGST = 0;
-  let totalIGST = 0;
-  let totalGST = 0;
-  let grandTotal = 0;
-  let totalDiscount = 0;
-  let totalDiscountPer = 0;
-  let totalMRP = 0;
-  let totalQuantity = 0;
-  let totalBasePrice = 0;
-  let totalDiscountedBasePrice = 0;
+    let subtotal = 0;
+    let totalCGST = 0;
+    let totalSGST = 0;
+    let totalIGST = 0;
+    let totalGST = 0;
+    let grandTotal = 0;
+    let totalDiscount = 0;
+    let totalDiscountPer = 0;
+    let totalMRP = 0;
+    let totalQuantity = 0;
+    let totalBasePrice = 0;
+    let totalDiscountedBasePrice = 0;
 
-  values.paymentDetails.forEach((entry) => {
-    const basePrice = entry.gstCalculation?.basePrice || 0;
-    const discount = entry.discount || 0;
-    const quantity = entry.quantity || 1;
+    values.paymentDetails.forEach((entry) => {
+      const basePrice = entry.gstCalculation?.basePrice || 0;
+      const discount = entry.discount || 0;
+      const quantity = entry.quantity || 1;
 
-    // Use rate (exclusive of GST) for subtotal
-    const rate = entry.rate || entry.mrp || 0;
-    const discountedRate = rate * (1 - discount / 100);
-    const discountedRateTotal = discountedRate * quantity;
+      // Use rate (exclusive of GST) for subtotal
+      const rate = entry.rate || entry.mrp || 0;
+      const discountedRate = rate * (1 - discount / 100);
+      const discountedRateTotal = discountedRate * quantity;
 
-    // Calculate base price total (without discount)
-    const basePriceTotal = basePrice * quantity;
-    totalBasePrice += basePriceTotal;
+      // Calculate base price total (without discount)
+      const basePriceTotal = basePrice * quantity;
+      totalBasePrice += basePriceTotal;
 
-    // Calculate discount amount
-    const discountAmount = ((rate * discount) / 100) * quantity;
-    totalDiscount += discountAmount;
+      // Calculate discount amount
+      const discountAmount = ((rate * discount) / 100) * quantity;
+      totalDiscount += discountAmount;
 
-    // Calculate MRP total
-    const mrpTotal = (entry.mrp || 0) * quantity;
-    totalMRP += mrpTotal;
+      // Calculate MRP total
+      const mrpTotal = (entry.mrp || 0) * quantity;
+      totalMRP += mrpTotal;
 
-    // Calculate total quantity
-    totalQuantity += quantity;
+      // Calculate total quantity
+      totalQuantity += quantity;
 
-    // Calculate GST amounts (GST is on base price before discount)
-    if (entry.gstCalculation) {
-      if (entry.gstCalculation.type === 'CGST+SGST') {
-        const cgstAmount = (entry.gstCalculation.cgstAmount || 0) * quantity;
-        const sgstAmount = (entry.gstCalculation.sgstAmount || 0) * quantity;
-        totalCGST += cgstAmount;
-        totalSGST += sgstAmount;
-        totalGST += cgstAmount + sgstAmount;
-      } else if (entry.gstCalculation.type === 'IGST') {
-        const igstAmount = (entry.gstCalculation.gstAmount || 0) * quantity;
-        totalIGST += igstAmount;
-        totalGST += igstAmount;
+      // Calculate GST amounts (GST is on base price before discount)
+      if (entry.gstCalculation) {
+        if (entry.gstCalculation.type === 'CGST+SGST') {
+          const cgstAmount = (entry.gstCalculation.cgstAmount || 0) * quantity;
+          const sgstAmount = (entry.gstCalculation.sgstAmount || 0) * quantity;
+          totalCGST += cgstAmount;
+          totalSGST += sgstAmount;
+          totalGST += cgstAmount + sgstAmount;
+        } else if (entry.gstCalculation.type === 'IGST') {
+          const igstAmount = (entry.gstCalculation.gstAmount || 0) * quantity;
+          totalIGST += igstAmount;
+          totalGST += igstAmount;
+        }
       }
-    }
 
-    // Subtotal is the discounted rate (exclusive of GST)
-    subtotal += discountedRateTotal;
-    totalDiscountedBasePrice += discountedRateTotal;
-  });
+      // Subtotal is the discounted rate (exclusive of GST)
+      subtotal += discountedRateTotal;
+      totalDiscountedBasePrice += discountedRateTotal;
+    });
 
-  // Grand Total = Subtotal + GST
-  grandTotal = subtotal + totalGST;
+    // Grand Total = Subtotal + GST
+    grandTotal = subtotal + totalGST;
 
-  return {
-    subtotal: subtotal.toFixed(2),
-    totalCGST: totalCGST.toFixed(2),
-    totalSGST: totalSGST.toFixed(2),
-    totalIGST: totalIGST.toFixed(2),
-    totalGST: totalGST.toFixed(2),
-    totalDiscount: totalDiscount.toFixed(2),
-    grandTotal: grandTotal.toFixed(2),
-    totalMRP: totalMRP.toFixed(2),
-    totalQuantity: totalQuantity,
-    totalBasePrice: totalBasePrice.toFixed(2),
-    totalDiscountedBasePrice: totalDiscountedBasePrice.toFixed(2),
+    return {
+      subtotal: subtotal.toFixed(2),
+      totalCGST: totalCGST.toFixed(2),
+      totalSGST: totalSGST.toFixed(2),
+      totalIGST: totalIGST.toFixed(2),
+      totalGST: totalGST.toFixed(2),
+      totalDiscount: totalDiscount.toFixed(2),
+      grandTotal: grandTotal.toFixed(2),
+      totalMRP: totalMRP.toFixed(2),
+      totalQuantity: totalQuantity,
+      totalBasePrice: totalBasePrice.toFixed(2),
+      totalDiscountedBasePrice: totalDiscountedBasePrice.toFixed(2),
+    };
   };
-};
 
   const validationSchema = Yup.object().shape({
     recieptNumber: Yup.string().required('Voucher number is required'),
@@ -593,31 +592,33 @@ const CreateVoucher = () => {
   const [paymentMethods, setPaymentMethods] = useState([]);
 
   // Helper functions for multiple payment methods
-  const addPaymentMethod = (defaultMode = '') => {
-    const newMethod = {
+ const addPaymentMethod = (defaultMode = '', totalAmount = 0) => {
+  const remaining = Math.max(
+    (parseFloat(totalAmount) || 0) - calculateTotalAllocatedPayments(),
+    0,
+  );
+  setPaymentMethods((prev) => [
+    ...prev,
+    {
       mode: defaultMode,
-      amount: '',
+      amount: remaining > 0 ? remaining.toFixed(2) : '',
       bankId: '',
       chequeNumber: '',
       transactionId: '',
       cardNumber: '',
-    };
-    setPaymentMethods([...paymentMethods, newMethod]);
-  };
+    },
+  ]);
+};
 
-  const removePaymentMethod = (index) => {
-    const newMethods = [...paymentMethods];
-    newMethods.splice(index, 1);
-    setPaymentMethods(newMethods);
-    // Update Formik fields after removal
-    updateFormikFieldsFromPaymentMethods();
-  };
+const removePaymentMethod = (index) => {
+  setPaymentMethods((prev) => prev.filter((_, i) => i !== index));
+};
 
-  const updatePaymentMethod = (index, field, value) => {
-    const newMethods = [...paymentMethods];
-    newMethods[index] = { ...newMethods[index], [field]: value };
-    setPaymentMethods(newMethods);
-  };
+const updatePaymentMethod = (index, field, value) => {
+  setPaymentMethods((prev) =>
+    prev.map((m, i) => (i === index ? { ...m, [field]: value } : m)),
+  );
+};
 
   const calculateTotalAllocatedPayments = () => {
     return paymentMethods.reduce((total, payment) => {
@@ -754,6 +755,11 @@ const CreateVoucher = () => {
       })),
     ];
   };
+  // POS: every product is available in every row (minus ones already used)
+const getPosProducts = (values, currentIndex) => {
+  const used = getUsedproductsIds(values, currentIndex);
+  return allProducts.filter((p) => !used.includes(p.value));
+};
 
   const [SelectedINVENTORYData, setSelectedINVENTORYData] = useState([]);
   const [isINVENTORYModalOpen, setIsINVENTORYModalOpen] = useState(false);
@@ -825,6 +831,24 @@ const CreateVoucher = () => {
   };
 
   const today = new Date().toISOString().split('T')[0];
+
+//   useEffect(() => {
+//   if (Vouchers?.typeOfVoucher === 'Sales' && Vouchers?.posInvoicing) {
+//     setFieldValue('amountReceived', payableTotal);
+
+//     if (!isPaymentInParts) {
+//       const amountField = {
+//         Cash: 'cashAmount',
+//         Card: 'cardAmount',
+//         'Bank Transfer': 'bankAmount',
+//         Cheque: 'chequeAmount',
+//       }[values.modeOfPayment];
+//       if (amountField) {
+//         setFieldValue(amountField, payableTotal > 0 ? payableTotal : null);
+//       }
+//     }
+//   }
+// }, [payableTotal, isPaymentInParts, values.modeOfPayment]);
 
   return (
     <DefaultLayout>
@@ -918,13 +942,30 @@ const CreateVoucher = () => {
           }}
           enableReinitialize={true}
           validationSchema={validationSchema}
-          onSubmit={(values, { setSubmitting }) => {
-            const action = values.formAction || 'save';
-            handleCreateVoucher(values, action, setSubmitting);
-          }}
+     onSubmit={(values, { setSubmitting }) => {
+  if (
+    Vouchers?.typeOfVoucher === 'Sales' &&
+    Vouchers?.posInvoicing &&
+    isPaymentInParts
+  ) {
+    if (
+      paymentMethods.length === 0 ||
+      !isPaymentAllocationValid(values.amountReceived)
+    ) {
+      toast.error('Split payments must add up to the total amount');
+      setSubmitting(false);
+      return;
+    }
+  }
+  const action = values.formAction || 'save';
+  handleCreateVoucher(values, action, setSubmitting);
+}}
         >
           {({ isSubmitting, setFieldValue, values, submitForm }) => {
             const totals = calculateTotals(values);
+            const payableTotal = Number(
+  (values.isExport ? parseFloat(totals.subtotal) : parseFloat(totals.grandTotal)) || 0,
+);
             const updateFormikFieldsFromPaymentMethods = () => {
               // Clear all individual fields first
               setFieldValue('chequeNumber', '');
@@ -1109,8 +1150,7 @@ const CreateVoucher = () => {
                   } else {
                     return `${baseType} IGST-${regLocation}`;
                   }
-                }
-                else if (!custLocation) {
+                } else if (!custLocation) {
                   if (Vouchers?.typeOfVoucher === 'Purchase') {
                     return `${baseType} ${regLocation}`;
                   } else if (Vouchers?.typeOfVoucher === 'Payment') {
@@ -1519,17 +1559,16 @@ const CreateVoucher = () => {
               }
             }, [paymentMethods, isPaymentInParts]);
 
-            useEffect(() => {
-              if (isPaymentInParts) {
-                // Clear modeOfPayment field since we're using multiple methods
-                setFieldValue('modeOfPayment', '');
-              }
-            }, [isPaymentInParts]);
+        useEffect(() => {
+  if (isPaymentInParts) {
+    updateFormikFieldsFromPaymentMethods();
+  }
+}, [paymentMethods, isPaymentInParts]);
 
             useEffect(() => {
-                const totalAmountWithGst = (
-    parseFloat(totals.subtotal) + parseFloat(totals.totalGST)
-  ).toFixed(2);
+              const totalAmountWithGst = (
+                parseFloat(totals.subtotal) + parseFloat(totals.totalGST)
+              ).toFixed(2);
               if (
                 Vouchers?.typeOfVoucher === 'Purchase' &&
                 regType?.toLowerCase() === 'regular'
@@ -1637,6 +1676,10 @@ const CreateVoucher = () => {
               index,
             ) => {
               if (!productsId) return null;
+              if (!productsId) return null;
+if (Vouchers?.posInvoicing) {
+  return allProducts.find((p) => p.value === productsId) || null;
+}
 
               // First, try to find in rowProducts (order products)
               const foundInRowProducts = rowProducts.find(
@@ -1949,7 +1992,8 @@ const CreateVoucher = () => {
             ) => {
               const mrp = option?.price || 0;
               const hsnCode = option?.hsnCode || {};
-              const customerAddress = selectedLedger?.obj?.shippingAddress || '';
+              const customerAddress =
+                selectedLedger?.obj?.shippingAddress || '';
               const customerState = selectedLedger?.obj?.shippingState || '';
               const gstRegistration = Vouchers?.defGstRegist?.state || '';
               const currentDiscount =
@@ -2028,6 +2072,24 @@ const CreateVoucher = () => {
               });
               setFieldValue('totalDiscountPer', totalDiscountPer);
             }, [values?.paymentDetails, setFieldValue]);
+
+            useEffect(() => {
+  if (Vouchers?.typeOfVoucher === 'Sales' && Vouchers?.posInvoicing) {
+    setFieldValue('amountReceived', payableTotal);
+
+    if (!isPaymentInParts) {
+      const amountField = {
+        Cash: 'cashAmount',
+        Card: 'cardAmount',
+        'Bank Transfer': 'bankAmount',
+        Cheque: 'chequeAmount',
+      }[values.modeOfPayment];
+      if (amountField) {
+        setFieldValue(amountField, payableTotal > 0 ? payableTotal : null);
+      }
+    }
+  }
+}, [payableTotal, isPaymentInParts, values.modeOfPayment]);
 
             return (
               <Form>
@@ -2259,89 +2321,93 @@ const CreateVoucher = () => {
                                 </div>
                               )}
                             </div>
-                           {!Vouchers?.name?.toLowerCase().includes('pos') && (
-  <div className="flex-2 min-w-[200px] ">
-    <label className="mb-2.5 block text-black dark:text-white">
-      {getPartyAccountLabel()}-Orders
-    </label>
-    <ReactSelect
-      name="orderIds"
-      style={{ height: '20px' }}
-      value={availableOrders.filter((opt) =>
-        values.orderIds?.includes(opt.value),
-      )}
-      onChange={(selectedOptions) => {
-        const selectedValues =
-          selectedOptions?.map((option) => option.value) || [];
-        setFieldValue('orderIds', selectedValues);
+                            {!Vouchers?.name?.toLowerCase().includes('pos') && (
+                              <div className="flex-2 min-w-[200px] ">
+                                <label className="mb-2.5 block text-black dark:text-white">
+                                  {getPartyAccountLabel()}-Orders
+                                </label>
+                                <ReactSelect
+                                  name="orderIds"
+                                  style={{ height: '20px' }}
+                                  value={availableOrders.filter((opt) =>
+                                    values.orderIds?.includes(opt.value),
+                                  )}
+                                  onChange={(selectedOptions) => {
+                                    const selectedValues =
+                                      selectedOptions?.map(
+                                        (option) => option.value,
+                                      ) || [];
+                                    setFieldValue('orderIds', selectedValues);
 
-        handleOrderSelect(selectedValues);
-      }}
-      options={availableOrders}
-      isMulti={true}
-      className="h-[200px]"
-      menuPortalTarget={document.body}
-      styles={{
-        ...customStyles,
-        control: (base, state) => ({
-          ...base,
-          minHeight: '42px',
-          maxHeight: '42px',
-          overflowY: 'auto',
-          borderColor: state.isFocused ? '#3b82f6' : '#d1d5db',
-          '&:hover': {
-            borderColor: '#9ca3af',
-          },
-        }),
-        valueContainer: (base) => ({
-          ...base,
-          maxHeight: '38px',
-          overflowY: 'auto',
-          flexWrap: 'nowrap',
-          display: 'flex',
-        }),
-        multiValue: (base) => ({
-          ...base,
-          backgroundColor: '#3b82f6',
-          borderRadius: '4px',
-          margin: '2px',
-          flexShrink: 0,
-        }),
-        multiValueLabel: (base) => ({
-          ...base,
-          color: 'white',
-          padding: '2px 6px',
-          fontSize: '12px',
-        }),
-        multiValueRemove: (base) => ({
-          ...base,
-          color: 'white',
-          ':hover': {
-            backgroundColor: '#2563eb',
-            color: 'white',
-          },
-        }),
-        indicatorsContainer: (base) => ({
-          ...base,
-          height: '40px',
-        }),
-        menuPortal: (base) => ({
-          ...base,
-          zIndex: 100000,
-        }),
-      }}
-      components={{
-        DropdownIndicator: null,
-        IndicatorSeparator: null,
-      }}
-    />
-    <ErrorMessage
-      name="orderId"
-      component="div"
-      className="text-red-500 text-xs mt-1"
-    />
-  </div>
-)}
+                                    handleOrderSelect(selectedValues);
+                                  }}
+                                  options={availableOrders}
+                                  isMulti={true}
+                                  className="h-[200px]"
+                                  menuPortalTarget={document.body}
+                                  styles={{
+                                    ...customStyles,
+                                    control: (base, state) => ({
+                                      ...base,
+                                      minHeight: '42px',
+                                      maxHeight: '42px',
+                                      overflowY: 'auto',
+                                      borderColor: state.isFocused
+                                        ? '#3b82f6'
+                                        : '#d1d5db',
+                                      '&:hover': {
+                                        borderColor: '#9ca3af',
+                                      },
+                                    }),
+                                    valueContainer: (base) => ({
+                                      ...base,
+                                      maxHeight: '38px',
+                                      overflowY: 'auto',
+                                      flexWrap: 'nowrap',
+                                      display: 'flex',
+                                    }),
+                                    multiValue: (base) => ({
+                                      ...base,
+                                      backgroundColor: '#3b82f6',
+                                      borderRadius: '4px',
+                                      margin: '2px',
+                                      flexShrink: 0,
+                                    }),
+                                    multiValueLabel: (base) => ({
+                                      ...base,
+                                      color: 'white',
+                                      padding: '2px 6px',
+                                      fontSize: '12px',
+                                    }),
+                                    multiValueRemove: (base) => ({
+                                      ...base,
+                                      color: 'white',
+                                      ':hover': {
+                                        backgroundColor: '#2563eb',
+                                        color: 'white',
+                                      },
+                                    }),
+                                    indicatorsContainer: (base) => ({
+                                      ...base,
+                                      height: '40px',
+                                    }),
+                                    menuPortal: (base) => ({
+                                      ...base,
+                                      zIndex: 100000,
+                                    }),
+                                  }}
+                                  components={{
+                                    DropdownIndicator: null,
+                                    IndicatorSeparator: null,
+                                  }}
+                                />
+                                <ErrorMessage
+                                  name="orderId"
+                                  component="div"
+                                  className="text-red-500 text-xs mt-1"
+                                />
+                              </div>
+                            )}
 
                             <div className="flex-2 max-w-[120px]">
                               <label className="mb-2.5 block text-black dark:text-white">
@@ -2572,125 +2638,128 @@ const CreateVoucher = () => {
                           (Vouchers?.typeOfVoucher === 'Purchase' &&
                             regType?.toLowerCase() == 'regular')) &&
                           !values.isExport && (
-                          <>
-                            {/* Collapsible Header */}
-                            <div
-                              className="flex items-center gap-2 cursor-pointer mt-4 mb-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-                              onClick={() => setShowGSTLedgers(!showGSTLedgers)}
-                            >
-                              {showGSTLedgers ? (
-                                <FaChevronUp
-                                  className="text-gray-600 dark:text-gray-400"
-                                  size={16}
-                                />
-                              ) : (
-                                <FaChevronDown
-                                  className="text-gray-600 dark:text-gray-400"
-                                  size={16}
-                                />
-                              )}
-                              <span className="font-medium text-black dark:text-white">
-                                GST Ledgers{' '}
-                                {showGSTLedgers
-                                  ? '(Click to hide)'
-                                  : '(Click to show)'}
-                                <span className="text-red-600">
-                                  {' '}
-                                  Important To Check These Ledgers Before Submit
+                            <>
+                              {/* Collapsible Header */}
+                              <div
+                                className="flex items-center gap-2 cursor-pointer mt-4 mb-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                                onClick={() =>
+                                  setShowGSTLedgers(!showGSTLedgers)
+                                }
+                              >
+                                {showGSTLedgers ? (
+                                  <FaChevronUp
+                                    className="text-gray-600 dark:text-gray-400"
+                                    size={16}
+                                  />
+                                ) : (
+                                  <FaChevronDown
+                                    className="text-gray-600 dark:text-gray-400"
+                                    size={16}
+                                  />
+                                )}
+                                <span className="font-medium text-black dark:text-white">
+                                  GST Ledgers{' '}
+                                  {showGSTLedgers
+                                    ? '(Click to hide)'
+                                    : '(Click to show)'}
+                                  <span className="text-red-600">
+                                    {' '}
+                                    Important To Check These Ledgers Before
+                                    Submit
+                                  </span>
                                 </span>
-                              </span>
-                              <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
-                                (IGST, CGST, SGST)
-                              </span>
-                            </div>
-
-                            {/* Collapsible Content */}
-                            {showGSTLedgers && (
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 mb-4 animate-fadeIn">
-                                {/* IGST Ledger */}
-                                <div className="flex-1 min-w-[250px]">
-                                  <label className="mb-2.5 block text-black dark:text-white">
-                                    IGST Ledger
-                                  </label>
-                                  <ReactSelect
-                                    name="igstLedgerId"
-                                    value={igstOptions.find(
-                                      (opt) =>
-                                        opt.value === values.igstLedgerId,
-                                    )}
-                                    onChange={handleIgstLedgerChange}
-                                    options={igstOptions}
-                                    className="react-select-container bg-white dark:bg-form-Field w-full"
-                                    classNamePrefix="react-select"
-                                    placeholder="Select IGST Ledger"
-                                    menuPortalTarget={document.body}
-                                    styles={{
-                                      ...customStyles,
-                                      menuPortal: (base) => ({
-                                        ...base,
-                                        zIndex: 100000,
-                                      }),
-                                    }}
-                                  />
-                                </div>
-
-                                {/* CGST Ledger */}
-                                <div className="flex-1 min-w-[250px]">
-                                  <label className="mb-2.5 block text-black dark:text-white">
-                                    CGST Ledger
-                                  </label>
-                                  <ReactSelect
-                                    name="cgstLedgerId"
-                                    value={cgstOptions.find(
-                                      (opt) =>
-                                        opt.value === values.cgstLedgerId,
-                                    )}
-                                    onChange={handleCgstLedgerChange}
-                                    options={cgstOptions}
-                                    className="react-select-container bg-white dark:bg-form-Field w-full"
-                                    classNamePrefix="react-select"
-                                    placeholder="Select CGST Ledger"
-                                    menuPortalTarget={document.body}
-                                    styles={{
-                                      ...customStyles,
-                                      menuPortal: (base) => ({
-                                        ...base,
-                                        zIndex: 100000,
-                                      }),
-                                    }}
-                                  />
-                                </div>
-
-                                {/* SGST Ledger */}
-                                <div className="flex-1 min-w-[250px]">
-                                  <label className="mb-2.5 block text-black dark:text-white">
-                                    SGST Ledger
-                                  </label>
-                                  <ReactSelect
-                                    name="sgstLedgerId"
-                                    value={sgstOptions.find(
-                                      (opt) =>
-                                        opt.value === values.sgstLedgerId,
-                                    )}
-                                    onChange={handleSgstLedgerChange}
-                                    options={sgstOptions}
-                                    className="react-select-container bg-white dark:bg-form-Field w-full"
-                                    classNamePrefix="react-select"
-                                    placeholder="Select SGST Ledger"
-                                    menuPortalTarget={document.body}
-                                    styles={{
-                                      ...customStyles,
-                                      menuPortal: (base) => ({
-                                        ...base,
-                                        zIndex: 100000,
-                                      }),
-                                    }}
-                                  />
-                                </div>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                                  (IGST, CGST, SGST)
+                                </span>
                               </div>
-                            )}
-                          </>
-                        )}
+
+                              {/* Collapsible Content */}
+                              {showGSTLedgers && (
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-2 mb-4 animate-fadeIn">
+                                  {/* IGST Ledger */}
+                                  <div className="flex-1 min-w-[250px]">
+                                    <label className="mb-2.5 block text-black dark:text-white">
+                                      IGST Ledger
+                                    </label>
+                                    <ReactSelect
+                                      name="igstLedgerId"
+                                      value={igstOptions.find(
+                                        (opt) =>
+                                          opt.value === values.igstLedgerId,
+                                      )}
+                                      onChange={handleIgstLedgerChange}
+                                      options={igstOptions}
+                                      className="react-select-container bg-white dark:bg-form-Field w-full"
+                                      classNamePrefix="react-select"
+                                      placeholder="Select IGST Ledger"
+                                      menuPortalTarget={document.body}
+                                      styles={{
+                                        ...customStyles,
+                                        menuPortal: (base) => ({
+                                          ...base,
+                                          zIndex: 100000,
+                                        }),
+                                      }}
+                                    />
+                                  </div>
+
+                                  {/* CGST Ledger */}
+                                  <div className="flex-1 min-w-[250px]">
+                                    <label className="mb-2.5 block text-black dark:text-white">
+                                      CGST Ledger
+                                    </label>
+                                    <ReactSelect
+                                      name="cgstLedgerId"
+                                      value={cgstOptions.find(
+                                        (opt) =>
+                                          opt.value === values.cgstLedgerId,
+                                      )}
+                                      onChange={handleCgstLedgerChange}
+                                      options={cgstOptions}
+                                      className="react-select-container bg-white dark:bg-form-Field w-full"
+                                      classNamePrefix="react-select"
+                                      placeholder="Select CGST Ledger"
+                                      menuPortalTarget={document.body}
+                                      styles={{
+                                        ...customStyles,
+                                        menuPortal: (base) => ({
+                                          ...base,
+                                          zIndex: 100000,
+                                        }),
+                                      }}
+                                    />
+                                  </div>
+
+                                  {/* SGST Ledger */}
+                                  <div className="flex-1 min-w-[250px]">
+                                    <label className="mb-2.5 block text-black dark:text-white">
+                                      SGST Ledger
+                                    </label>
+                                    <ReactSelect
+                                      name="sgstLedgerId"
+                                      value={sgstOptions.find(
+                                        (opt) =>
+                                          opt.value === values.sgstLedgerId,
+                                      )}
+                                      onChange={handleSgstLedgerChange}
+                                      options={sgstOptions}
+                                      className="react-select-container bg-white dark:bg-form-Field w-full"
+                                      classNamePrefix="react-select"
+                                      placeholder="Select SGST Ledger"
+                                      menuPortalTarget={document.body}
+                                      styles={{
+                                        ...customStyles,
+                                        menuPortal: (base) => ({
+                                          ...base,
+                                          zIndex: 100000,
+                                        }),
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          )}
 
                         {/* Show message for non-regular suppliers in Purchase */}
                         {Vouchers?.typeOfVoucher === 'Purchase' &&
@@ -2773,7 +2842,7 @@ const CreateVoucher = () => {
                                           >
                                             {/* Product Dropdown */}
                                             <td className="border-b border-[#eee] py-4 px-3 dark:border-strokedark">
-                                              {selectedLedger ? (
+                                             {selectedLedger || Vouchers?.posInvoicing ? (
                                                 <ReactSelect
                                                   name={`paymentDetails.${index}.productsId`}
                                                   value={getSelectedProductValue(
@@ -2812,7 +2881,8 @@ const CreateVoucher = () => {
                                                       return;
                                                     }
 
-                                                    const mrp = option?.price || 0;
+                                                    const mrp =
+                                                      option?.price || 0;
                                                     const hsnCode =
                                                       option?.hsnCode || {};
 
@@ -2842,16 +2912,18 @@ const CreateVoucher = () => {
                                                       );
 
                                                     // Rate = MRP - GST (Exclusive of GST)
-                                                    const displayRate = Math.max(
-                                                      mrp -
-                                                        (gstCalculation.totalGstAmount ||
-                                                          0),
-                                                      0,
-                                                    );
+                                                    const displayRate =
+                                                      Math.max(
+                                                        mrp -
+                                                          (gstCalculation.totalGstAmount ||
+                                                            0),
+                                                        0,
+                                                      );
 
                                                     setFieldValue(
                                                       `paymentDetails.${index}.productsId`,
-                                                      option?.obj?.product?.id ||
+                                                      option?.obj?.product
+                                                        ?.id ||
                                                         option?.obj?.id ||
                                                         null,
                                                     );
@@ -2906,17 +2978,13 @@ const CreateVoucher = () => {
                                                       lineTotal,
                                                     );
                                                   }}
-                                                  options={
-                                                    // Show all products for rows marked as new product, otherwise show order products
-                                                    entry.isNewProduct ||
-                                                    newProductRowIndex === index
-                                                      ? getAllAvailableProducts(
-                                                          rowProducts,
-                                                          values,
-                                                          index,
-                                                        )
-                                                      : rowProducts
-                                                  }
+                                            options={
+  Vouchers?.posInvoicing
+    ? getPosProducts(values, index)
+    : entry.isNewProduct || newProductRowIndex === index
+    ? getAllAvailableProducts(rowProducts, values, index)
+    : rowProducts
+}
                                                   placeholder={
                                                     loadingAllProducts
                                                       ? 'Loading...'
@@ -3115,7 +3183,8 @@ const CreateVoucher = () => {
 
                                                     // Recalculate when discount changes
                                                     if (entry.productsId) {
-                                                      const mrp = entry.mrp || 0;
+                                                      const mrp =
+                                                        entry.mrp || 0;
                                                       const hsnCode =
                                                         (
                                                           availableProducts.find(
@@ -3257,40 +3326,42 @@ const CreateVoucher = () => {
                                                 regType?.toLowerCase() ===
                                                   'regular')) &&
                                               !values.isExport && (
-                                              // GST Type column - update the display
-                                              <td className="border-b border-[#eee] py-4 px-3 dark:border-strokedark">
-                                                {entry.gstCalculation && (
-                                                  <div className="flex flex-col">
-                                                    <span
-                                                      className={`text-xs font-medium px-2 py-1 rounded ${
-                                                        entry.gstCalculation
-                                                          .type === 'CGST+SGST'
-                                                          ? 'bg-blue-100 text-blue-800'
-                                                          : entry.gstCalculation
-                                                              .type === 'IGST'
-                                                          ? 'bg-green-100 text-green-800'
-                                                          : 'bg-gray-100 text-gray-800'
-                                                      }`}
-                                                    >
-                                                      {
-                                                        entry.gstCalculation
-                                                          .type
-                                                      }
-                                                    </span>
-                                                    {entry.gstCalculation
-                                                      .discountApplied && (
-                                                      <span className="text-xs text-orange-600 mt-1">
+                                                // GST Type column - update the display
+                                                <td className="border-b border-[#eee] py-4 px-3 dark:border-strokedark">
+                                                  {entry.gstCalculation && (
+                                                    <div className="flex flex-col">
+                                                      <span
+                                                        className={`text-xs font-medium px-2 py-1 rounded ${
+                                                          entry.gstCalculation
+                                                            .type ===
+                                                          'CGST+SGST'
+                                                            ? 'bg-blue-100 text-blue-800'
+                                                            : entry
+                                                                .gstCalculation
+                                                                .type === 'IGST'
+                                                            ? 'bg-green-100 text-green-800'
+                                                            : 'bg-gray-100 text-gray-800'
+                                                        }`}
+                                                      >
                                                         {
                                                           entry.gstCalculation
-                                                            .discountPercentage
+                                                            .type
                                                         }
-                                                        % Discount Applied
                                                       </span>
-                                                    )}
-                                                  </div>
-                                                )}
-                                              </td>
-                                            )}
+                                                      {entry.gstCalculation
+                                                        .discountApplied && (
+                                                        <span className="text-xs text-orange-600 mt-1">
+                                                          {
+                                                            entry.gstCalculation
+                                                              .discountPercentage
+                                                          }
+                                                          % Discount Applied
+                                                        </span>
+                                                      )}
+                                                    </div>
+                                                  )}
+                                                </td>
+                                              )}
 
                                             {/* Delete Button */}
                                             <td className="border-b border-[#eee] py-4 px-3 dark:border-strokedark text-center">
@@ -3313,163 +3384,152 @@ const CreateVoucher = () => {
                                 </table>
                               </div>
                               {/* Add Row Button */}
+                              
 
                               <div className="flex items-center gap-4 mt-4">
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    push({
-                                      id: uuidv4(),
-                                      productsId: null,
-                                      mrp: 0,
-                                      rate: 0,
-                                      exclusiveGst: 0,
-                                      discount: 0,
-                                      quantity: 1,
-                                      value: 0,
-                                      igstRate: 0,
-                                      gstAmount: 0,
-                                      gstCalculation: null,
-                                    })
-                                  }
-                                  disabled={!selectedLedger}
-                                  className="flex items-center gap-2 mt-4 text-primary hover:text-primary/80 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
-                                >
-                                  <IoMdAdd size={20} /> Add Row
-                                </button>
+  <button
+    type="button"
+    onClick={() =>
+      push({
+        id: uuidv4(),
+        productsId: null,
+        mrp: 0,
+        rate: 0,
+        exclusiveGst: 0,
+        discount: 0,
+        quantity: 1,
+        value: 0,
+        igstRate: 0,
+        gstAmount: 0,
+        gstCalculation: null,
+      })
+    }
+    disabled={!Vouchers?.posInvoicing && !selectedLedger}
+    className="flex items-center gap-2 text-primary hover:text-primary/80 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
+  >
+    <IoMdAdd size={20} /> Add Row
+  </button>
+
+
+
+
+                                
+                                {!Vouchers?.posInvoicing && (
+          <span>..</span>
+                                )}
 
                                 <span className="text-gray-400">|</span>
+{Vouchers?.posInvoicing ? (
+<span>pos</span>
+) : (
+  <button
+    type="button"
+    onClick={() => {
+      // Clean up empty rows before adding new one
+      const cleanupEmptyRows = () => {
+        const rowsToKeep = [];
+        const rowsToRemove = [];
 
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    // Clean up empty rows before adding new one
-                                    const cleanupEmptyRows = () => {
-                                      const rowsToKeep = [];
-                                      const rowsToRemove = [];
+        values.paymentDetails.forEach((entry, index) => {
+          const isEmpty = !entry.productsId || entry.productsId === null;
 
-                                      values.paymentDetails.forEach(
-                                        (entry, index) => {
-                                          const isEmpty =
-                                            !entry.productsId ||
-                                            entry.productsId === null;
+          if (isEmpty) {
+            rowsToRemove.push(index);
+          } else {
+            rowsToKeep.push(entry);
+          }
+        });
 
-                                          if (isEmpty) {
-                                            rowsToRemove.push(index);
-                                          } else {
-                                            rowsToKeep.push(entry);
-                                          }
-                                        },
-                                      );
+        if (rowsToRemove.length > 0) {
+          const lastNonEmptyIndex = Math.max(
+            ...values.paymentDetails
+              .map((_, i) => i)
+              .filter((i) => !rowsToRemove.includes(i)),
+            -1,
+          );
 
-                                      if (rowsToRemove.length > 0) {
-                                        const lastNonEmptyIndex = Math.max(
-                                          ...values.paymentDetails
-                                            .map((_, i) => i)
-                                            .filter(
-                                              (i) => !rowsToRemove.includes(i),
-                                            ),
-                                          -1,
-                                        );
+          const emptyRowsAtEnd = rowsToRemove.filter(
+            (i) => i > lastNonEmptyIndex,
+          );
 
-                                        const emptyRowsAtEnd =
-                                          rowsToRemove.filter(
-                                            (i) => i > lastNonEmptyIndex,
-                                          );
+          emptyRowsAtEnd
+            .sort((a, b) => b - a)
+            .forEach((index) => {
+              remove(index);
+            });
 
-                                        emptyRowsAtEnd
-                                          .sort((a, b) => b - a)
-                                          .forEach((index) => {
-                                            remove(index);
-                                          });
+          if (emptyRowsAtEnd.length > 0) {
+            toast.info(`Removed ${emptyRowsAtEnd.length} empty row(s)`);
+          }
+        }
+      };
 
-                                        if (emptyRowsAtEnd.length > 0) {
-                                          toast.info(
-                                            `Removed ${emptyRowsAtEnd.length} empty row(s)`,
-                                          );
-                                        }
-                                      }
-                                    };
+      cleanupEmptyRows();
 
-                                    cleanupEmptyRows();
+      setTimeout(() => {
+        const hasSelectedProducts = values.paymentDetails.some(
+          (entry) =>
+            entry.productsId !== null && entry.productsId !== undefined,
+        );
 
-                                    setTimeout(() => {
-                                      const hasSelectedProducts =
-                                        values.paymentDetails.some(
-                                          (entry) =>
-                                            entry.productsId !== null &&
-                                            entry.productsId !== undefined,
-                                        );
+        const lastRow =
+          values.paymentDetails[values.paymentDetails.length - 1];
+        const isLastRowEmpty = !lastRow?.productsId || lastRow?.productsId === null;
 
-                                      const lastRow =
-                                        values.paymentDetails[
-                                          values.paymentDetails.length - 1
-                                        ];
-                                      const isLastRowEmpty =
-                                        !lastRow?.productsId ||
-                                        lastRow?.productsId === null;
-
-                                      if (!hasSelectedProducts) {
-                                        const newIndex =
-                                          values.paymentDetails.length;
-                                        push({
-                                          id: uuidv4(),
-                                          productsId: null,
-                                          mrp: 0,
-                                          rate: 0,
-                                          exclusiveGst: 0,
-                                          discount: 0,
-                                          quantity: 1,
-                                          value: 0,
-                                          igstRate: 0,
-                                          gstAmount: 0,
-                                          gstCalculation: null,
-                                          isNewProduct: true,
-                                        });
-                                        setNewProductRowIndex(newIndex);
-                                        setAddingNewProduct(true);
-                                      } else if (isLastRowEmpty) {
-                                        setFieldValue(
-                                          `paymentDetails.${
-                                            values.paymentDetails.length - 1
-                                          }.isNewProduct`,
-                                          true,
-                                        );
-                                        setNewProductRowIndex(
-                                          values.paymentDetails.length - 1,
-                                        );
-                                        setAddingNewProduct(true);
-                                        toast.info(
-                                          "Last row converted to 'New Product' type",
-                                        );
-                                      } else {
-                                        const newIndex =
-                                          values.paymentDetails.length;
-                                        push({
-                                          id: uuidv4(),
-                                          productsId: null,
-                                          mrp: 0,
-                                          rate: 0,
-                                          exclusiveGst: 0,
-                                          discount: 0,
-                                          quantity: 1,
-                                          value: 0,
-                                          igstRate: 0,
-                                          gstAmount: 0,
-                                          gstCalculation: null,
-                                          isNewProduct: true,
-                                        });
-                                        setNewProductRowIndex(newIndex);
-                                        setAddingNewProduct(true);
-                                      }
-                                    }, 100);
-                                  }}
-                                  disabled={!selectedLedger}
-                                  className="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
-                                >
-                                  <IoMdAdd size={20} /> Add New Product (Not in
-                                  Order)
-                                </button>
+        if (!hasSelectedProducts) {
+          const newIndex = values.paymentDetails.length;
+          push({
+            id: uuidv4(),
+            productsId: null,
+            mrp: 0,
+            rate: 0,
+            exclusiveGst: 0,
+            discount: 0,
+            quantity: 1,
+            value: 0,
+            igstRate: 0,
+            gstAmount: 0,
+            gstCalculation: null,
+            isNewProduct: true,
+          });
+          setNewProductRowIndex(newIndex);
+          setAddingNewProduct(true);
+        } else if (isLastRowEmpty) {
+          setFieldValue(
+            `paymentDetails.${values.paymentDetails.length - 1}.isNewProduct`,
+            true,
+          );
+          setNewProductRowIndex(values.paymentDetails.length - 1);
+          setAddingNewProduct(true);
+          toast.info("Last row converted to 'New Product' type");
+        } else {
+          const newIndex = values.paymentDetails.length;
+          push({
+            id: uuidv4(),
+            productsId: null,
+            mrp: 0,
+            rate: 0,
+            exclusiveGst: 0,
+            discount: 0,
+            quantity: 1,
+            value: 0,
+            igstRate: 0,
+            gstAmount: 0,
+            gstCalculation: null,
+            isNewProduct: true,
+          });
+          setNewProductRowIndex(newIndex);
+          setAddingNewProduct(true);
+        }
+      }, 100);
+    }}
+    disabled={!selectedLedger}
+    className="flex items-center gap-2 text-green-600 hover:text-green-700 font-medium disabled:text-gray-400 disabled:cursor-not-allowed"
+  >
+    <IoMdAdd size={20} /> Add New Product (Not in Order)
+  </button>
+)}
+                              
                               </div>
 
                               {/* GST Summary */}
@@ -3499,64 +3559,69 @@ const CreateVoucher = () => {
                                         {totals.totalQuantity}
                                       </p>
                                     </div>
-                                  {values.isExport ? (
-  <div>
-    <p className="text-gray-600 dark:text-gray-400">
-      Export Sale NO GST Applicable
-    </p>
-  </div>
-) : (
-  <>
-    {totals.totalCGST > 0 && (
-      <div className="flex flex-col">
-        <p className="text-gray-600 dark:text-gray-400">CGST</p>
-        <Field
-          type="number"
-          name="totalCgst"
-          value={totals.totalCGST}
-          placeholder="0.00"
-          readOnly
-          className="w-full bg-gray-50 dark:bg-slate-800 text-sm rounded border"
-        />
-      </div>
-    )}
-    {totals.totalSGST > 0 && (
-      <div className="flex flex-col">
-        <p className="text-gray-600 dark:text-gray-400">SGST</p>
-        <Field
-          type="number"
-          name="totalSgst"
-          value={totals.totalSGST}
-          placeholder="0.00"
-          readOnly
-          className="w-full bg-gray-50 dark:bg-slate-800 text-sm rounded border"
-        />
-      </div>
-    )}
-    {totals.totalIGST > 0 && (
-      <div className="flex flex-col">
-        <p className="text-gray-600 dark:text-gray-400">IGST</p>
-        <Field
-          type="number"
-          name="totalIgst"
-          value={totals.totalIGST}
-          placeholder="0.00"
-          readOnly
-          className="w-full bg-gray-50 dark:bg-slate-800 text-sm rounded border"
-        />
-      </div>
-    )}
-    <div>
-      <p className="text-gray-600 dark:text-gray-400">Total GST</p>
-      <p className="font-medium text-black dark:text-white">
-        ₹{totals.totalGST}
-      </p>
-    </div>
-  </>
-)}
-
-                               
-
+                                    {values.isExport ? (
+                                      <div>
+                                        <p className="text-gray-600 dark:text-gray-400">
+                                          Export Sale NO GST Applicable
+                                        </p>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        {totals.totalCGST > 0 && (
+                                          <div className="flex flex-col">
+                                            <p className="text-gray-600 dark:text-gray-400">
+                                              CGST
+                                            </p>
+                                            <Field
+                                              type="number"
+                                              name="totalCgst"
+                                              value={totals.totalCGST}
+                                              placeholder="0.00"
+                                              readOnly
+                                              className="w-full bg-gray-50 dark:bg-slate-800 text-sm rounded border"
+                                            />
+                                          </div>
+                                        )}
+                                        {totals.totalSGST > 0 && (
+                                          <div className="flex flex-col">
+                                            <p className="text-gray-600 dark:text-gray-400">
+                                              SGST
+                                            </p>
+                                            <Field
+                                              type="number"
+                                              name="totalSgst"
+                                              value={totals.totalSGST}
+                                              placeholder="0.00"
+                                              readOnly
+                                              className="w-full bg-gray-50 dark:bg-slate-800 text-sm rounded border"
+                                            />
+                                          </div>
+                                        )}
+                                        {totals.totalIGST > 0 && (
+                                          <div className="flex flex-col">
+                                            <p className="text-gray-600 dark:text-gray-400">
+                                              IGST
+                                            </p>
+                                            <Field
+                                              type="number"
+                                              name="totalIgst"
+                                              value={totals.totalIGST}
+                                              placeholder="0.00"
+                                              readOnly
+                                              className="w-full bg-gray-50 dark:bg-slate-800 text-sm rounded border"
+                                            />
+                                          </div>
+                                        )}
+                                        <div>
+                                          <p className="text-gray-600 dark:text-gray-400">
+                                            Total GST
+                                          </p>
+                                          <p className="font-medium text-black dark:text-white">
+                                            ₹{totals.totalGST}
+                                          </p>
+                                        </div>
+                                      </>
+                                    )}
 
                                     <div className="flex flex-col">
                                       <p className="text-gray-600 dark:text-gray-400">
@@ -3565,7 +3630,8 @@ const CreateVoucher = () => {
                                       <Field
                                         type="number"
                                         name="totalAmount"
-                                        value={totals.subtotal}
+                                        // value={totals.subtotal}
+                                        value={payableTotal.toFixed(2)}
                                         placeholder="0.00"
                                         readOnly
                                         className="w-full bg-gray-50 dark:bg-slate-800 text-sm rounded border font-bold"
@@ -3856,7 +3922,7 @@ const CreateVoucher = () => {
                                     setFieldValue('modeOfPayment', mode);
 
                                     const amountReceived =
-                                      parseFloat(values.amountReceived) || 0;
+                                      parseFloat(payableTotal) || 0;
 
                                     setFieldValue('chequeNumber', '');
                                     setFieldValue('cardNumber', '');
@@ -4210,7 +4276,7 @@ const CreateVoucher = () => {
                                       <div className="text-sm text-blue-600 dark:text-blue-400">
                                         Total to Split:{' '}
                                         <span className="font-bold text-lg">
-                                          ₹{values.amountReceived || 0}
+                                          ₹{payableTotal || 0}
                                         </span>
                                       </div>
                                       <div
@@ -4218,7 +4284,7 @@ const CreateVoucher = () => {
                                       >
                                         Remaining: ₹
                                         {(
-                                          values.amountReceived -
+                                          payableTotal -
                                           calculateTotalAllocatedPayments()
                                         ).toFixed(2)}
                                       </div>
@@ -4231,14 +4297,14 @@ const CreateVoucher = () => {
                                     </span>
                                     <button
                                       type="button"
-                                      onClick={() => addPaymentMethod('Cash')}
+                                     onClick={() => addPaymentMethod('Cash', payableTotal)}
                                       className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full"
                                     >
                                       + Cash
                                     </button>
                                     <button
                                       type="button"
-                                      onClick={() => addPaymentMethod('Cheque')}
+                                      onClick={() => addPaymentMethod('Cheque', payableTotal)}
                                       className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full"
                                     >
                                       + Cheque
@@ -4246,7 +4312,7 @@ const CreateVoucher = () => {
                                     <button
                                       type="button"
                                       onClick={() =>
-                                        addPaymentMethod('Bank Transfer')
+                                        addPaymentMethod('Bank Transfer', payableTotal)
                                       }
                                       className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full"
                                     >
@@ -4254,7 +4320,7 @@ const CreateVoucher = () => {
                                     </button>
                                     <button
                                       type="button"
-                                      onClick={() => addPaymentMethod('Card')}
+                                      onClick={() => addPaymentMethod('Card', payableTotal)}
                                       className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full"
                                     >
                                       + Card
@@ -4264,7 +4330,7 @@ const CreateVoucher = () => {
 
                                 <button
                                   type="button"
-                                  onClick={() => addPaymentMethod('')}
+                                  onClick={() => addPaymentMethod('', payableTotal)}
                                   className="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
                                 >
                                   <svg
@@ -4301,7 +4367,7 @@ const CreateVoucher = () => {
                                         0,
                                       );
                                     const maxAvailable =
-                                      (parseFloat(values.amountReceived) || 0) -
+                                      (parseFloat(payableTotal) || 0) -
                                       otherAmountsTotal;
 
                                     return (
@@ -4603,7 +4669,7 @@ const CreateVoucher = () => {
                                   <div
                                     className={`p-4 rounded-lg border ${
                                       isPaymentAllocationValid(
-                                        values.amountReceived,
+                                        payableTotal,
                                       )
                                         ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
                                         : 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800'
@@ -4613,14 +4679,14 @@ const CreateVoucher = () => {
                                       <div
                                         className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
                                           isPaymentAllocationValid(
-                                            values.amountReceived,
+                                            payableTotal,
                                           )
                                             ? 'bg-green-500'
                                             : 'bg-yellow-500'
                                         }`}
                                       >
                                         {isPaymentAllocationValid(
-                                          values.amountReceived,
+                                          payableTotal,
                                         ) ? (
                                           <svg
                                             className="w-4 h-4 text-white"
@@ -4643,21 +4709,21 @@ const CreateVoucher = () => {
                                         <p
                                           className={`font-medium ${
                                             isPaymentAllocationValid(
-                                              values.amountReceived,
+                                              payableTotal,
                                             )
                                               ? 'text-green-700 dark:text-green-400'
                                               : 'text-yellow-700 dark:text-yellow-400'
                                           }`}
                                         >
                                           {isPaymentAllocationValid(
-                                            values.amountReceived,
+                                            payableTotal,
                                           )
                                             ? 'Payment allocation complete!'
                                             : 'Payment allocation incomplete'}
                                         </p>
                                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                           {isPaymentAllocationValid(
-                                            values.amountReceived,
+                                            payableTotal,
                                           )
                                             ? `Total allocated: ₹${calculateTotalAllocatedPayments().toFixed(
                                                 2,
@@ -4665,9 +4731,9 @@ const CreateVoucher = () => {
                                             : `Allocated: ₹${calculateTotalAllocatedPayments().toFixed(
                                                 2,
                                               )} / Total: ₹${
-                                                values.amountReceived
+                                                payableTotal
                                               }. Remaining: ₹${(
-                                                values.amountReceived -
+                                                payableTotal -
                                                 calculateTotalAllocatedPayments()
                                               ).toFixed(2)}`}
                                         </p>
