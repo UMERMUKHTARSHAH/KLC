@@ -74,14 +74,14 @@ console.log(currentUser,"4545");
                       {customer.customerName}
                     </span>
                   </div>
-                  <div className="flex justify-between">
+                  {/* <div className="flex justify-between">
                     <span className="text-slate-500 dark:text-slate-300">
                       Customer ID
                     </span>
                     <span className="font-medium text-slate-800 dark:text-white">
                       {customer.id}
                     </span>
-                  </div>
+                  </div> */}
                   <div className="flex justify-between">
                     <span className="text-slate-500 dark:text-slate-300">
                       Relationship Manager

@@ -1355,7 +1355,7 @@ const ViewLedger = () => {
             alert("Failed to delete entry");
         }
     };
-    console.log(SelectedLEDGERData,"1010101");
+    console.log(filteredLedgerEntries,"1010101");
     
 
 
@@ -1711,7 +1711,7 @@ const ViewLedger = () => {
                                                                 </td>
                                                                  <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 max-w-xs">
                                                                     <div className="truncate" title={ledger.voucherType || 'No voucherType'}>
-                                                                       <span> {(ledger?.updatedBy?.split("-")[0]?.toUpperCase()) }</span> <br></br><span>{new Date(ledger.updatedAt).toLocaleString() }</span>
+                                                                       <span> {(ledger?.updatedBy?ledger.updatedBy:'-') }</span>
                                                                     </div>
                                                                 </td>
 
