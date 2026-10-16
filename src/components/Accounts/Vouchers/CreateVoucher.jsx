@@ -55,6 +55,7 @@ const CreateVoucher = () => {
   const [isCustModelOpen, setisCustModelOpen] = useState(false);
 
   const [selectedOrder, setselectedOrder] = useState(null);
+  const [loyaltycustomerId, setloyaltycustomerId] = useState(null)
 
   const [regType, setregType] = useState('');
   const [isPaymentInParts, setIsPaymentInParts] = useState(false);
@@ -77,6 +78,59 @@ const CreateVoucher = () => {
   const [newProductRowIndex, setNewProductRowIndex] = useState(null);
 
   const [newShippingState, setnewShippingState] = useState('');
+
+
+  const [loyaltyPointsBalance, setLoyaltyPointsBalance] = useState(0);
+const [useLoyaltyPoints, setUseLoyaltyPoints] = useState(false);
+const [loadingLoyalty, setLoadingLoyalty] = useState(false);
+
+useEffect(() => {
+  // reset whenever the customer changes
+  setUseLoyaltyPoints(false);
+  setLoyaltyPointsBalance(0);
+
+  if (
+    !loyaltycustomerId ||
+    !Vouchers?.posInvoicing ||
+    Vouchers?.typeOfVoucher !== 'Sales'
+  )
+    return;
+
+    console.log(loyaltycustomerId,"454545");
+    
+
+  const controller = new AbortController();
+
+  const fetchLoyalty = async () => {
+    setLoadingLoyalty(true);
+    try {
+      const response = await fetch(
+        `${BASE_URL}/api/loyalty/account/${loyaltycustomerId}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          signal: controller.signal,
+        },
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setLoyaltyPointsBalance(Number(data?.pointsBalance) || 0);
+      }
+    } catch (error) {
+      if (error.name !== 'AbortError') {
+        console.error('Error fetching loyalty points:', error);
+      }
+    } finally {
+      setLoadingLoyalty(false);
+    }
+  };
+
+  fetchLoyalty();
+  return () => controller.abort();
+}, [loyaltycustomerId, Vouchers?.posInvoicing, Vouchers?.typeOfVoucher]);
 
   // Filter ledgers based on voucher type
   const getFilteredLedgers = () => {
@@ -104,6 +158,7 @@ const CreateVoucher = () => {
     type: ledg.ledgerType,
     isSupplier: ledg?.supplier !== null,
   }));
+console.log(LedgerData,"11111111111111111..........................");
 
   const giftvoucherledgers = Ledger.filter(
     (ledg) => ledg?.ledgerType === 'GIFTVOUCHER',
@@ -850,6 +905,10 @@ const getPosProducts = (values, currentIndex) => {
 //   }
 // }, [payableTotal, isPaymentInParts, values.modeOfPayment]);
 
+
+console.log(loyaltycustomerId,"1111111111111111111111111111111111111111");
+
+
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Configurator/Create Voucher" />
@@ -862,6 +921,7 @@ const getPosProducts = (values, currentIndex) => {
             voucherId: Number(id),
             formAction: '',
             paymentDate: '',
+            loyaltyPointsToRedeem: 0,
             ledgerId: '',
             orderIds: [],
             currentBalance: '',
@@ -966,6 +1026,25 @@ const getPosProducts = (values, currentIndex) => {
             const payableTotal = Number(
   (values.isExport ? parseFloat(totals.subtotal) : parseFloat(totals.grandTotal)) || 0,
 );
+
+const maxRedeemable = Math.min(loyaltyPointsBalance, payableTotal);
+
+const loyaltyRedeem = useLoyaltyPoints
+  ? Math.min(parseFloat(values.loyaltyPointsToRedeem) || 0, maxRedeemable)
+  : 0;
+
+// Grand total stays untouched; this is what gets split across payment modes
+const amountToSplit = Math.max(payableTotal - loyaltyRedeem, 0);
+
+// Keep the formik field in sync (cap it, zero it when unchecked)
+useEffect(() => {
+  const current = parseFloat(values.loyaltyPointsToRedeem) || 0;
+  if (!useLoyaltyPoints) {
+    if (current !== 0) setFieldValue('loyaltyPointsToRedeem', 0);
+  } else if (current > maxRedeemable) {
+    setFieldValue('loyaltyPointsToRedeem', maxRedeemable);
+  }
+}, [useLoyaltyPoints, maxRedeemable, values.loyaltyPointsToRedeem]);
             const updateFormikFieldsFromPaymentMethods = () => {
               // Clear all individual fields first
               setFieldValue('chequeNumber', '');
@@ -2073,9 +2152,9 @@ if (Vouchers?.posInvoicing) {
               setFieldValue('totalDiscountPer', totalDiscountPer);
             }, [values?.paymentDetails, setFieldValue]);
 
-            useEffect(() => {
+         useEffect(() => {
   if (Vouchers?.typeOfVoucher === 'Sales' && Vouchers?.posInvoicing) {
-    setFieldValue('amountReceived', payableTotal);
+    setFieldValue('amountReceived', amountToSplit);
 
     if (!isPaymentInParts) {
       const amountField = {
@@ -2085,11 +2164,11 @@ if (Vouchers?.posInvoicing) {
         Cheque: 'chequeAmount',
       }[values.modeOfPayment];
       if (amountField) {
-        setFieldValue(amountField, payableTotal > 0 ? payableTotal : null);
+        setFieldValue(amountField, amountToSplit > 0 ? amountToSplit : null);
       }
     }
   }
-}, [payableTotal, isPaymentInParts, values.modeOfPayment]);
+}, [amountToSplit, isPaymentInParts, values.modeOfPayment]);
 
             return (
               <Form>
@@ -2285,6 +2364,7 @@ if (Vouchers?.posInvoicing) {
                                   setcustaddress(
                                     option?.obj?.shippingState || '',
                                   );
+                                  setloyaltycustomerId(option?.obj?.customerId || null);
 
                                   setregType(option?.obj.registrationType);
                                 }}
@@ -3532,6 +3612,92 @@ if (Vouchers?.posInvoicing) {
                               
                               </div>
 
+
+                              {Vouchers?.typeOfVoucher === 'Sales' &&
+  Vouchers?.posInvoicing &&
+  values.ledgerId && (
+    <div className="mt-6 p-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg">
+      <div className="flex justify-between items-center">
+        <h4 className="text-lg font-semibold text-black dark:text-white">
+          Loyalty Points
+        </h4>
+        <span className="text-sm text-gray-700 dark:text-gray-300">
+          Available:{' '}
+          <span className="font-bold">
+            {loadingLoyalty ? 'Loading...' : loyaltyPointsBalance}
+          </span>
+        </span>
+      </div>
+
+      {loyaltyPointsBalance > 0 ? (
+        <>
+          <label className="mt-3 flex items-center gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={useLoyaltyPoints}
+              onChange={(e) => {
+                setUseLoyaltyPoints(e.target.checked);
+                setFieldValue('loyaltyPointsToRedeem', 0);
+                setPaymentMethods([]); // re-split after the amount changes
+              }}
+              className="h-4 w-4"
+            />
+            <span className="text-sm text-black dark:text-white">
+              Use these points
+            </span>
+          </label>
+
+          {useLoyaltyPoints && (
+            <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <label className="block mb-1 text-gray-600 dark:text-gray-400">
+                  Points to Redeem (max {maxRedeemable.toFixed(2)})
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max={maxRedeemable}
+                  step="1"
+                  value={values.loyaltyPointsToRedeem || ''}
+                  placeholder="0"
+                  onChange={(e) => {
+                    let val = parseFloat(e.target.value) || 0;
+                    if (val > maxRedeemable) {
+                      val = maxRedeemable;
+                      toast.warning(`You can redeem at most ${maxRedeemable}`);
+                    }
+                    if (val < 0) val = 0;
+                    setFieldValue('loyaltyPointsToRedeem', val);
+                    setPaymentMethods([]); // total changed → re-split
+                  }}
+                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-3 text-black dark:bg-form-Field dark:text-white focus:border-primary"
+                />
+              </div>
+              <div>
+                <p className="text-gray-600 dark:text-gray-400">Grand Total</p>
+                <p className="font-medium text-black dark:text-white">
+                  ₹{payableTotal.toFixed(2)}
+                </p>
+              </div>
+              <div>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Payable after Points
+                </p>
+                <p className="font-bold text-black dark:text-white">
+                  ₹{amountToSplit.toFixed(2)}
+                </p>
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        !loadingLoyalty && (
+          <p className="mt-2 text-sm text-gray-500">No points available.</p>
+        )
+      )}
+    </div>
+  )}
+
                               {/* GST Summary */}
                               {Vouchers?.typeOfVoucher === 'Sales' ? (
                                 <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
@@ -3922,7 +4088,7 @@ if (Vouchers?.posInvoicing) {
                                     setFieldValue('modeOfPayment', mode);
 
                                     const amountReceived =
-                                      parseFloat(payableTotal) || 0;
+                                      parseFloat(amountToSplit) || 0;
 
                                     setFieldValue('chequeNumber', '');
                                     setFieldValue('cardNumber', '');
@@ -4276,15 +4442,15 @@ if (Vouchers?.posInvoicing) {
                                       <div className="text-sm text-blue-600 dark:text-blue-400">
                                         Total to Split:{' '}
                                         <span className="font-bold text-lg">
-                                          ₹{payableTotal || 0}
+                                         ₹{amountToSplit.toFixed(2)}
                                         </span>
                                       </div>
                                       <div
-                                        className={`text-sm font-semibold ${getBalanceColor()}`}
+                                        className={`text-sm font-semibold ${getBalanceColor(amountToSplit)}`}
                                       >
                                         Remaining: ₹
                                         {(
-                                          payableTotal -
+                                          amountToSplit -
                                           calculateTotalAllocatedPayments()
                                         ).toFixed(2)}
                                       </div>
@@ -4297,14 +4463,14 @@ if (Vouchers?.posInvoicing) {
                                     </span>
                                     <button
                                       type="button"
-                                     onClick={() => addPaymentMethod('Cash', payableTotal)}
+                                     onClick={() => addPaymentMethod('Cash', amountToSplit)}
                                       className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full"
                                     >
                                       + Cash
                                     </button>
                                     <button
                                       type="button"
-                                      onClick={() => addPaymentMethod('Cheque', payableTotal)}
+                                      onClick={() => addPaymentMethod('Cheque', amountToSplit)}
                                       className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full"
                                     >
                                       + Cheque
@@ -4312,7 +4478,7 @@ if (Vouchers?.posInvoicing) {
                                     <button
                                       type="button"
                                       onClick={() =>
-                                        addPaymentMethod('Bank Transfer', payableTotal)
+                                        addPaymentMethod('Bank Transfer', amountToSplit)
                                       }
                                       className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full"
                                     >
@@ -4320,7 +4486,7 @@ if (Vouchers?.posInvoicing) {
                                     </button>
                                     <button
                                       type="button"
-                                      onClick={() => addPaymentMethod('Card', payableTotal)}
+                                      onClick={() => addPaymentMethod('Card', amountToSplit)}
                                       className="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-full"
                                     >
                                       + Card
@@ -4330,7 +4496,7 @@ if (Vouchers?.posInvoicing) {
 
                                 <button
                                   type="button"
-                                  onClick={() => addPaymentMethod('', payableTotal)}
+                                  onClick={() => addPaymentMethod('', amountToSplit)}
                                   className="w-full py-2.5 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
                                 >
                                   <svg
@@ -4367,7 +4533,7 @@ if (Vouchers?.posInvoicing) {
                                         0,
                                       );
                                     const maxAvailable =
-                                      (parseFloat(payableTotal) || 0) -
+                                      (parseFloat(amountToSplit) || 0) -
                                       otherAmountsTotal;
 
                                     return (
@@ -4669,7 +4835,7 @@ if (Vouchers?.posInvoicing) {
                                   <div
                                     className={`p-4 rounded-lg border ${
                                       isPaymentAllocationValid(
-                                        payableTotal,
+                                        amountToSplit,
                                       )
                                         ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800'
                                         : 'bg-yellow-50 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800'
@@ -4679,14 +4845,14 @@ if (Vouchers?.posInvoicing) {
                                       <div
                                         className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center ${
                                           isPaymentAllocationValid(
-                                            payableTotal,
+                                            amountToSplit,
                                           )
                                             ? 'bg-green-500'
                                             : 'bg-yellow-500'
                                         }`}
                                       >
                                         {isPaymentAllocationValid(
-                                          payableTotal,
+                                          amountToSplit,
                                         ) ? (
                                           <svg
                                             className="w-4 h-4 text-white"
@@ -4709,21 +4875,21 @@ if (Vouchers?.posInvoicing) {
                                         <p
                                           className={`font-medium ${
                                             isPaymentAllocationValid(
-                                              payableTotal,
+                                              amountToSplit,
                                             )
                                               ? 'text-green-700 dark:text-green-400'
                                               : 'text-yellow-700 dark:text-yellow-400'
                                           }`}
                                         >
                                           {isPaymentAllocationValid(
-                                            payableTotal,
+                                            amountToSplit,
                                           )
                                             ? 'Payment allocation complete!'
                                             : 'Payment allocation incomplete'}
                                         </p>
                                         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                           {isPaymentAllocationValid(
-                                            payableTotal,
+                                            amountToSplit,
                                           )
                                             ? `Total allocated: ₹${calculateTotalAllocatedPayments().toFixed(
                                                 2,
@@ -4731,9 +4897,9 @@ if (Vouchers?.posInvoicing) {
                                             : `Allocated: ₹${calculateTotalAllocatedPayments().toFixed(
                                                 2,
                                               )} / Total: ₹${
-                                                payableTotal
+                                                amountToSplit
                                               }. Remaining: ₹${(
-                                                payableTotal -
+                                                amountToSplit -
                                                 calculateTotalAllocatedPayments()
                                               ).toFixed(2)}`}
                                         </p>
