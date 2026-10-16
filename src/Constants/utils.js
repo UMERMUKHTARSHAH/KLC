@@ -8,7 +8,7 @@ export const UPDATE_UNIT_URL = `${BASE_URL}/unit/updateUnit`;
 export const VIEW_ALL_UNITS = `${BASE_URL}/unit/viewAll`;
 export const DELETE_UNIT_URL = `${BASE_URL}/unit/deleteUnit/`;
 //BOM
-
+export const CHANGELOYALTY = `${BASE_URL}/api/loyalty/legacy`;
 // Product Url
 export const PRODUCTCOUNT_URL = `${BASE_URL}/api/dashboard/productGroupCounts`;
 
