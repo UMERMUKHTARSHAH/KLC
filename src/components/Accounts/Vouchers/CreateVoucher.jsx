@@ -173,6 +173,9 @@ console.log(LedgerData,"11111111111111111..........................");
   const BankLedgers = Ledger.filter(
     (ledg) => ledg?.name && ledg.name.toLowerCase().includes('bank'),
   );
+  const loyalityLedgers = Ledger.filter(
+    (ledg) => ledg?.name && ledg.name.toLowerCase().includes('loyalty'),
+  );
 
   const cardLedgers = Ledger.filter(
     (ledg) =>
@@ -187,6 +190,11 @@ console.log(LedgerData,"11111111111111111..........................");
   }));
 
   const bankData = BankLedgers?.map((ledg) => ({
+    value: ledg?.id,
+    label: ledg?.name,
+  }));
+
+   const loyaltyData = loyalityLedgers?.map((ledg) => ({
     value: ledg?.id,
     label: ledg?.name,
   }));
@@ -929,6 +937,7 @@ console.log(loyaltycustomerId,"1111111111111111111111111111111111111111");
             gstRegistration: Vouchers?.defGstRegist?.id || '',
             locationId: Vouchers?.defGstRegist?.id || '',
             narration: '',
+            loyaltyLedgerId:null,
             modeOfPayment: '',
             chequeNumber: '',
             cardNumber: '',
@@ -3668,6 +3677,7 @@ if (Vouchers?.posInvoicing) {
                     }
                     if (val < 0) val = 0;
                     setFieldValue('loyaltyPointsToRedeem', val);
+                    setFieldValue('loyaltyLedgerId', loyaltyData[0]?.value || null); // Set default loyalty ledger if available
                     setPaymentMethods([]); // total changed → re-split
                   }}
                   className="w-full rounded border-[1.5px] border-stroke bg-transparent py-2 px-3 text-black dark:bg-form-Field dark:text-white focus:border-primary"
@@ -4530,7 +4540,7 @@ if (Vouchers?.posInvoicing) {
                                           }
                                           return total;
                                         },
-                                        0,
+                                        0, 
                                       );
                                     const maxAvailable =
                                       (parseFloat(amountToSplit) || 0) -
