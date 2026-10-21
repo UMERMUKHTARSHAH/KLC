@@ -262,6 +262,15 @@ const Home = () => {
         iconBg: 'bg-amber-100',
         iconColor: 'text-amber-600'
       },
+        {
+        title: 'Loyalty Points System Report',
+        link: '/report/loyalityPointsReport',
+        icon: <GrCompliance className="w-5 h-5" />,
+        levelUp: true,
+        description: 'Volume and status broken down by individual product.',
+        iconBg: 'bg-amber-100',
+        iconColor: 'text-amber-600'
+      },
       {
         title: 'All Groups Product Report',
         icon: <GrCompliance className="w-5 h-5" />,

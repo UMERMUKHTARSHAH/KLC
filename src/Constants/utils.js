@@ -238,6 +238,8 @@ export const UPDATE_CUSTOMER_URL = `${BASE_URL}/customer`;
 export const VIEW_ALL_CUSTOMER = `${BASE_URL}/customer/viewAll`;
 
 export const DOWNLOAD_REPORT = `${BASE_URL}/report/searchReport`;
+export const DOWNLOAD_LOYALTY_REPORT = `${BASE_URL}/api/reports/loyalty/download`;
+export const VIEW_LOYALTY_REPORT = `${BASE_URL}/api/reports/loyalty/preview`;
 export const DOWNLOADPRODUCT_REPORT = `${BASE_URL}/report/downloadProductCsv`;
 
 export const DOWNLOADCUSTOMER_REPORT = `${BASE_URL}/report/downloadCustomerCsv`;

@@ -1709,7 +1709,8 @@ const ViewLedger = () => {
                                                                         {ledger.voucherType || 'No voucherType'}
                                                                     </div>
                                                                 </td>
-                                                                 <td className="px-6 py-4 text-sm text-gray-600 dark:text-gray-300 max-w-xs">
+
+                                                                 <td className="px-6 py-4 text-sm text-gray-600  dark:text-gray-300 max-w-xs">
                                                                     <div className="truncate" title={ledger.voucherType || 'No voucherType'}>
                                                                        <span> {(ledger?.updatedBy?ledger.updatedBy:'-') }</span>
                                                                     </div>
@@ -1728,6 +1729,7 @@ const ViewLedger = () => {
 
 
                                                                 <td className="px-5 py-5 bVoucher-b bVoucher-gray-200 text-sm">
+                                                                    
                                                                     <p className="flex text-gray-900 whitespace-no-wrap">
                                                                         {
                                                                             ledger.posInvoicing === true &&

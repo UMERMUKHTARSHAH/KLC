@@ -200,12 +200,16 @@ import Fiber from './components/Order/Fiber.jsx';
 import Reports from './components/Reports/Reports.jsx';
 import ProductReport from './components/Reports/ProductReport.jsx';
 
+
+
+
 import RetailWholeSaleReport from './components/Reports/RetailWholesaleReport.jsx';
 
 import CreditorsReports from './components/AccReports/CreditorsReports.jsx';
 
 import ClientReports from './components/AccReports/ClientReports.jsx';
 import ProfitLossReports from './components/AccReports/ProfitLossReports.jsx';
+import LoyaltyPointsSystemReport from './components/AccReports/LoyaltyPointsSystemReport.jsx';
 import StockReports from './components/AccReports/StockReports.jsx';
 import DebitorsReports from './components/AccReports/DebitorsReports.jsx';
 import SalesReports from './components/AccReports/SalesReports.jsx';
@@ -840,6 +844,18 @@ function App() {
                 <RoleBasedRoute allowedRoles={["ROLE_ADMIN", "ROLE_APPROVER", "ROLE_EXECUTOR", "ROLE_ADMIN_DLI", "ROLE_ADMIN_SXR"]}></RoleBasedRoute>
                 <PageTitle title="Dashboard" />
                 <GeneralFinancialReportDashboard />
+              </>
+            }
+          />
+
+
+             <Route
+            path="/report/loyalityPointsReport"
+            element={
+              <>
+                <RoleBasedRoute allowedRoles={["ROLE_ADMIN", "ROLE_APPROVER", "ROLE_EXECUTOR", "ROLE_ADMIN_DLI", "ROLE_ADMIN_SXR"]}></RoleBasedRoute>
+                <PageTitle title="loyaltypoints" />
+                <LoyaltyPointsSystemReport />
               </>
             }
           />
