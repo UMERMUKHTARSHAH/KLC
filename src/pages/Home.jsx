@@ -584,7 +584,7 @@ const Home = () => {
       if (['Production Dashboard', 'Orders Dashboard', 'Monthly Order Calendar'].includes(card.title)) {
         operations.push(card);
       } else if (['Reports',  'Retail/Wholesale Reports', 'Financial Reports', 
-                  'Customer Report', 'Product Report', 'All Groups Product Report'].includes(card.title)) {
+                  'Customer Report', 'Product Report', 'All Groups Product Report', 'Loyalty Points System Report'].includes(card.title)) {
         reports.push(card);
       } else if (['Upload Excel'].includes(card.title)) {
         dataTools.push(card);
