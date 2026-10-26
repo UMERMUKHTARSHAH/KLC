@@ -170,10 +170,10 @@ const Chart = () => {
       { title: "Edit Received Quantity", link: "/order/recievedQuantity", countKey: "ordersWithPendingProducts", icon: <MdEditSquare className="w-10 h-10" />, levelUp: true },
       { title: "Update Shipping Date", link: "/order/updateShippingDate", countKey: "ordersWithShippingDate", icon: <GrUpdate className="w-10 h-10" />, levelUp: true },
       { title: "Monthly Orders", link: "/Order/monthlyorders", icon: <SiHomeassistantcommunitystore className="w-10 h-10" />, levelDown: true },
-      { title: "Delayed Order Products", link: "/delayedOrders", countKey: "ordersWithDelayed", icon: <MdTimer className="w-10 h-10" />, levelDown: true }
+      { title: "Delayed Orders", link: "/delayedOrders", countKey: "ordersWithDelayed", icon: <MdTimer className="w-10 h-10" />, levelDown: true }
     ],
     ROLE_QUALITYCONTROL: [
-      { title: "Completed Orders", link: "/orderlist/Closed", countKey: "ordersWithOnlyClosed", icon: <MdRecommend className="w-10 h-10" />, levelUp: true },
+      { title: "Completed Orders   .   .", link: "/orderlist/Closed", countKey: "ordersWithOnlyClosed", icon: <MdRecommend className="w-10 h-10" />, levelUp: true },
     ],
     ROLE_EXECUTOR: [
       { title: "Pending For Approval", link: "/order/created", countKey: "ordersWithCreated", icon: <AiOutlinePartition className="w-10 h-10" />, levelUp: true },
@@ -204,7 +204,7 @@ const Chart = () => {
       { title: "Update Challan", link: "/orderlist/UpdateChallan", countKey: "ordersWithApprovedChallan", icon: <PiGearFineFill className="w-10 h-10" />, levelUp: true },
       { title: "In Progress Orders", link: "/order/Approved", countKey: "approvedOrders", icon: <GrCompliance className="w-10 h-10" />, levelUp: true },
       { title: "Partially In Progress", link: "/order/partiallyApproved", countKey: "ordersWithApprovedOrForcedClosure", icon: <RiProgress8Fill className="w-10 h-10" />, levelUp: true },
-      { title: "Completed Orders", link: "/orderlist/Closed", countKey: "ordersWithOnlyClosed", icon: <MdRecommend className="w-10 h-10" />, levelUp: true },
+      { title: "Completed Orders   .  .", link: "/orderlist/Closed", countKey: "ordersWithOnlyClosed", icon: <MdRecommend className="w-10 h-10" />, levelUp: true },
       { title: "Partially Completed Orders", link: "/orderlist/PartiallyClosed", countKey: "ordersWithOnlyPartiallyClosed", icon: <MdRepartition className="w-10 h-10" />, levelUp: true },
       { title: "Pending Orders", link: "/orderlist/Pending", countKey: "ordersWithOnlyPending", icon: <MdOutlinePendingActions className="w-10 h-10" />, levelUp: true },
       { title: "Partially Pending Orders", link: "/orderlist/PartiallyPending", countKey: "ordersWithAtLeastOnePending", icon: <MdOutlinePending className="w-10 h-10" />, levelUp: true },
@@ -240,7 +240,7 @@ const Chart = () => {
   // Summary cards with their respective links
   const summaryCards = [
     {
-      title: "Total orders",
+      title: "Total orders.      .   .   .   .",
       count: totalOrders,
       icon: <SiHomeassistantcommunitystore className="w-5 h-5 text-blue-600" />,
       bgColor: "bg-blue-100",
@@ -249,7 +249,7 @@ const Chart = () => {
       link: "/Order/ViewOrder"
     },
     {
-      title: "Completed order",
+      title: "Completed orders    .   .",
       count: completedOrders,
       icon: <FcApproval className="w-5 h-5" />,
       bgColor: "bg-green-100",
@@ -258,7 +258,7 @@ const Chart = () => {
       link: "/orderlist/Closed"
     },
     {
-      title: "Delayed order product",
+      title: "Delayed orders     .  .",
       count: delayedOrders,
       icon: <MdTimer className="w-5 h-5 text-orange-600" />,
       bgColor: "bg-orange-100",
@@ -286,13 +286,13 @@ const Chart = () => {
     const otherCards = [];
 
     const filteredCards = cardsToShow.filter(card => {
-      const summaryTitles = ['Total Orders', 'Completed Orders', 'Delayed Order Products', 'Cancelled Orders'];
+      const summaryTitles = ['Total Orders', 'Completed Orders', 'Delayed Order Prod', 'Cancelled Orders'];
       return !summaryTitles.includes(card.title);
     });
 
     filteredCards.forEach(card => {
       // Needs Attention category
-      if (['Update Shipping Date', 'Delayed Order Products', 'Forced Closed Orders', 
+      if (['Update Shipping Date', 'Delayed Order Prod', 'Forced Closed Orders', 
            'Edit Received Quantity', 'Update Challan', 
            'Need Modification Orders', 'Cancelled Orders'].includes(card.title)) {
         needsAttention.push(card);
@@ -438,7 +438,7 @@ const Chart = () => {
           {summaryCards.map((card, idx) => (
             <Link to={card.link} key={idx}>
               <div className="bg-white dark:bg-black/10 rounded-xl shadow-sm p-4 border border-gray-200 hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 ease-in-out cursor-pointer hover:scale-[1.02] hover:-translate-y-1 dark">
-  <div className="flex items-center justify-between tracking-wider whitespace-nowrap">
+  <div className="flex items-center justify-between">
     <div>
       <p className={`text-6px font-sm ${card.textColor} uppercase tracking-wider`}>
         {card.title}

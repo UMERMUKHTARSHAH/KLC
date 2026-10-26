@@ -205,6 +205,9 @@ const ViewUsers = () => {
                   <th className="min-w-[100px] py-4 px-4 font-medium text-black dark:text-white text-sm">
                     Status
                   </th>
+                  <th className="min-w-[100px] py-4 px-4 font-medium text-black dark:text-white text-sm">
+                    Action
+                  </th>
                   {/* <th className="min-w-[150px] py-4 px-4 font-medium text-black dark:text-white text-sm">
                     Last Updated
                   </th> */}
@@ -299,6 +302,10 @@ const ViewUsers = () => {
                         </span>
                       </td>
                       
+                      <td className="py-5 px-4">
+                        {getStatusBadge(user)}
+                      </td>
+
                       <td className="py-5 px-4">
                         {getStatusBadge(user)}
                       </td>

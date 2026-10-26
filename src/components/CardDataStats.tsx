@@ -33,20 +33,20 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
   {/* Content - Title and Count on left, Icon on right corner */}
   <div className="relative flex items-center justify-between gap-4 w-full">
     {/* Title and Count - Left side */}
-    <div className="flex-1 min-w-0">
-      <div className="relative inline-block">
-        <span className="absolute inset-0 blur-md bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-50 transition-opacity duration-500"></span>
-        <h4 className="relative text-2xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400 ">
-          {total}
-        </h4>
-      </div>
+<div className="flex-1 min-w-0">
+  <div className="relative inline-block">
+    <span className="absolute inset-0 blur-md bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-50 transition-opacity duration-500"></span>
+    <h4 className="relative text-2xl font-black bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent dark:from-purple-400 dark:to-pink-400">
+      {total}
+    </h4>
+  </div>
 
-      <div className="mt-9">
-        <h2 className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap">
-          {title}
-        </h2>
-      </div>
-    </div>
+  <div className="mt-9">
+    <h2 className="text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider ">
+      {title}
+    </h2>
+  </div>
+</div>
 
     {/* Icon - Right side corner */}
     <div className="relative flex-shrink-0 mt-[-20px]">
