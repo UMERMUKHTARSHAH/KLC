@@ -81,7 +81,7 @@ const useSignup = () => {
             const data = await response.json();
             if (response?.ok) {
                 toast.success("User Added Successfully");
-                navigate("/auth/signin")
+                navigate("/auth/viewUsers")
 
 
 
