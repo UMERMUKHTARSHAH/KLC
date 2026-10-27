@@ -1,315 +1,313 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
 
 import Loader from './common/Loader/index.js';
 import PageTitle from './components/PageTitle.js';
-import SignIn from './pages/Authentication/SignIn.jsx';
-import SignUp from './pages/Authentication/SignUp.jsx';
-import ViewUsers from './pages/Authentication/ViewUsers.jsx';
-import EditUser from './pages/Authentication/EditUser.jsx';
-import Calendar from './pages/Calendar.js';
-import Chart from './pages/Chart.jsx';
+const SignIn = lazy(() => import('./pages/Authentication/SignIn.jsx'));
+const SignUp = lazy(() => import('./pages/Authentication/SignUp.jsx'));
+const ViewUsers = lazy(() => import('./pages/Authentication/ViewUsers.jsx'));
+const EditUser = lazy(() => import('./pages/Authentication/EditUser.jsx'));
+const Calendar = lazy(() => import('./pages/Calendar.js'));
+const Chart = lazy(() => import('./pages/Chart.jsx'));
 
-import AccReports from './pages/AccReports.jsx';
-import Home from './pages/Home.jsx';
-import FinancialReportDashboard from './pages/FinancialReportDashboard.jsx';
-import GeneralFinancialReportDashboard from './pages/GeneralFinancialReportDashboard.jsx';
-import Groups from './components/Accounts/Config/Groups.jsx';
+const AccReports = lazy(() => import('./pages/AccReports.jsx'));
+const Home = lazy(() => import('./pages/Home.jsx'));
+const FinancialReportDashboard = lazy(() => import('./pages/FinancialReportDashboard.jsx'));
+const GeneralFinancialReportDashboard = lazy(() => import('./pages/GeneralFinancialReportDashboard.jsx'));
+const Groups = lazy(() => import('./components/Accounts/Config/Groups.jsx'));
 
-import Daybook from './components/Accounts/Config/Daybook.jsx';
+const Daybook = lazy(() => import('./components/Accounts/Config/Daybook.jsx'));
 
-import OrderVoucherView from './components/Accounts/Config/OrderVoucherView.jsx';
+const OrderVoucherView = lazy(() => import('./components/Accounts/Config/OrderVoucherView.jsx'));
 
-import AddLut from './components/Accounts/Config/AddLut.jsx';
-import PaymentSummary from './components/Accounts/Config/PaymentSummary.jsx';
+const AddLut = lazy(() => import('./components/Accounts/Config/AddLut.jsx'));
+const PaymentSummary = lazy(() => import('./components/Accounts/Config/PaymentSummary.jsx'));
 
-import Voucher from './components/Accounts/Vouchers/Voucher.jsx';
-import CreateVoucher from './components/Accounts/Vouchers/CreateVoucher.jsx';
-import EditVoucher from './components/Accounts/Vouchers/EditVoucher.jsx';
-import CreateVoucherShopify from './components/Accounts/Vouchers/CreateVoucherShopify.jsx';
-import UpdateVoucher from './components/Accounts/Vouchers/UpdateVoucher.jsx';
-import CreateDebitNote from './components/Accounts/Vouchers/CreateDebitNote.jsx';
-import CreateCreditNote from './components/Accounts/Vouchers/CreateCreditNote.jsx';
-import CreateContra from './components/Accounts/Vouchers/CreateContra.jsx';
-import CreateJournal from './components/Accounts/Vouchers/CreateJournal.jsx';
-import CreateReceipt from './components/Accounts/Vouchers/CreateReceipt.jsx';
+const Voucher = lazy(() => import('./components/Accounts/Vouchers/Voucher.jsx'));
+const CreateVoucher = lazy(() => import('./components/Accounts/Vouchers/CreateVoucher.jsx'));
+const EditVoucher = lazy(() => import('./components/Accounts/Vouchers/EditVoucher.jsx'));
+const CreateVoucherShopify = lazy(() => import('./components/Accounts/Vouchers/CreateVoucherShopify.jsx'));
+const UpdateVoucher = lazy(() => import('./components/Accounts/Vouchers/UpdateVoucher.jsx'));
+const CreateDebitNote = lazy(() => import('./components/Accounts/Vouchers/CreateDebitNote.jsx'));
+const CreateCreditNote = lazy(() => import('./components/Accounts/Vouchers/CreateCreditNote.jsx'));
+const CreateContra = lazy(() => import('./components/Accounts/Vouchers/CreateContra.jsx'));
+const CreateJournal = lazy(() => import('./components/Accounts/Vouchers/CreateJournal.jsx'));
+const CreateReceipt = lazy(() => import('./components/Accounts/Vouchers/CreateReceipt.jsx'));
 
-import CreateVoucherPurchase from './components/Accounts/Vouchers/CreateVoucherPurchase.jsx';
-import VoucherEntriesView from './components/Accounts/Vouchers/VoucherEntriesView.jsx';
+const CreateVoucherPurchase = lazy(() => import('./components/Accounts/Vouchers/CreateVoucherPurchase.jsx'));
+const VoucherEntriesView = lazy(() => import('./components/Accounts/Vouchers/VoucherEntriesView.jsx'));
 
-import StockJournalView from './components/Accounts/Vouchers/StockJournalView.jsx';
+const StockJournalView = lazy(() => import('./components/Accounts/Vouchers/StockJournalView.jsx'));
 
-import PrintStockJournal from './components/Accounts/Vouchers/PrintStockJournal.jsx';
+const PrintStockJournal = lazy(() => import('./components/Accounts/Vouchers/PrintStockJournal.jsx'));
 
-import VoucherEntriesDebitView from './components/Accounts/Vouchers/VoucherEntriesDebitView.jsx';
-import PrintCreditDebit from './components/Accounts/Vouchers/PrintCreditDebit.jsx';
+const VoucherEntriesDebitView = lazy(() => import('./components/Accounts/Vouchers/VoucherEntriesDebitView.jsx'));
+const PrintCreditDebit = lazy(() => import('./components/Accounts/Vouchers/PrintCreditDebit.jsx'));
 
-import VoucherEntriesViewPayment from './components/Accounts/Vouchers/VoucherEntriesViewPayment.jsx';
+const VoucherEntriesViewPayment = lazy(() => import('./components/Accounts/Vouchers/VoucherEntriesViewPayment.jsx'));
 
-import PrintEntryPayment from './components/Accounts/Vouchers/PrintEntryPayment.jsx';
+const PrintEntryPayment = lazy(() => import('./components/Accounts/Vouchers/PrintEntryPayment.jsx'));
 
-import PrintPaymentVoucher from './components/Accounts/Vouchers/PrintPaymentVoucher.jsx';
-import PrintPosEntryPayment from './components/Accounts/Vouchers/PrintPosEntryPayment.jsx';
-import ViewVoucher from './components/Accounts/Vouchers/ViewVoucher.jsx';
+const PrintPaymentVoucher = lazy(() => import('./components/Accounts/Vouchers/PrintPaymentVoucher.jsx'));
+const PrintPosEntryPayment = lazy(() => import('./components/Accounts/Vouchers/PrintPosEntryPayment.jsx'));
+const ViewVoucher = lazy(() => import('./components/Accounts/Vouchers/ViewVoucher.jsx'));
 
-import KaniProducts from './components/Kani/KaniProducts.jsx';
-import KaniOrders from './components/Kani/KaniOrders.jsx';
-import FilterSupplier from './components/Kani/FilterSupplier.jsx';
-import SupplierOrder from './components/Kani/SupplierOrder.jsx';
-import KaniClientOrders from './components/Kani/KaniClientOrders.jsx';
-import RetailClientOrders from './components/Kani/RetailClientOrders.jsx';
-import WholesaleClientOrders from './components/Kani/WholesaleClientOrders.jsx';
-import KlcOrders from './components/Kani/KlcOrders.jsx';
-import ProductGroupDetails from './components/Kani/ProductGroupDetails.jsx';
+const KaniProducts = lazy(() => import('./components/Kani/KaniProducts.jsx'));
+const KaniOrders = lazy(() => import('./components/Kani/KaniOrders.jsx'));
+const FilterSupplier = lazy(() => import('./components/Kani/FilterSupplier.jsx'));
+const SupplierOrder = lazy(() => import('./components/Kani/SupplierOrder.jsx'));
+const KaniClientOrders = lazy(() => import('./components/Kani/KaniClientOrders.jsx'));
+const RetailClientOrders = lazy(() => import('./components/Kani/RetailClientOrders.jsx'));
+const WholesaleClientOrders = lazy(() => import('./components/Kani/WholesaleClientOrders.jsx'));
+const KlcOrders = lazy(() => import('./components/Kani/KlcOrders.jsx'));
+const ProductGroupDetails = lazy(() => import('./components/Kani/ProductGroupDetails.jsx'));
 
-import CreateLedger from './components/Ledger/CreateLedger.jsx';
-import UpdateCustomerLedger from './components/Ledger/UpdateCustomerLedger.jsx';
+const CreateLedger = lazy(() => import('./components/Ledger/CreateLedger.jsx'));
+const UpdateCustomerLedger = lazy(() => import('./components/Ledger/UpdateCustomerLedger.jsx'));
 
-import UpdateLedger from './components/Ledger/UpdateLedger.jsx';
-import UpdateLedgerr from './components/Ledger/UpdateLedgerr.jsx';
-import Material from './components/Material/Material.jsx';
-import AddProduct from './components/Products/AddProduct.jsx';
-import ViewNotifications from './components/Notification/ViewNotifications.jsx';
-import ViewProduct from './components/Products/ViewProduct.jsx';
+const UpdateLedger = lazy(() => import('./components/Ledger/UpdateLedger.jsx'));
+const UpdateLedgerr = lazy(() => import('./components/Ledger/UpdateLedgerr.jsx'));
+const Material = lazy(() => import('./components/Material/Material.jsx'));
+const AddProduct = lazy(() => import('./components/Products/AddProduct.jsx'));
+const ViewNotifications = lazy(() => import('./components/Notification/ViewNotifications.jsx'));
+const ViewProduct = lazy(() => import('./components/Products/ViewProduct.jsx'));
 
-import ExcelUploadProduct from './components/Products/ExcelUploadProduct.jsx';
-import ExcelUploadBulkInventory from './components/Products/ExcelUploadBulkInventory.jsx';
+const ExcelUploadProduct = lazy(() => import('./components/Products/ExcelUploadProduct.jsx'));
+const ExcelUploadBulkInventory = lazy(() => import('./components/Products/ExcelUploadBulkInventory.jsx'));
 
-import UpdateKani from './components/Kani/UpdateKani.jsx';
-import KaniSection from './components/Kani/KaniSection.jsx';
-import PashminaEmbroidery from './components/Kani/PashminaEmbroidery.jsx';
-import EmbroideryOrders from './components/Kani/EmbroideryOrders.jsx';
-import PashminaSuppliers from './components/Kani/PashminaSuppliers.jsx';
-import PashminaInProgress from './components/Kani/PashminaInProgress.jsx';
-import RetailEmbroidery from './components/Kani/RetailEmbroidery.jsx';
-import WholesaleEmbroidery from './components/Kani/WholesaleEmbroidery.jsx';
-import KlcEmbroidery from './components/Kani/KlcEmbroidery.jsx';
-import PashminaSupplier from './components/Kani/PashminaSupplier.jsx';
-import ContemporaryPashmina from './components/Kani/ContemporaryPashmina.jsx';
-import ContemporaryOrders from './components/Kani/ContemporaryOrders.jsx';
-import ContemporarySuppliers from './components/Kani/ContemporarySuppliers.jsx';
-import ContemporarySuppOrder from './components/Kani/ContemporarySuppOrder.jsx';
-import ContemporaryInProgress from './components/Kani/ContemporaryInProgress.jsx';
-import RetailContemporary from './components/Kani/RetailContemporary.jsx';
-import WholesaleContemporary from './components/Kani/WholesaleContemporary.jsx';
-import KlcContemporary from './components/Kani/KlcContemporary.jsx';
-import PapierMache from './components/Kani/PapierMache.jsx';
-import PapierMacheOrders from './components/Kani/PapierMacheOrders.jsx';
-import RetailPapierMache from './components/Kani/RetailPapierMache.jsx';
-import WholeSalePapierMache from './components/Kani/WholeSalePapierMache.jsx';
-import KlcPapierMache from './components/Kani/KlcPapierMache.jsx';
-import PapierMacheSuppliers from './components/Kani/PapierMacheSuppliers.jsx';
-import PapierMacheInProgress from './components/Kani/PapierMacheInProgress.jsx';
-import WoolEmbroidery from './components/Kani/WoolEmbroidery.jsx';
-import WoolEmbroideryOrders from './components/Kani/WoolEmbroideryOrders.jsx';
-import WoolSuppliers from './components/Kani/WoolSuppliers.jsx';
-import WoolSupplierOrders from './components/Kani/WoolSupplierOrders.jsx';
-import WoolInProgress from './components/Kani/WoolInProgress.jsx';
-import WoolWholesaleOrders from './components/Kani/WoolWholesaleOrders.jsx';
-import WoolKlcOrders from './components/Kani/WoolKlcOrders.jsx';
-import WoolRetailOrders from './components/Kani/WoolRetailOrders.jsx';
-import ContemporaryWool from './components/Kani/ContemporaryWool.jsx';
-import ContemporaryWoolOrders from './components/Kani/ContemporaryWoolOrders.jsx';
-import RetailContWool from './components/Kani/RetailContWool.jsx';
-import ContWoolWholesale from './components/Kani/ContWoolWholesale.jsx';
-import ContWoolKlc from './components/Kani/ContWoolKlc.jsx';
-import ContWoolSuppliers from './components/Kani/ContWoolSuppliers.jsx';
-import ContWoolInProgress from './components/Kani/ContWoolInProgress.jsx';
-import ContWoolSuppOrders from './components/Kani/ContWoolSuppOrders.jsx';
-import Cotton from './components/Kani/Cotton.jsx';
-import CottonOrders from './components/Kani/CottonOrders.jsx';
-import CottonSuppliers from './components/Kani/CottonSuppliers.jsx';
-import CottonSuppOrder from './components/Kani/CottonSuppOrder.jsx';
-import CottonInProgress from './components/Kani/CottonInProgress.jsx';
-import CottonRetail from './components/Kani/CottonRetail.jsx';
-import CottonWholesale from './components/Kani/CottonWholesale.jsx';
-import CottonKlc from './components/Kani/CottonKlc.jsx';
-import ContemporarySaree from './components/Kani/ContemporarySaree.jsx';
-import ContemporarySareeOrders from './components/Kani/ContemporarySareeOrders.jsx';
-import SareeSuppliers from './components/Kani/SareeSuppliers.jsx';
-import SareeInProgress from './components/Kani/SareeInProgress.jsx';
-import SareeSuppOrder from './components/Kani/SareeSuppOrder.jsx';
-import SareeRetail from './components/Kani/SareeRetail.jsx';
-import SareeWholesale from './components/Kani/SareeWholesale.jsx';
-import SareeKlc from './components/Kani/SareeKlc.jsx';
-import PapierMachieSuppOrders from './components/Kani/PapierMachieSuppOrders.jsx';
+const UpdateKani = lazy(() => import('./components/Kani/UpdateKani.jsx'));
+const KaniSection = lazy(() => import('./components/Kani/KaniSection.jsx'));
+const PashminaEmbroidery = lazy(() => import('./components/Kani/PashminaEmbroidery.jsx'));
+const EmbroideryOrders = lazy(() => import('./components/Kani/EmbroideryOrders.jsx'));
+const PashminaSuppliers = lazy(() => import('./components/Kani/PashminaSuppliers.jsx'));
+const PashminaInProgress = lazy(() => import('./components/Kani/PashminaInProgress.jsx'));
+const RetailEmbroidery = lazy(() => import('./components/Kani/RetailEmbroidery.jsx'));
+const WholesaleEmbroidery = lazy(() => import('./components/Kani/WholesaleEmbroidery.jsx'));
+const KlcEmbroidery = lazy(() => import('./components/Kani/KlcEmbroidery.jsx'));
+const PashminaSupplier = lazy(() => import('./components/Kani/PashminaSupplier.jsx'));
+const ContemporaryPashmina = lazy(() => import('./components/Kani/ContemporaryPashmina.jsx'));
+const ContemporaryOrders = lazy(() => import('./components/Kani/ContemporaryOrders.jsx'));
+const ContemporarySuppliers = lazy(() => import('./components/Kani/ContemporarySuppliers.jsx'));
+const ContemporarySuppOrder = lazy(() => import('./components/Kani/ContemporarySuppOrder.jsx'));
+const ContemporaryInProgress = lazy(() => import('./components/Kani/ContemporaryInProgress.jsx'));
+const RetailContemporary = lazy(() => import('./components/Kani/RetailContemporary.jsx'));
+const WholesaleContemporary = lazy(() => import('./components/Kani/WholesaleContemporary.jsx'));
+const KlcContemporary = lazy(() => import('./components/Kani/KlcContemporary.jsx'));
+const PapierMache = lazy(() => import('./components/Kani/PapierMache.jsx'));
+const PapierMacheOrders = lazy(() => import('./components/Kani/PapierMacheOrders.jsx'));
+const RetailPapierMache = lazy(() => import('./components/Kani/RetailPapierMache.jsx'));
+const WholeSalePapierMache = lazy(() => import('./components/Kani/WholeSalePapierMache.jsx'));
+const KlcPapierMache = lazy(() => import('./components/Kani/KlcPapierMache.jsx'));
+const PapierMacheSuppliers = lazy(() => import('./components/Kani/PapierMacheSuppliers.jsx'));
+const PapierMacheInProgress = lazy(() => import('./components/Kani/PapierMacheInProgress.jsx'));
+const WoolEmbroidery = lazy(() => import('./components/Kani/WoolEmbroidery.jsx'));
+const WoolEmbroideryOrders = lazy(() => import('./components/Kani/WoolEmbroideryOrders.jsx'));
+const WoolSuppliers = lazy(() => import('./components/Kani/WoolSuppliers.jsx'));
+const WoolSupplierOrders = lazy(() => import('./components/Kani/WoolSupplierOrders.jsx'));
+const WoolInProgress = lazy(() => import('./components/Kani/WoolInProgress.jsx'));
+const WoolWholesaleOrders = lazy(() => import('./components/Kani/WoolWholesaleOrders.jsx'));
+const WoolKlcOrders = lazy(() => import('./components/Kani/WoolKlcOrders.jsx'));
+const WoolRetailOrders = lazy(() => import('./components/Kani/WoolRetailOrders.jsx'));
+const ContemporaryWool = lazy(() => import('./components/Kani/ContemporaryWool.jsx'));
+const ContemporaryWoolOrders = lazy(() => import('./components/Kani/ContemporaryWoolOrders.jsx'));
+const RetailContWool = lazy(() => import('./components/Kani/RetailContWool.jsx'));
+const ContWoolWholesale = lazy(() => import('./components/Kani/ContWoolWholesale.jsx'));
+const ContWoolKlc = lazy(() => import('./components/Kani/ContWoolKlc.jsx'));
+const ContWoolSuppliers = lazy(() => import('./components/Kani/ContWoolSuppliers.jsx'));
+const ContWoolInProgress = lazy(() => import('./components/Kani/ContWoolInProgress.jsx'));
+const ContWoolSuppOrders = lazy(() => import('./components/Kani/ContWoolSuppOrders.jsx'));
+const Cotton = lazy(() => import('./components/Kani/Cotton.jsx'));
+const CottonOrders = lazy(() => import('./components/Kani/CottonOrders.jsx'));
+const CottonSuppliers = lazy(() => import('./components/Kani/CottonSuppliers.jsx'));
+const CottonSuppOrder = lazy(() => import('./components/Kani/CottonSuppOrder.jsx'));
+const CottonInProgress = lazy(() => import('./components/Kani/CottonInProgress.jsx'));
+const CottonRetail = lazy(() => import('./components/Kani/CottonRetail.jsx'));
+const CottonWholesale = lazy(() => import('./components/Kani/CottonWholesale.jsx'));
+const CottonKlc = lazy(() => import('./components/Kani/CottonKlc.jsx'));
+const ContemporarySaree = lazy(() => import('./components/Kani/ContemporarySaree.jsx'));
+const ContemporarySareeOrders = lazy(() => import('./components/Kani/ContemporarySareeOrders.jsx'));
+const SareeSuppliers = lazy(() => import('./components/Kani/SareeSuppliers.jsx'));
+const SareeInProgress = lazy(() => import('./components/Kani/SareeInProgress.jsx'));
+const SareeSuppOrder = lazy(() => import('./components/Kani/SareeSuppOrder.jsx'));
+const SareeRetail = lazy(() => import('./components/Kani/SareeRetail.jsx'));
+const SareeWholesale = lazy(() => import('./components/Kani/SareeWholesale.jsx'));
+const SareeKlc = lazy(() => import('./components/Kani/SareeKlc.jsx'));
+const PapierMachieSuppOrders = lazy(() => import('./components/Kani/PapierMachieSuppOrders.jsx'));
 
-import AddBom from './components/Products/AddBom.jsx';
-import AddLocationInventory from './components/Products/AddLoctionInventory.jsx';
+const AddBom = lazy(() => import('./components/Products/AddBom.jsx'));
+const AddLocationInventory = lazy(() => import('./components/Products/AddLoctionInventory.jsx'));
 
-import UpdateBom from './components/Products/UpdateBom.jsx';
-import UpdateProduct from './components/Products/UpdateProduct.jsx';
-import UpdateLocationInventory from './components/Products/UpdateLocationInventory.jsx';
+const UpdateBom = lazy(() => import('./components/Products/UpdateBom.jsx'));
+const UpdateProduct = lazy(() => import('./components/Products/UpdateProduct.jsx'));
+const UpdateLocationInventory = lazy(() => import('./components/Products/UpdateLocationInventory.jsx'));
 
 
 
-import FormLayout from './pages/Form/FormLayout.js';
-import Profile from './pages/Profile.js';
-import Settings from './pages/Settings.js';
-import Tables from './pages/Tables.js';
-import Alerts from './pages/UiElements/Alerts.js';
-import PageNotFOund from './pages/PageNotFOund.jsx';
+const FormLayout = lazy(() => import('./pages/Form/FormLayout.js'));
+const Profile = lazy(() => import('./pages/Profile.js'));
+const Settings = lazy(() => import('./pages/Settings.js'));
+const Tables = lazy(() => import('./pages/Tables.js'));
+const Alerts = lazy(() => import('./pages/UiElements/Alerts.js'));
+const PageNotFOund = lazy(() => import('./pages/PageNotFOund.jsx'));
 
-import Buttons from './pages/UiElements/Buttons.js';
+const Buttons = lazy(() => import('./pages/UiElements/Buttons.js'));
 import PrivateRoute from './PrivateRoute/PrivateRoute.jsx';
 import RoleBasedRoute from './PrivateRoute/RoleBasedRoute.jsx';
-import Budget from './components/Budget/Budget.jsx';
+const Budget = lazy(() => import('./components/Budget/Budget.jsx'));
 
 
-import ViewBudget from './components/Budget/ViewBudget.jsx';
-import BudgetReport from './components/Budget/BudgetReport.jsx';
+const ViewBudget = lazy(() => import('./components/Budget/ViewBudget.jsx'));
+const BudgetReport = lazy(() => import('./components/Budget/BudgetReport.jsx'));
 
-import BudgetReportView from './components/Budget/BudgetReportView.jsx';
+const BudgetReportView = lazy(() => import('./components/Budget/BudgetReportView.jsx'));
 
-import UpdateBudget from './components/Budget/UpdateBudget.jsx';
+const UpdateBudget = lazy(() => import('./components/Budget/UpdateBudget.jsx'));
 
-import AddWeave from './components/Configurator/AddWeave.jsx';
-import Size from './components/Configurator/Size.jsx';
-import Design from './components/Configurator/Design.jsx';
-import Style from './components/Configurator/Style.jsx';
-import Currency from './components/Configurator/Currency.jsx';
-import Unit from './components/Configurator/Unit.jsx';
-import ProductGroup from './components/Configurator/ProductGroup.jsx';
+const AddWeave = lazy(() => import('./components/Configurator/AddWeave.jsx'));
+const Size = lazy(() => import('./components/Configurator/Size.jsx'));
+const Design = lazy(() => import('./components/Configurator/Design.jsx'));
+const Style = lazy(() => import('./components/Configurator/Style.jsx'));
+const Currency = lazy(() => import('./components/Configurator/Currency.jsx'));
+const Unit = lazy(() => import('./components/Configurator/Unit.jsx'));
+const ProductGroup = lazy(() => import('./components/Configurator/ProductGroup.jsx'));
 
-import ProductSubGroup from './components/Configurator/ProductSubGroup.jsx';
-import AddColorGroup from './components/Configurator/AddColorGroup.jsx';
-import AddProductCategory from './components/Configurator/AddProductCategory.jsx';
-import CustomerGroup from './components/Configurator/CustomerGroup.jsx';
-import OrderType from './components/Configurator/OrderType.jsx';
-import HsnCode from './components/Configurator/HsnCode.jsx';
-import Location from './components/Configurator/Location.jsx';
-import Supplier from './components/Configurator/Supplier.jsx';
+const ProductSubGroup = lazy(() => import('./components/Configurator/ProductSubGroup.jsx'));
+const AddColorGroup = lazy(() => import('./components/Configurator/AddColorGroup.jsx'));
+const AddProductCategory = lazy(() => import('./components/Configurator/AddProductCategory.jsx'));
+const CustomerGroup = lazy(() => import('./components/Configurator/CustomerGroup.jsx'));
+const OrderType = lazy(() => import('./components/Configurator/OrderType.jsx'));
+const HsnCode = lazy(() => import('./components/Configurator/HsnCode.jsx'));
+const Location = lazy(() => import('./components/Configurator/Location.jsx'));
+const Supplier = lazy(() => import('./components/Configurator/Supplier.jsx'));
 
-import AddSupplier from './components/Supplier/AddSupplier.jsx';
-import ViewLedger from './components/Supplier/SupplierLedger/ViewLedger.jsx';
+const AddSupplier = lazy(() => import('./components/Supplier/AddSupplier.jsx'));
+const ViewLedger = lazy(() => import('./components/Supplier/SupplierLedger/ViewLedger.jsx'));
 // import LedgerPrintPage from './components/Supplier/SupplierLedger/LedgerPrintPage.jsx';
 
 // import ViewSuppLedger from './components/Supplier/SupplierLedger/ViewSuppLedger.jsx';
 
-import AddBulkSupplier from './components/Supplier/AddBulkSupplier.jsx';
+const AddBulkSupplier = lazy(() => import('./components/Supplier/AddBulkSupplier.jsx'));
 
-import ViewSupplier from './components/Supplier/ViewSupplier.jsx';
-import UpdateSupplier from './components/Supplier/UpdateSupplier.jsx';
+const ViewSupplier = lazy(() => import('./components/Supplier/ViewSupplier.jsx'));
+const UpdateSupplier = lazy(() => import('./components/Supplier/UpdateSupplier.jsx'));
 
-import MaterialPo from './components/PuchaseOrder/MaterialPo';
-import ViewMaterialPo from './components/PuchaseOrder/ViewMaterialPo';
-import UpdateMaterialPo from './components/PuchaseOrder/UpdateMaterialPo.jsx';
+const MaterialPo = lazy(() => import('./components/PuchaseOrder/MaterialPo'));
+const ViewMaterialPo = lazy(() => import('./components/PuchaseOrder/ViewMaterialPo'));
+const UpdateMaterialPo = lazy(() => import('./components/PuchaseOrder/UpdateMaterialPo.jsx'));
 
-import AddOrder from './components/Order/AddOrder';
-import Fiber from './components/Order/Fiber.jsx';
+const AddOrder = lazy(() => import('./components/Order/AddOrder'));
+const Fiber = lazy(() => import('./components/Order/Fiber.jsx'));
 
-import Reports from './components/Reports/Reports.jsx';
-import ProductReport from './components/Reports/ProductReport.jsx';
-
-
-
-
-import RetailWholeSaleReport from './components/Reports/RetailWholesaleReport.jsx';
-
-import CreditorsReports from './components/AccReports/CreditorsReports.jsx';
-
-import ClientReports from './components/AccReports/ClientReports.jsx';
-import ProfitLossReports from './components/AccReports/ProfitLossReports.jsx';
-import LoyaltyPointsSystemReport from './components/AccReports/LoyaltyPointsSystemReport.jsx';
-import StockReports from './components/AccReports/StockReports.jsx';
-import DebitorsReports from './components/AccReports/DebitorsReports.jsx';
-import SalesReports from './components/AccReports/SalesReports.jsx';
-
-import PurchaseReports from './components/AccReports/PurchaseReports.jsx';
-
-import FinanceReportByDate from './components/Reports/FinanceReportByDate.jsx';
-
-
-import ViewPerforma from './components/Order/ViewPerforma';
-
-import DownloadPerformaws from './components/Order/DownloadPerformaws';
-
-import DownloadPerformare from './components/Order/DownloadPerformare';
-
-import ViewOrder from './components/Order/ViewOrder.jsx';
-
-import EditOrderCreated from './components/Order/EditOrderCreated.jsx';
-
-import UpdateOrderStatus from './components/Order/UpdateOrderStatus.jsx';
-import OrderProforma from './components/Order/Proforma/OrderProforma.jsx';
-import UpdateOrderProforma from './components/Order/Proforma/UpdateOrderProforma.jsx';
-import UpdateRetailProforma from './components/Order/Proforma/UpdateRetailProforma.jsx';
-import RetailOrderProforma from './components/Order/Proforma/RetailOrderProforma.jsx';
+const Reports = lazy(() => import('./components/Reports/Reports.jsx'));
+const ProductReport = lazy(() => import('./components/Reports/ProductReport.jsx'));
 
 
 
-import UpdatePartiallyOrderStatus from './components/Order/UpdatePartiallyOrderStatus.jsx';
-import UpdatePartiallyApprovedOrder from './components/Order/UpdatePartiallyApprovedOrder.jsx';
-import UpdatePartiallyPending from './components/Order/UpdatePartiallyPending.jsx';
-import UpdateOrderCancelled from './components/Order/UpdateOrderCancelled.jsx';
 
-import UpdatePartiallyClosed from './components/Order/UpdatePartiallyClosed.jsx';
+const RetailWholeSaleReport = lazy(() => import('./components/Reports/RetailWholesaleReport.jsx'));
 
-import UpdateOrderRecieving from './components/Order/UpdateOrderRecieving.jsx';
-import UpdateForcedClosure from './components/Order/UpdateForcedClosure.jsx';
-import UpdateChallan from './components/Order/UpdateChallan.jsx';
-import UpdateExpectedSupplierDate from './components/Order/UpdateExpectedSupplierDate.jsx';
+const CreditorsReports = lazy(() => import('./components/AccReports/CreditorsReports.jsx'));
+
+const ClientReports = lazy(() => import('./components/AccReports/ClientReports.jsx'));
+const ProfitLossReports = lazy(() => import('./components/AccReports/ProfitLossReports.jsx'));
+const LoyaltyPointsSystemReport = lazy(() => import('./components/AccReports/LoyaltyPointsSystemReport.jsx'));
+const StockReports = lazy(() => import('./components/AccReports/StockReports.jsx'));
+const DebitorsReports = lazy(() => import('./components/AccReports/DebitorsReports.jsx'));
+const SalesReports = lazy(() => import('./components/AccReports/SalesReports.jsx'));
+
+const PurchaseReports = lazy(() => import('./components/AccReports/PurchaseReports.jsx'));
+
+const FinanceReportByDate = lazy(() => import('./components/Reports/FinanceReportByDate.jsx'));
+
+
+const ViewPerforma = lazy(() => import('./components/Order/ViewPerforma'));
+
+const DownloadPerformaws = lazy(() => import('./components/Order/DownloadPerformaws'));
+
+const DownloadPerformare = lazy(() => import('./components/Order/DownloadPerformare'));
+
+const ViewOrder = lazy(() => import('./components/Order/ViewOrder.jsx'));
+
+const EditOrderCreated = lazy(() => import('./components/Order/EditOrderCreated.jsx'));
+
+const UpdateOrderStatus = lazy(() => import('./components/Order/UpdateOrderStatus.jsx'));
+const OrderProforma = lazy(() => import('./components/Order/Proforma/OrderProforma.jsx'));
+const UpdateOrderProforma = lazy(() => import('./components/Order/Proforma/UpdateOrderProforma.jsx'));
+const UpdateRetailProforma = lazy(() => import('./components/Order/Proforma/UpdateRetailProforma.jsx'));
+const RetailOrderProforma = lazy(() => import('./components/Order/Proforma/RetailOrderProforma.jsx'));
+
+
+
+const UpdatePartiallyOrderStatus = lazy(() => import('./components/Order/UpdatePartiallyOrderStatus.jsx'));
+const UpdatePartiallyApprovedOrder = lazy(() => import('./components/Order/UpdatePartiallyApprovedOrder.jsx'));
+const UpdatePartiallyPending = lazy(() => import('./components/Order/UpdatePartiallyPending.jsx'));
+const UpdateOrderCancelled = lazy(() => import('./components/Order/UpdateOrderCancelled.jsx'));
+
+const UpdatePartiallyClosed = lazy(() => import('./components/Order/UpdatePartiallyClosed.jsx'));
+
+const UpdateOrderRecieving = lazy(() => import('./components/Order/UpdateOrderRecieving.jsx'));
+const UpdateForcedClosure = lazy(() => import('./components/Order/UpdateForcedClosure.jsx'));
+const UpdateChallan = lazy(() => import('./components/Order/UpdateChallan.jsx'));
+const UpdateExpectedSupplierDate = lazy(() => import('./components/Order/UpdateExpectedSupplierDate.jsx'));
 
 // import UpdateSupplierRecievingOrders from './components/Order/UpdateSupplierRecievingOrders.jsx';
 
-import ViewExpectedDateOrder from './components/Order/ViewExpectedDateOrder.jsx';
+const ViewExpectedDateOrder = lazy(() => import('./components/Order/ViewExpectedDateOrder.jsx'));
 
-import ViewSupplierRecievingOrders from './components/Order/ViewSupplierRecievingOrders.jsx';
-import ViewOrderShippingDate from './components/Order/ViewOrderShippingDate.jsx';
+const ViewSupplierRecievingOrders = lazy(() => import('./components/Order/ViewSupplierRecievingOrders.jsx'));
+const ViewOrderShippingDate = lazy(() => import('./components/Order/ViewOrderShippingDate.jsx'));
 
-import ViewNeedModification from './components/Order/ViewNeedModification.jsx';
+const ViewNeedModification = lazy(() => import('./components/Order/ViewNeedModification.jsx'));
 
-import ViewOrderCancelled from './components/Order/ViewOrderCancelled.jsx';
-
-
-
-import IssueChalaan from './components/Order/IssueChalaan.jsx';
+const ViewOrderCancelled = lazy(() => import('./components/Order/ViewOrderCancelled.jsx'));
 
 
 
-
-import UpdateOrderProduct from './components/Order/UpdateOrderProduct.jsx';
-import ViewProductByOrderId from './components/Order/ViewProductByOrderId.jsx';
-
-import ViewOrderForcedClosure from './components/Order/ViewOrderForcedClosure.jsx';
-import ViewRecievedQuantity from './components/Order/ViewRecievedQuantity.jsx';
-
-
-import MonthlyOrders from './components/MonthlyOrders/MonthlyOrders.jsx'
-
-
-import ViewOrderCreated from './components/Order/ViewOrderCreated.jsx';
-import ViewOrderApproved from './components/Order/ViewOrderApproved.jsx';
-
-import PendingForBill from './components/Order/PendingForBill.jsx';
-import UpdatePendingForBill from './components/Order/UpdatePendingForBill.jsx';
+const IssueChalaan = lazy(() => import('./components/Order/IssueChalaan.jsx'));
 
 
 
-import ViewChallan from './components/Order/ViewChallan.jsx';
 
-import ViewOrderRejected from './components/Order/ViewOrderRejected.jsx';
+const UpdateOrderProduct = lazy(() => import('./components/Order/UpdateOrderProduct.jsx'));
+const ViewProductByOrderId = lazy(() => import('./components/Order/ViewProductByOrderId.jsx'));
 
-
-
-import ViewOrderPartiallyCreated from './components/Order/ViewOrderPartiallyCreated.jsx';
-
-import ViewOrderPartiallyApproved from './components/Order/ViewOrderPartiallyApproved.jsx';
-
-import ViewOrderExecuted from './components/Order/ViewOrderExecuted.jsx';
-import UpdateOrderAccepted from './components/Order/UpdateOrderAccepted.jsx';
-import UpdateOrderPending from './components/Order/UpdateOrderPending.jsx';
-
-import UpdateClosedOrder from './components/Order/UpdateClosedOrder.jsx';
-
-import ViewOrderPartiallyPending from './components/Order/ViewOrderPartiallyPending.jsx';
-import ViewOrderPending from './components/Order/ViewOrderPending.jsx';
-
-import ViewOrderClosed from './components/Order/ViewOrderClosed.jsx';
-
-import ViewOrderPartiallyClosed from './components/Order/ViewOrderPartiallyClosed.jsx';
+const ViewOrderForcedClosure = lazy(() => import('./components/Order/ViewOrderForcedClosure.jsx'));
+const ViewRecievedQuantity = lazy(() => import('./components/Order/ViewRecievedQuantity.jsx'));
 
 
+const MonthlyOrders = lazy(() => import('./components/MonthlyOrders/MonthlyOrders.jsx'));
+
+
+const ViewOrderCreated = lazy(() => import('./components/Order/ViewOrderCreated.jsx'));
+const ViewOrderApproved = lazy(() => import('./components/Order/ViewOrderApproved.jsx'));
+
+const PendingForBill = lazy(() => import('./components/Order/PendingForBill.jsx'));
+const UpdatePendingForBill = lazy(() => import('./components/Order/UpdatePendingForBill.jsx'));
+
+
+
+const ViewChallan = lazy(() => import('./components/Order/ViewChallan.jsx'));
+
+const ViewOrderRejected = lazy(() => import('./components/Order/ViewOrderRejected.jsx'));
+
+
+
+const ViewOrderPartiallyCreated = lazy(() => import('./components/Order/ViewOrderPartiallyCreated.jsx'));
+
+const ViewOrderPartiallyApproved = lazy(() => import('./components/Order/ViewOrderPartiallyApproved.jsx'));
+
+const ViewOrderExecuted = lazy(() => import('./components/Order/ViewOrderExecuted.jsx'));
+const UpdateOrderAccepted = lazy(() => import('./components/Order/UpdateOrderAccepted.jsx'));
+const UpdateOrderPending = lazy(() => import('./components/Order/UpdateOrderPending.jsx'));
+
+const UpdateClosedOrder = lazy(() => import('./components/Order/UpdateClosedOrder.jsx'));
+
+const ViewOrderPartiallyPending = lazy(() => import('./components/Order/ViewOrderPartiallyPending.jsx'));
+const ViewOrderPending = lazy(() => import('./components/Order/ViewOrderPending.jsx'));
+
+const ViewOrderClosed = lazy(() => import('./components/Order/ViewOrderClosed.jsx'));
+
+const ViewOrderPartiallyClosed = lazy(() => import('./components/Order/ViewOrderPartiallyClosed.jsx'));
 
 
 
@@ -317,20 +315,22 @@ import ViewOrderPartiallyClosed from './components/Order/ViewOrderPartiallyClose
 
 
 
-import UpdateOrder from './components/Order/UpdateOrder.jsx';
-import ViewOrderr from './components/Order/ViewOrderr.jsx';
-import UpdateOrderShippingDate from './components/Order/UpdateOrderShippingDate.jsx';
 
-import AddCustomer from './components/Customer/AddCustomer';
-import ViewZohoContact from './components/Customer/ViewZohoContact.jsx';
-import ExcelUploadCustomer from './components/Customer/AddCustomerBulk.jsx';
-import ExcelUploadLedger from './components/Ledger/BulkLedgerUpload.jsx'
 
-import ViewCustomer from './components/Customer/ViewCustomer';
-import UpdateCustomer from './components/Customer/UpdateCustomer';
-import CreateMaterialInventory from './components/Inventory/CreateMaterialInventory.jsx';
-import ViewMaterialInventory from './components/Inventory/ViewMaterialInventory.jsx';
-import UpdateInventoryMaterial from './components/Inventory/UpdateInventoryMaterial.jsx';
+const UpdateOrder = lazy(() => import('./components/Order/UpdateOrder.jsx'));
+const ViewOrderr = lazy(() => import('./components/Order/ViewOrderr.jsx'));
+const UpdateOrderShippingDate = lazy(() => import('./components/Order/UpdateOrderShippingDate.jsx'));
+
+const AddCustomer = lazy(() => import('./components/Customer/AddCustomer'));
+const ViewZohoContact = lazy(() => import('./components/Customer/ViewZohoContact.jsx'));
+const ExcelUploadCustomer = lazy(() => import('./components/Customer/AddCustomerBulk.jsx'));
+const ExcelUploadLedger = lazy(() => import('./components/Ledger/BulkLedgerUpload.jsx'));
+
+const ViewCustomer = lazy(() => import('./components/Customer/ViewCustomer'));
+const UpdateCustomer = lazy(() => import('./components/Customer/UpdateCustomer'));
+const CreateMaterialInventory = lazy(() => import('./components/Inventory/CreateMaterialInventory.jsx'));
+const ViewMaterialInventory = lazy(() => import('./components/Inventory/ViewMaterialInventory.jsx'));
+const UpdateInventoryMaterial = lazy(() => import('./components/Inventory/UpdateInventoryMaterial.jsx'));
 
 
 
@@ -339,47 +339,47 @@ import UpdateInventoryMaterial from './components/Inventory/UpdateInventoryMater
 
 
 
-import AddProductInventory from './components/ProductsInventory/AddProductInventory.jsx';
-import UpdateExcelInventory from './components/ProductsInventory/UpdateExcelInventory.jsx';
-import ViewRecentTransactions from './components/ProductsInventory/ViewRecentTransactions.jsx';
+const AddProductInventory = lazy(() => import('./components/ProductsInventory/AddProductInventory.jsx'));
+const UpdateExcelInventory = lazy(() => import('./components/ProductsInventory/UpdateExcelInventory.jsx'));
+const ViewRecentTransactions = lazy(() => import('./components/ProductsInventory/ViewRecentTransactions.jsx'));
 
-import ViewProductsInventory from './components/ProductsInventory/ViewProductsInventory.jsx';
-import UpdateInventory from './components/ProductsInventory/UpdateInventory.jsx';
+const ViewProductsInventory = lazy(() => import('./components/ProductsInventory/ViewProductsInventory.jsx'));
+const UpdateInventory = lazy(() => import('./components/ProductsInventory/UpdateInventory.jsx'));
 
 
 
-import AddStockJournels from './components/StockJournell/AddStockJournels.jsx';
+const AddStockJournels = lazy(() => import('./components/StockJournell/AddStockJournels.jsx'));
 
-import ShopifyPage from './components/shopifyPage/ShopifyPage.jsx';
-import ShopifyOrders from './components/shopifyPage/ShopifyOrders.jsx';
-import ShopifyInventory from './components/shopifyPage/ShopifyInventory.jsx';
-import AddStockJournell from './components/StockJournel/AddStockJournell.jsx';
+const ShopifyPage = lazy(() => import('./components/shopifyPage/ShopifyPage.jsx'));
+const ShopifyOrders = lazy(() => import('./components/shopifyPage/ShopifyOrders.jsx'));
+const ShopifyInventory = lazy(() => import('./components/shopifyPage/ShopifyInventory.jsx'));
+const AddStockJournell = lazy(() => import('./components/StockJournel/AddStockJournell.jsx'));
 // import ViewStockJournel from './components/StockJournel/ViewStockJournel.jsx';
-import ViewStockJournels from './components/StockJournel/ViewStockJournels.jsx';
+const ViewStockJournels = lazy(() => import('./components/StockJournel/ViewStockJournels.jsx'));
 
-import VerifyStockJournal from './components/StockJournel/VerifyStockJournal.jsx';
-import VerifyStockJournals from './components/StockJournel/VerifyStockJournals.jsx';
+const VerifyStockJournal = lazy(() => import('./components/StockJournel/VerifyStockJournal.jsx'));
+const VerifyStockJournals = lazy(() => import('./components/StockJournel/VerifyStockJournals.jsx'));
 
 
-import PrintStockJournals from './components/StockJournel/PrintStockJournals.jsx';
-import Godown from './components/Godown/Godown.jsx'
+const PrintStockJournals = lazy(() => import('./components/StockJournel/PrintStockJournals.jsx'));
+const Godown = lazy(() => import('./components/Godown/Godown.jsx'));
 
-import ViewStockJournalCreated from './components/StockJournel/ViewStockJournalCreated.jsx';
-import EditStockJournals from './components/StockJournel/EditStockJournals.jsx';
+const ViewStockJournalCreated = lazy(() => import('./components/StockJournel/ViewStockJournalCreated.jsx'));
+const EditStockJournals = lazy(() => import('./components/StockJournel/EditStockJournals.jsx'));
 // import ViewStockJournel from './components/StockJournel/ViewStockJournel.jsx';
 
 // import UpdateProduct from './components/Products/UpdateProduct';
 
-import UpdateStockJournal from './components/StockJournel/UpdateStockJournal.jsx';
+const UpdateStockJournal = lazy(() => import('./components/StockJournel/UpdateStockJournal.jsx'));
 // import { signoutSuccess } from './redux/Slice/UserSlice';
 
 // import useInactivity from './hooks/useInactivity';
 
-import ViewKaniProducts from './components/Kani/ViewKaniProducts.jsx';
-import ViewSupplierProduct from './components/Kani/ViewSupplierProduct.jsx';
-import KaniInProgress from './components/Kani/KaniInProgress.jsx';
-import UpdateKaniProducts from './components/Kani/UpdateKaniProducts.jsx';
-import UpdatePashminaProducts from './components/Kani/UpdatePashminaProducts.jsx';
+const ViewKaniProducts = lazy(() => import('./components/Kani/ViewKaniProducts.jsx'));
+const ViewSupplierProduct = lazy(() => import('./components/Kani/ViewSupplierProduct.jsx'));
+const KaniInProgress = lazy(() => import('./components/Kani/KaniInProgress.jsx'));
+const UpdateKaniProducts = lazy(() => import('./components/Kani/UpdateKaniProducts.jsx'));
+const UpdatePashminaProducts = lazy(() => import('./components/Kani/UpdatePashminaProducts.jsx'));
 
 // import 'react-toastify/dist/ReactToastify.css';
 
@@ -387,7 +387,6 @@ import UpdatePashminaProducts from './components/Kani/UpdatePashminaProducts.jsx
 // import { toast } from 'react-toastify';
 
 function App() {
-  const [loading, setLoading] = useState(true);
   const { pathname } = useLocation();
   // const navigate = useNavigate();
   // const dispatch = useDispatch();
@@ -405,14 +404,9 @@ function App() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
-  }, []);
-
-  return loading ? (
-    <Loader />
-  ) : (
+  return (
     <>
+      <Suspense fallback={<Loader />}>
       <Routes>
         <Route
           path="/auth/signin"
@@ -2477,6 +2471,7 @@ function App() {
           <Route path="*" element={<PageNotFOund />} />
         </Route>
       </Routes>
+      </Suspense>
     </>
   );
 }

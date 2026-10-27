@@ -290,7 +290,7 @@ const DropdownNotification = () => {
   const getAllCount= async()=>{
     try {
       const data = await fetchWithAuth(`${ALLNOTIF_COUNT}`);
-      console.log(data,"55555555555552");
+      
       
       setTotalCount(data.allCount || 0);
     } catch (error) {
@@ -298,7 +298,7 @@ const DropdownNotification = () => {
     }
   }
 
-  getAllCount()
+
 
   // =========================================================
   // FETCH NOTIFICATIONS BY TAB WITH PAGINATION
@@ -478,6 +478,7 @@ const DropdownNotification = () => {
   // =========================================================
   useEffect(() => {
     fetchUnreadCount();
+      getAllCount()
 
     const interval = setInterval(fetchUnreadCount, 30000);
 
@@ -1296,7 +1297,7 @@ const DropdownNotification = () => {
       {/* =====================================================
           SCROLLBAR
       ====================================================== */}
-      <style jsx global>{`
+      <style>{`
         .custom-scrollbar::-webkit-scrollbar {
           width: 3px;
         }

@@ -11,27 +11,18 @@ import {
 } from '../Constants/utils';
 
 // Import Icons
-import { LuScale, LuPanelLeftClose } from 'react-icons/lu';
+
 import { SiHomeassistantcommunitystore } from 'react-icons/si';
 import { AiOutlinePartition, AiOutlineClose } from 'react-icons/ai';
 import {
   RiProgress1Line,
   RiProgress8Fill,
-  RiUserReceived2Fill,
+
   RiAlignItemBottomFill,
 } from 'react-icons/ri';
-import { FcApproval, FcCancel } from 'react-icons/fc';
+
 import { GrCompliance, GrUpdate } from 'react-icons/gr';
-import {
-  MdRepartition,
-  MdOutlinePendingActions,
-  MdOutlinePending,
-  MdRecommend,
-  MdEditSquare,
-} from 'react-icons/md';
-import { PiGearFineFill } from 'react-icons/pi';
-import { CiCalendarDate } from 'react-icons/ci';
-import { VscDiffModified } from 'react-icons/vsc';
+
 import { toast } from 'react-toastify';
 import { TbReorder } from 'react-icons/tb';
 import { GiWool } from 'react-icons/gi';
