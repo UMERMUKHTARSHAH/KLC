@@ -18,7 +18,7 @@ const CardDataStats: React.FC<CardDataStatsProps> = ({
   children,
 }) => {
   return (
-   <div className="group relative overflow-hidden rounded-2xl backdrop-blur-md bg-white/10 dark:bg-black/20 shadow-2xl border border-white/30 hover:border-purple-500/50 transition-all duration-500 flex flex-col p-6 hover:shadow-purple-500/30 hover:shadow-2xl min-h-[130px]">
+   <div className="group relative overflow-hidden rounded-2xl backdrop-blur-md bg-white/10 dark:bg-black/20 shadow-2xl border border-white/30 hover:border-purple-500/50 transition-all duration-500 flex flex-col p-6 hover:shadow-purple-500/30 hover:shadow-2xl h-[150px]">
 
   {/* Glass reflection effect */}
   <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-2xl"></div>

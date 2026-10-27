@@ -6,6 +6,7 @@ import PageTitle from './components/PageTitle.js';
 import SignIn from './pages/Authentication/SignIn.jsx';
 import SignUp from './pages/Authentication/SignUp.jsx';
 import ViewUsers from './pages/Authentication/ViewUsers.jsx';
+import EditUser from './pages/Authentication/EditUser.jsx';
 import Calendar from './pages/Calendar.js';
 import Chart from './pages/Chart.jsx';
 
@@ -440,6 +441,15 @@ function App() {
               <>
                 <PageTitle title="AddUser " />
                 <ViewUsers />
+              </>
+            }
+          />
+                <Route
+            path="/auth/edit/:id"
+            element={
+              <>
+                <PageTitle title="AddUser " />
+                <EditUser />
               </>
             }
           />
