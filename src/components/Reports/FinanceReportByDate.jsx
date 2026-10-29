@@ -381,20 +381,7 @@ const FinanceReportByDate = () => {
 
 
 
-                                        <button
-                                            type="button"
-                                            onClick={() => handlegenerateCsv(values)}
-                                            className=" mr-3 mb-4 md:w-[260px] w-[220px] md:h-[50px] h-[40px] pt-2 rounded-lg justify-center  bg-primary md:p-2.5 font-medium md:text-sm text-gray hover:bg-opacity-90"
-                                        >
-                                            Extra Qty Report(csv)
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handlegenerateCsv(values)}
-                                            className="flex mr-3 mb-4 md:w-[260px] w-[220px] md:h-[50px] h-[40px] pt-2 rounded-lg justify-center  bg-primary md:p-2.5 font-medium md:text-sm text-gray hover:bg-opacity-90"
-                                        >
-                                            Received Qty Report(csv)
-                                        </button>
+                                   
                                     </div>
 
                                 </Form>

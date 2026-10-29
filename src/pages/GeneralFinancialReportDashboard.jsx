@@ -115,9 +115,7 @@ const GeneralFinancialReportDashboard = () => {
                 isDownload: true,
                 downloadUrl: DOWNLOADPENDINGFINNCIALORDERS_REPORT, countKey: "proforma", icon: <RiAlignItemBottomFill className="w-10 h-10" />,
             },
-            { title: "Recieved Quantity Financial Reports", link: "/chart", countKey: "orders", icon: <SiHomeassistantcommunitystore className="w-10 h-10" />, levelDown: true },
-
-            { title: "Extra Quantity Financial Reports", link: "/product/addExcelProduct", countKey: "ordersWithCreated", icon: <AiOutlinePartition className="w-10 h-10" />, levelUp: true },
+           
 
 
         ],
