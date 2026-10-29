@@ -84,7 +84,7 @@ const SignIn = () => {
 
       if (!res.ok) {
         dispatch(signInFailure());
-        setError('Invalid Credentials');
+        setError(data?.errorMessage || 'Invalid Credentials');
         setIsLoading(false);
         return;
       }
