@@ -34,6 +34,7 @@ const AddOrder = () => {
 
   const [isProductModalOpen, setisProductModalOpen] = useState(false)
   const [selectedCustomerGroup, setSelectedCustomerGroup] = useState(null);
+  const [newCustomerEmail, setNewCustomerEmail] = useState('');
   const [newCustomerName, setNewCustomerName] = useState('');
     const [shippingstate, setShippingState] = useState(null);
   const dispatch = useDispatch();
@@ -492,11 +493,12 @@ if (values.orderCatagory === 'Embroidery' || values.orderCatagory === 'Dyeing') 
 
   console.log(selectedSuppliers, "umerumer");
 
-  const handleAddCustomer = async (name, group,state) => {
+  const handleAddCustomer = async (name, group,email,state) => {
     const values = {
       customerName: name,
       customerGroup: { id: group?.id },
-      shippingState: state
+      shippingState: state,
+      email: email
     };
 
     try {
@@ -1742,6 +1744,17 @@ console.log(values,"25632222");
                   isClearable
                 />
               </div>
+
+                <div className="mb-4">
+                <label className="block text-black dark:text-white mb-2">Email <span className="text-red-500 ml-1">*</span></label>
+                <input
+                  type="email"
+                  value={newCustomerEmail}
+                  onChange={(e) => setNewCustomerEmail(e.target.value)}
+                  className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-slate-700 dark:text-white dark:focus:border-primary"
+                  placeholder="Enter customer email"
+                />
+              </div>
                  <div className="flex-1 min-w-[300px]">
                                   <label className="mb-2.5 block text-black dark:text-white">
                                     Billing State <span className="text-red-600">*</span>
@@ -1775,9 +1788,9 @@ console.log(values,"25632222");
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleAddCustomer(newCustomerName, selectedCustomerGroup,shippingstate)}
+                  onClick={() => handleAddCustomer(newCustomerName, selectedCustomerGroup,newCustomerEmail,shippingstate)}
                   className="px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 transition-colors"
-                  disabled={!newCustomerName.trim()}
+                  disabled={!newCustomerName.trim() || !newCustomerEmail.trim()}
                 >
                   Add Customer
                 </button>
