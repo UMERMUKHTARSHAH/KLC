@@ -340,7 +340,7 @@ const handleCreateVoucher = async (values, action = 'save', onSuccess, onError) 
         if (values.typeOfVoucher === "Payment") {
             url = `${ADD_VoucherPaymentEntry_URL}/${values.voucherId}/create`;
         } else {
-            url = `${ADD_VoucherEntry_URL}?action=${action}`;
+           url = `${ADD_VoucherEntry_URL}?action=save`;
         }
 
         // Remove formAction from payload
