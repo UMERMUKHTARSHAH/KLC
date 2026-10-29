@@ -46,23 +46,20 @@ const Reports = () => {
 
     console.log(report, "4521");
 
-    const formattedProductGroup =productGroup && productGroup?.map(prod => ({
-        label: prod.productGroupName,
-        value: prod.productGroupName
-    }));
+    const formattedProductGroup = (productGroup || []).map(prod => ({
+    label: prod.productGroupName,
+    value: prod.productGroupName
+}));
 
-    console.log(formattedProductGroup,"45454");
-    
+const formattedOrderType = (orderType || []).map(type => ({
+    label: type.orderTypeName,
+    value: type.orderTypeName
+}));
 
-    const formattedOrderType = orderType?.map(type => ({
-        label: type.orderTypeName,
-        value: type.orderTypeName
-    }));
-
-    const formattedCustomer = Customer?.map(cust => ({
-        label: cust.customerName,
-        value: cust.customerName
-    }));
+const formattedCustomer = (Customer || []).map(cust => ({
+    label: cust.customerName,
+    value: cust.customerName
+}));
 
     const orderStatus = [
         { label: "Pending", value: "Pending" },
@@ -78,20 +75,20 @@ const Reports = () => {
         { label: "rejected", value: "rejected" },
     ];
 
-    const formattedSupplier = Supplier?.map(sup => ({
-        label: sup.name,
-        value: sup.id
-    }));
+const formattedSupplier = (Supplier || []).map(sup => ({
+    label: sup.name,
+    value: sup.id
+}));
 
-    const formattedProdId = prodId?.map(id => ({
-        label: id,
-        value: id
-    })) || [];
+const formattedProdId = (prodId || []).map(id => ({
+    label: id,
+    value: id
+}));
 
-    const formattedOrderNo = orderNo?.map(no => ({
-        label: no,
-        value: no
-    })) || [];
+const formattedOrderNo = (orderNo || []).map(no => ({
+    label: no,
+    value: no
+}));
 
     // ✅ FIXED: Render table rows with proper data access
     const renderTableRows = () => {
