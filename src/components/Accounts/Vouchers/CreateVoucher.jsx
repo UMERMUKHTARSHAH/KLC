@@ -2528,7 +2528,7 @@ if (Vouchers?.posInvoicing) {
                             }}
                           >
                             {/* Checkbox row - stays in normal flow */}
-                            <div className="flex flex-col gap-3 min-w-[250px] justify-content-between">
+                            {/* <div className="flex flex-col gap-3 min-w-[250px] justify-content-between">
                               <label className="whitespace-nowrap text-black dark:text-white">
                                 Supply Location
                               </label>
@@ -2559,7 +2559,7 @@ if (Vouchers?.posInvoicing) {
                                   }}
                                 />
                               </div>
-                            </div>
+                            </div> */}
 
                             {/* Expanded content - positioned absolutely below */}
                             {values.isDeliveryDifferent && (

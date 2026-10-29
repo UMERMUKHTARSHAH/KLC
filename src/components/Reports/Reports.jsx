@@ -46,10 +46,13 @@ const Reports = () => {
 
     console.log(report, "4521");
 
-    const formattedProductGroup = productGroup?.map(prod => ({
+    const formattedProductGroup =productGroup && productGroup?.map(prod => ({
         label: prod.productGroupName,
         value: prod.productGroupName
     }));
+
+    console.log(formattedProductGroup,"45454");
+    
 
     const formattedOrderType = orderType?.map(type => ({
         label: type.orderTypeName,
