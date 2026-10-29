@@ -1761,7 +1761,7 @@ const ProductGroupDetails = () => {
                          dark:bg-gray-700 dark:text-green-400 border border-green-400
                          cursor-pointer hover:bg-green-200 transition-colors duration-200 view-badge"
                         >
-                          ADD PRODUCT
+                          UPDATE PRODUCT
                         </span>
                       </div>
                     </td>
