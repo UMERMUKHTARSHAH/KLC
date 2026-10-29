@@ -35,6 +35,7 @@ const AddOrder = () => {
   const [isProductModalOpen, setisProductModalOpen] = useState(false)
   const [selectedCustomerGroup, setSelectedCustomerGroup] = useState(null);
   const [newCustomerName, setNewCustomerName] = useState('');
+    const [shippingstate, setShippingState] = useState(null);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -268,7 +269,46 @@ const AddOrder = () => {
     }
   }, [orderTypee, productId, customers]);
 
-
+  const stateOption = [
+    { value: '01', label: 'Jammu & Kashmir' },
+    { value: '02', label: 'Himachal Pradesh' },
+    { value: '03', label: 'Punjab' },
+    { value: '04', label: 'Chandigarh' },
+    { value: '05', label: 'Uttarakhand' },
+    { value: '06', label: 'Haryana' },
+    { value: '07', label: 'Delhi' },
+    { value: '08', label: 'Rajasthan' },
+    { value: '09', label: 'Uttar Pradesh' },
+    { value: '10', label: 'Bihar' },
+    { value: '11', label: 'Sikkim' },
+    { value: '12', label: 'Arunachal Pradesh' },
+    { value: '13', label: 'Nagaland' },
+    { value: '14', label: 'Manipur' },
+    { value: '15', label: 'Mizoram' },
+    { value: '16', label: 'Tripura' },
+    { value: '17', label: 'Meghalaya' },
+    { value: '18', label: 'Assam' },
+    { value: '19', label: 'West Bengal' },
+    { value: '20', label: 'Jharkhand' },
+    { value: '21', label: 'Odisha' },
+    { value: '22', label: 'Chhattisgarh' },
+    { value: '23', label: 'Madhya Pradesh' },
+    { value: '24', label: 'Gujarat' },
+    { value: '25', label: 'Daman & Diu' },
+    { value: '26', label: 'Dadra & Nagar Haveli' },
+    { value: '27', label: 'Maharashtra' },
+    { value: '28', label: 'Andhra Pradesh' },
+    { value: '29', label: 'Karnataka' },
+    { value: '30', label: 'Goa' },
+    { value: '31', label: 'Lakshadweep' },
+    { value: '32', label: 'Kerala' },
+    { value: '33', label: 'Tamil Nadu' },
+    { value: '34', label: 'Puducherry' },
+    { value: '35', label: 'Andaman & Nicobar Islands' },
+    { value: '36', label: 'Telangana' },
+    { value: '37', label: 'Andhra Pradesh (New)' },
+    { value: '38', label: 'Ladakh' }
+  ];
 
   const customModalStyles = {
     content: {
@@ -452,10 +492,11 @@ if (values.orderCatagory === 'Embroidery' || values.orderCatagory === 'Dyeing') 
 
   console.log(selectedSuppliers, "umerumer");
 
-  const handleAddCustomer = async (name, group) => {
+  const handleAddCustomer = async (name, group,state) => {
     const values = {
       customerName: name,
-      customerGroup: { id: group?.id }
+      customerGroup: { id: group?.id },
+      shippingState: state
     };
 
     try {
@@ -1701,6 +1742,26 @@ console.log(values,"25632222");
                   isClearable
                 />
               </div>
+                 <div className="flex-1 min-w-[300px]">
+                                  <label className="mb-2.5 block text-black dark:text-white">
+                                    Billing State <span className="text-red-600">*</span>
+                                  </label>
+                                  <ReactSelect
+                                    name="shippingState"
+                                    styles={customStyles}
+                                    value={stateOption.find(option => option.value === shippingstate) || null}
+
+                                    onChange={(option) =>
+                                      setShippingState(option ? option.value : null)
+                                    }
+                                   
+                                    options={stateOption}
+                                    className="bg-white dark:bg-form-input"
+                                    classNamePrefix="react-select"
+                                    placeholder="Select Shipping State"
+                                  />
+                                 
+                                </div>
 
               {/* You can add more customer fields here as needed */}
 
@@ -1714,7 +1775,7 @@ console.log(values,"25632222");
                 </button>
                 <button
                   type="button"
-                  onClick={() => handleAddCustomer(newCustomerName, selectedCustomerGroup)}
+                  onClick={() => handleAddCustomer(newCustomerName, selectedCustomerGroup,shippingstate)}
                   className="px-4 py-2 bg-primary text-white rounded hover:bg-blue-600 transition-colors"
                   disabled={!newCustomerName.trim()}
                 >

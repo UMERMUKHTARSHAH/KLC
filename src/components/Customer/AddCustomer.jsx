@@ -510,7 +510,7 @@ const AddCustomer = () => {
                 <div className="mb-4.5 flex flex-wrap gap-6">
                   <div className="flex-1 min-w-[300px]">
                     <label className="mb-2.5 block text-black dark:text-white">
-                      Billling State <span className="text-red-600">*</span>
+                      Billing State <span className="text-red-600">*</span>
                     </label>
                     <ReactSelect
                       name="shippingState"
