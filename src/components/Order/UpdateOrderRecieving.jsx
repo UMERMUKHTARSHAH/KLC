@@ -400,10 +400,10 @@ const UpdateOrderRecieving = () => {
                 supplierOrderQty: supplier.supplierOrderQty || 0,
               })) || [],
 
-            receivedQuantity: '',
+            receivedQuantity: 0,
             receivedDate: '',
 
-            pendingQuantity: '',
+            pendingQuantity: order?.quantityToManufacture ?? 0,
 
             defectiveQuantity: '',
 
