@@ -56,7 +56,7 @@ const AddLut = () => {
 
     // Function to toggle LUT active status
     const toggleLutActive = async (lutId, lut) => {
-        console.log(lut, "4445454");
+     
 
         try {
             const response = await fetch(`${TOGGLE_Lut_URL}/${lutId}`, {
@@ -69,7 +69,7 @@ const AddLut = () => {
                 //     isActive: !currentStatus
                 // })
             });
-            console.log(response, "luyyyyy");
+          
 
 
             const data = await response.json();

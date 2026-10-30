@@ -40,4 +40,4 @@ src = src.replace('<Routes>', '<Suspense fallback={<Loader />}>\n      <Routes>'
 src = src.replace('</Routes>', '</Routes>\n      </Suspense>');
 
 fs.writeFileSync(file, src);
-console.log(`Converted ${count} imports to lazy. Backup: ${file}.bak`);
+

@@ -78,7 +78,7 @@ const Groups = () => {
     ]
     const [gstDetailModal, setgstDetailModal] = useState(false)
     const handlerateDetails = (option, setFieldValue) => {
-        console.log(option, "optoooon");
+   
         setFieldValue('gstratedetails', option.value);
         if (option.value === "Specify Slab Based Rates") {
 
@@ -90,14 +90,14 @@ const Groups = () => {
 
     const handleModalSubmit = (values) => {
 
-        console.log(values, "ggjio");
+      
         setgstDetails(values)
 
     }
     useEffect(() => {
     getGroupss()
     }, [])
-    console.log(Groupss,"hhhhhhh665");
+
     
     
 

@@ -11,7 +11,7 @@ const ViewTable = ({
     columns = [] // Accept custom columns
 }) => {
     const startingSerialNumber = (pagination.currentPage - 1) * pagination.itemsPerPage + 1;
-console.log(units,"hey");
+
 
     // Function to generate dynamic headers
     const renderTableHeaders = () => {

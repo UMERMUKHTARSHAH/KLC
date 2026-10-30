@@ -82,7 +82,7 @@ const ViewDayBook = () => {
             });
 
             const data = await response.json();
-            console.log(data, "jumps");
+  
 
             if (data?.content) {
                 setDayBooks(data.content);

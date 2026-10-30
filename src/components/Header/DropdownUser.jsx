@@ -16,7 +16,7 @@ const DropdownUser = () => {
   const dispatch = useDispatch();
 
   const { currentUser } = useSelector((state) => state?.persisted?.user);
-  console.log(currentUser,"4521");
+
   
 
   //console.log(currentUser);

@@ -57,7 +57,7 @@ const OrderVoucherView = () => {
 
             const data = await response.json();
 
-            console.log(data, "umerrr");
+           
 
 
             if (data?.content) {
@@ -88,7 +88,7 @@ const OrderVoucherView = () => {
 
     // NEW: Function to apply voucher filter
     const applyVoucherFilter = (orders, filterType) => {
-        console.log(orders,"kkkkkkkkkkkkkkkkkkkkkk");
+    
         
         let filtered = [];
 
@@ -139,7 +139,7 @@ const OrderVoucherView = () => {
         setSelectedOrder(order);
         setShowOrdersWithVouchers(true);
     };
-    console.log(selectedOrder, "jhjh");
+
 
     const openOrdersWithoutVouchersModal = (order) => {
         setSelectedOrder(order);
@@ -152,7 +152,7 @@ const OrderVoucherView = () => {
         setShowOrdersWithVouchers(false);
         setShowOrdersWithoutVouchers(false);
     };
-    console.log(filteredOrders,"ggggggggggggggggggggggggggggg");
+ 
     
 
     const renderTableRows = () => {

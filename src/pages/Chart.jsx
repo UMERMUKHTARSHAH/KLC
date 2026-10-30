@@ -240,7 +240,7 @@ const Chart = () => {
   // Summary cards with their respective links
   const summaryCards = [
     {
-      title: "Total orders.      .   .   .   .",
+      title: "Total orders",
       count: totalOrders,
       icon: <SiHomeassistantcommunitystore className="w-5 h-5 text-blue-600" />,
       bgColor: "bg-blue-100",
@@ -249,7 +249,7 @@ const Chart = () => {
       link: "/Order/ViewOrder"
     },
     {
-      title: "Completed orders    .   .",
+      title: "Completed orders",
       count: completedOrders,
       icon: <FcApproval className="w-5 h-5" />,
       bgColor: "bg-green-100",
@@ -258,7 +258,7 @@ const Chart = () => {
       link: "/orderlist/Closed"
     },
     {
-      title: "Delayed orders     .  .",
+      title: "Delayed orders",
       count: delayedOrders,
       icon: <MdTimer className="w-5 h-5 text-orange-600" />,
       bgColor: "bg-orange-100",
@@ -437,7 +437,7 @@ const Chart = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           {summaryCards.map((card, idx) => (
             <Link to={card.link} key={idx}>
-              <div className="bg-white dark:bg-black/10 rounded-xl shadow-sm p-4 border border-gray-200 hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 ease-in-out cursor-pointer hover:scale-[1.02] hover:-translate-y-1 dark">
+              <div className="bg-white h-[140px] dark:bg-black/10 rounded-xl shadow-sm p-4 border border-gray-200 hover:shadow-xl hover:shadow-gray-200/50 hover:border-gray-300 transition-all duration-300 ease-in-out cursor-pointer hover:scale-[1.02] hover:-translate-y-1 dark">
   <div className="flex items-center justify-between">
     <div>
       <p className={`text-6px font-sm ${card.textColor} uppercase tracking-wider`}>

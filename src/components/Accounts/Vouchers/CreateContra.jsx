@@ -26,7 +26,7 @@ const CreateContra = () => {
 
 
       const handleCreateVoucher = async (values) => {
-            console.log(values, "vouchercreate");
+     
     
             try {
                 const response = await fetch(`${CREATE_DEBITNOTE_URL}/${id}/create`, {

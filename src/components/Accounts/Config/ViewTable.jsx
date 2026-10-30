@@ -132,7 +132,7 @@ const ViewTable = ({ title, units, totalItems, handleDelete, handleUpdate, pagin
       );
     });
   };
-  console.log(ledgers, "kk++++++");
+
 
   // Calculate totals for the modal
   const calculateTotals = () => {
@@ -320,7 +320,7 @@ const ViewTable = ({ title, units, totalItems, handleDelete, handleUpdate, pagin
 
                   // Calculate running balance up to this index
                   const runningBalance = opening + totalCredit - totalDebit
-                  console.log(ledger, "jjkkjjkk");
+              
 
                   return (
                     <tr key={index}>
