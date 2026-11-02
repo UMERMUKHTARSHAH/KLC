@@ -406,7 +406,7 @@ const Chart = () => {
                       >
                         {step.count}
                       </div>
-                      <p className="mt-3 text-[12px] font-medium text-gray-600 leading-tight break-words w-full">
+                      <p className="mt-3 text-[12px] font-small text-gray-600 leading-tight  w-full">
                         {step.title}
                       </p>
                     </Link>
