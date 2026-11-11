@@ -6,7 +6,7 @@ import Pagination from '../Pagination/Pagination';
 import useDesign from '../../hooks/useDesign';
 import { useSelector } from 'react-redux';
 import ReactSelect from 'react-select';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaSearch, FaTrash } from 'react-icons/fa';
 
 import { customStyles as createCustomStyles, VIEW_ALL_PRODUCT_GROUP_URL } from '../../Constants/utils';
 import { use } from 'react';
@@ -25,6 +25,8 @@ const Design = () => {
         edit,
         currentDesign,
         pagination,
+         searchTerm,
+    setSearchTerm,
         handleDelete,
         handleUpdate,
         handleSubmit,
@@ -190,6 +192,27 @@ const Design = () => {
                                             <h3 className="font-medium text-slate-500 text-center text-xl dark:text-white mb-4">
                                                 Designs List
                                             </h3>
+
+       {/* Search */}
+<div className="flex justify-start px-4 mb-4">
+    <div className="relative w-full md:w-[320px] group">
+        <FaSearch
+            size={14}
+            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 transition-colors duration-200 group-focus-within:text-primary"
+        />
+        <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") e.preventDefault(); }}
+            placeholder="Search by Design Name"
+            className="w-full rounded-lg border-[1.5px] border-stroke bg-transparent py-2.5 pl-10 pr-4 text-black shadow-sm outline-none transition-all duration-200
+                       hover:border-primary/60
+                       focus:border-primary focus:ring-4 focus:ring-primary/20 focus:shadow-md
+                       dark:border-form-strokedark dark:bg-slate-800 dark:text-white dark:focus:border-primary dark:focus:ring-primary/30"
+        />
+    </div>
+</div>
 
                                             {/* Table */}
                                             <div className="overflow-x-auto">

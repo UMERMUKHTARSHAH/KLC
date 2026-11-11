@@ -7,6 +7,9 @@ const useDesign = () => {
     const { currentUser } = useSelector((state) => state?.persisted?.user);
     const { token } = currentUser;
     const [Design, setDesign] = useState([]);
+
+    const [searchTerm, setSearchTerm] = useState("");
+const [debouncedSearch, setDebouncedSearch] = useState("");
     const [edit, setEdit] = useState(false);
     const [currentDesign, setCurrentDesign] = useState({
         designName: "",
@@ -23,23 +26,40 @@ const useDesign = () => {
     });
 
     // Fetch data when page changes
-    useEffect(() => {
-        if (pagination.currentPage > 0) {
-            getDesign(pagination.currentPage);
-        }
-    }, [pagination.currentPage]);
+   // Debounce typing so the API isn't called on every keystroke
+useEffect(() => {
+    const timer = setTimeout(() => {
+        setDebouncedSearch(searchTerm.trim());
+        setPagination(prev => ({ ...prev, currentPage: 1 })); // reset to first page on new search
+    }, 500);
+
+    return () => clearTimeout(timer);
+}, [searchTerm]);
+
+// Fetch when page or search changes
+useEffect(() => {
+    if (pagination.currentPage > 0) {
+        getDesign(pagination.currentPage);
+    }
+}, [pagination.currentPage, debouncedSearch]);
 
     const getDesign = async (page) => {
+
+        
         try {
             if (page < 1) {
                 console.error("Invalid page number:", page);
                 return;
             }
             
-            const apiPage = Math.max(0, page ); // Fixed: subtract 1 for 0-indexed API
-            console.log("Fetching page:", page, "API page:", apiPage);
+           const apiPage = Math.max(0, page);
+
+const params = new URLSearchParams({ page: apiPage });
+if (debouncedSearch) {
+    params.append("designName", debouncedSearch); // change the key if your backend uses a different name
+}
             
-            const response = await fetch(`${GET_DESIGN_URL}?page=${apiPage}`, {
+            const response = await fetch(`${GET_DESIGN_URL}?${params.toString()}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -56,6 +76,7 @@ const useDesign = () => {
                 productGroup: item.productGroupId ? {
                     id: item.productGroupId,
                     productGroupName: item.productGroupName
+                    
                 } : {}
             }));
             
@@ -200,6 +221,8 @@ const useDesign = () => {
         edit,
         currentDesign,
         pagination,
+         searchTerm,
+    setSearchTerm,
         handleDelete,
         handleUpdate,
         handleSubmit,
