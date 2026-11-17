@@ -255,6 +255,7 @@ const UpdateExpectedSupplierDate = lazy(() => import('./components/Order/UpdateE
 const ViewExpectedDateOrder = lazy(() => import('./components/Order/ViewExpectedDateOrder.jsx'));
 
 const ViewSupplierRecievingOrders = lazy(() => import('./components/Order/ViewSupplierRecievingOrders.jsx'));
+const ViewSupplierOrders = lazy(() => import('./components/Order/ViewSupplierOrders.jsx'));
 const ViewOrderShippingDate = lazy(() => import('./components/Order/ViewOrderShippingDate.jsx'));
 
 const ViewNeedModification = lazy(() => import('./components/Order/ViewNeedModification.jsx'));
@@ -1270,6 +1271,17 @@ function App() {
               </>
             }
           />
+
+             <Route
+            path="/order/allsupplierorders"
+            element={
+              <>
+                <PageTitle title="Supplier Orders " />
+                <ViewSupplierOrders />
+              </>
+            }
+          />
+
 
           <Route
             path="/order/updateShippingDate"

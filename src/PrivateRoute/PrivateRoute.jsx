@@ -1,48 +1,52 @@
 // src/routes/PrivateRoute.js
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Outlet, Navigate } from 'react-router-dom';
+import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { signoutSuccess } from '../redux/Slice/UserSlice';
 import ModeSelectionModal from '../components/Modal/ModeSelectionModel';
+
+// A missing, malformed, or expired token all count as "not valid"
+const isTokenInvalid = (token) => {
+
+  console.log(token,"1212121");
+  
+  if (!token || typeof token !== 'string') return true;
+  try {
+    const decoded = jwtDecode(token);
+    if (!decoded.exp) return true;
+    return decoded.exp < Date.now() / 1000;
+  } catch (error) {
+    return true;
+  }
+};
 
 const PrivateRoute = () => {
   const { currentUser } = useSelector((state) => state.persisted.user);
   const appMode = useSelector((state) => state.persisted.appMode?.mode);
   const dispatch = useDispatch();
- 
-  const isTokenExpired = (token) => {
-    try {
-      const decoded = jwtDecode(token);
-      const currentTime = Date.now() / 1000;
-      return decoded.exp < currentTime;
-    } catch (error) {
-      console.error('Error decoding token', error);
-      return true;
-    }
-  };
+  const location = useLocation();
 
-  useEffect(() => {
-    if (currentUser && currentUser.token) {
-      if (isTokenExpired(currentUser.token)) {
-        dispatch(signoutSuccess());
-      }
-    }
-    
-    const interval = setInterval(() => {
-      if (currentUser && currentUser.token && isTokenExpired(currentUser.token)) {
-        dispatch(signoutSuccess());
-      }
-    }, 5000);
+  const token = currentUser?.token;
+  const invalid = !currentUser || isTokenInvalid(token);
 
-    return () => clearInterval(interval);
+  const checkAndLogout = useCallback(() => {
+    if (currentUser && isTokenInvalid(currentUser.token)) {
+      dispatch(signoutSuccess());
+    }
   }, [currentUser, dispatch]);
 
-  if (!currentUser || (currentUser.token && isTokenExpired(currentUser.token))) {
-    return <Navigate to="/auth/signin" />;
+  // Runs on mount, on every page change, and every 5 seconds
+  useEffect(() => {
+    checkAndLogout();
+    const interval = setInterval(checkAndLogout, 5000);
+    return () => clearInterval(interval);
+  }, [checkAndLogout, location.pathname]);
+
+  if (invalid) {
+    return <Navigate to="/auth/signin" replace state={{ from: location }} />;
   }
 
-  // Show mode selection if not chosen yet
   if (!appMode) {
     return <ModeSelectionModal />;
   }

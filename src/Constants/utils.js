@@ -386,6 +386,9 @@ export const GET_ORDERBYIDD_URL = `${BASE_URL}/order/orderReponse`;
 
 export const UPDATE_ORDER_URL = `${BASE_URL}/order/update`;
 
+
+export const VIEW_SUPPLIER_ORDERS = `${BASE_URL}/order/supplier-orders`;
+
 export const GET_PRODUCTIDINVENTORY_URL = `${BASE_URL}/products/inventoryProductIds`;
 export const GET_PRODUCTInventory_URL = `${BASE_URL}/productInventory/getByProduct`;
 export const UPDATE_PRODUCTInventory_URL = `${BASE_URL}/productInventory/update`;

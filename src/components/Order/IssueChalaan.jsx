@@ -26,6 +26,33 @@ import { useNavigate, useNavigation, useParams } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { toast } from 'react-toastify';
 import SupplierModall from './SupplierModall';
+
+
+const MAX_IMAGES = 3;
+const MAX_IMAGE_MB = 5;
+
+const ImagePreview = ({ file, onRemove }) => {
+  const [url, setUrl] = useState('');
+
+  useEffect(() => {
+    const objectUrl = URL.createObjectURL(file);
+    setUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl); // avoid memory leaks
+  }, [file]);
+
+  return (
+    <div className="relative w-28 h-28 border rounded overflow-hidden">
+      <img src={url} alt={file.name} className="w-full h-full object-cover" />
+      <button
+        type="button"
+        onClick={onRemove}
+        className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 text-xs"
+      >
+        ✕
+      </button>
+    </div>
+  );
+};
 const IssueChalaan = () => {
   const { currentUser } = useSelector((state) => state?.persisted?.user);
 
@@ -171,53 +198,55 @@ const IssueChalaan = () => {
     setIsModalOpen(false);
   };
 
-  const handleSubmit = async (values) => {
-    // ✅ DEFINE productDetailsArray here - filter out empty rows
-    const productDetailsArray = values.productDetails
-      .filter((item) => item.productId && item.qty > 0) // Remove empty rows
-      .map((item) => ({
-        fiberProductId: item.productId,
-        qty: item.qty,
-      }));
+const handleSubmit = async (values) => {
+  const productDetailsArray = values.productDetails
+    .filter((item) => item.productId && item.qty > 0)
+    .map((item) => ({ fiberProductId: item.productId, qty: item.qty }));
 
-    const formattedValues = {
-      challanNo: values.challanNo,
-      challanDate: values.challanDate,
-      challanDate1: values.challanDate1,
-      challanDate2: values.challanDate2,
-      challanDate3: values.challanDate3,
-      challanDate4: values.challanDate4,
-      expectedSupplierDate: values.expectedSupplierDate,
-      productDetails: productDetailsArray, // ✅ Now this exists
-    };
-
-    console.log(formattedValues, 'formattedValues'); // ✅ Fixed: log is now correct
-
-    try {
-      const url = `${UPDATE_ISSUECHALLAN}/${id}`;
-      const method = 'PUT';
-
-      const response = await fetch(url, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(formattedValues),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        toast.success(`Order Status Updated successfully`);
-        navigate('/orderlist/Executed');
-      } else {
-        toast.error(`${data.errorMessage}`);
-      }
-    } catch (error) {
-      console.error(error);
-      toast.error('An error occurred');
-    }
+  const formattedValues = {
+    challanNo: values.challanNo,
+    challanDate: values.challanDate,
+    challanDate1: values.challanDate1,
+    challanDate2: values.challanDate2,
+    challanDate3: values.challanDate3,
+    challanDate4: values.challanDate4,
+    expectedSupplierDate: values.expectedSupplierDate,
+    productDetails: productDetailsArray,
   };
+
+  const formData = new FormData();
+  // JSON part: the Blob type MUST be application/json or Spring returns 415
+  formData.append(
+    'data',
+    new Blob([JSON.stringify(formattedValues)], { type: 'application/json' }),
+  );
+  // Same key repeated for each file, which Spring binds to List<MultipartFile>
+  (values.colorImages || []).forEach((file) => {
+    formData.append('colorImages', file);
+  });
+
+  try {
+    const response = await fetch(`${UPDATE_ISSUECHALLAN}/${id}`, {
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        // DO NOT set Content-Type here; the browser adds it with the boundary
+      },
+      body: formData,
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      toast.success('Order Status Updated successfully');
+      navigate('/orderlist/Executed');
+    } else {
+      toast.error(`${data.errorMessage}`);
+    }
+  } catch (error) {
+    console.error(error);
+    toast.error('An error occurred');
+  }
+};
 
   console.log(prodIdModal, 'proddidmodal');
 
@@ -227,6 +256,30 @@ const IssueChalaan = () => {
   );
   console.log(order, 'jjhhjjhh');
 
+
+const handleImageSelect = (e, values, setFieldValue) => {
+  const selected = Array.from(e.target.files || []);
+
+  const valid = selected.filter((file) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error(`${file.name} is not an image`);
+      return false;
+    }
+    if (file.size > MAX_IMAGE_MB * 1024 * 1024) {
+      toast.error(`${file.name} is larger than ${MAX_IMAGE_MB}MB`);
+      return false;
+    }
+    return true;
+  });
+
+  const combined = [...(values.colorImages || []), ...valid];
+  if (combined.length > MAX_IMAGES) {
+    toast.error(`Maximum ${MAX_IMAGES} images allowed`);
+  }
+  setFieldValue('colorImages', combined.slice(0, MAX_IMAGES));
+  e.target.value = ''; // allow re-selecting the same file
+};
+
   return (
     <DefaultLayout>
       <Breadcrumb pageName="Order/Update Order Product" />
@@ -234,6 +287,8 @@ const IssueChalaan = () => {
         <Formik
           enableReinitialize={true}
           initialValues={{
+
+            colorImages: [],
             // orderNo: order?.orderNo || '',
             orderCategory: order?.orderCategory || '',
             productId: order?.products?.productId,
@@ -430,7 +485,39 @@ const IssueChalaan = () => {
 
                       {/* Product ID */}
                     </div>
-                    <div></div>
+                    <div>
+
+<div className="mt-5">
+  <label className="mb-2.5 block text-black dark:text-white">
+    Color Images (max {MAX_IMAGES})
+  </label>
+
+  <input
+    type="file"
+    accept="image/*"
+    multiple
+    disabled={(values.colorImages || []).length >= MAX_IMAGES}
+    onChange={(e) => handleImageSelect(e, values, setFieldValue)}
+    className="w-full max-w-md rounded border-[1.5px] border-stroke bg-white dark:bg-form-input py-2 px-3 text-black"
+  />
+
+  <div className="flex flex-wrap gap-3 mt-3">
+    {(values.colorImages || []).map((file, index) => (
+      <ImagePreview
+        key={`${file.name}-${index}`}
+        file={file}
+        onRemove={() =>
+          setFieldValue(
+            'colorImages',
+            values.colorImages.filter((_, i) => i !== index),
+          )
+        }
+      />
+    ))}
+  </div>
+</div>
+
+                    </div>
                     <div className="flex flex-wrap gap-3">
                       <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
                         <div className="inline-block min-w-full shadow-md rounded-lg overflow-hidden">

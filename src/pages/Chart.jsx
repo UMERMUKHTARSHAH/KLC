@@ -24,7 +24,7 @@ import { GiRolledCloth } from "react-icons/gi";
 import { GiCottonFlower } from "react-icons/gi";
 import { GiBandageRoll } from "react-icons/gi";
 import { GiScrollUnfurled } from "react-icons/gi";
-import { FaDropbox } from "react-icons/fa";
+import { FaDropbox, FaJediOrder } from "react-icons/fa";
 import { BiBookOpen } from 'react-icons/bi';
 
 const Chart = () => {
@@ -165,6 +165,7 @@ const Chart = () => {
       { title: "Rejected Orders", link: "/orderlist/RejectedOrders", countKey: "ordersWithRejected", icon: <AiOutlineClose className="w-10 h-10" />, levelUp: true },
       { title: "Supplier Date Updation", link: "/order/supplierExpectdateUpdate", countKey: "approvedSupplierOrdersCount", icon: <CiCalendarDate className="w-10 h-10" />, levelUp: true },
       { title: "Supplier Receiving Orders", link: "/order/supplierRecievingOrders", countKey: "ordersWithSupplierReceiving", icon: <RiUserReceived2Fill className="w-10 h-10" />, levelUp: true },
+      { title: "Supplier Orders", link: "/order/allsupplierorders", countKey: "ordersWithSupplierReceiving", icon: <FaJediOrder className="w-10 h-10" />, levelUp: true },
       { title: "Need Modification Orders", link: "/order/needModification", countKey: "ordersNeedModification", icon: <VscDiffModified className="w-10 h-10" />, levelUp: true },
       { title: "Cancelled Orders", link: "/order/Cancelled", countKey: "ordersCancelled", icon: <FcCancel className="w-10 h-10" />, levelUp: true },
       { title: "Edit Received Quantity", link: "/order/recievedQuantity", countKey: "ordersWithPendingProducts", icon: <MdEditSquare className="w-10 h-10" />, levelUp: true },
@@ -298,7 +299,7 @@ const Chart = () => {
         needsAttention.push(card);
       }
       // Fiber, Proforma & Suppliers category
-      else if (['Fibers Allocated', 'Proforma', 'Supplier Receiving Orders','Supplier Date Updation'].includes(card.title)) {
+      else if (['Fibers Allocated', 'Proforma', 'Supplier Receiving Orders','Supplier Orders','Supplier Date Updation'].includes(card.title)) {
         fiberProformaSuppliers.push(card);
       }
       // This Month category
