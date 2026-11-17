@@ -25,7 +25,7 @@ const ViewProduct = () => {
   const referenceImages = [];
   const [uploadType, setUploadType] = useState('referenceImages');
   const actualImages = [];
-
+  const formikRef = useRef(null);
   const theme = useSelector((state) => state?.persisted?.theme);
   const {
     Product,
@@ -281,7 +281,7 @@ const ViewProduct = () => {
                     `${GET_IMAGE}/products/getimages/${
                       item?.images?.find((img) => img.referenceImage)
                         .referenceImage
-                    }`
+                    }`,
                   )
                 }
               />
@@ -338,7 +338,7 @@ const ViewProduct = () => {
                   handleOpenFullImage(
                     `${GET_IMAGE}/products/getimages/${
                       item.images.find((img) => img?.actualImage)?.actualImage
-                    }`
+                    }`,
                   )
                 }
               />
@@ -418,7 +418,7 @@ const ViewProduct = () => {
         {/* Product ID */}
         <td className="px-5 py-5 border-b border-gray-200 text-sm whitespace-nowrap tracking-wider ">
           <p className="text-gray-900 tracking-wider whitespace-nowrap">
-            {item?.productId?.substring(0, 45) }
+            {item?.productId?.substring(0, 45)}
           </p>
         </td>
 
@@ -513,12 +513,46 @@ const ViewProduct = () => {
     ));
   };
 
+  const handleThisMonth = () => {
+    const formik = formikRef.current;
+    if (!formik) return;
+
+    // Build yyyy-mm-dd from local time (toISOString can shift the date by timezone)
+    const toLocalDateString = (d) =>
+      `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(
+        d.getDate(),
+      ).padStart(2, '0')}`;
+
+    const today = new Date();
+    const fromDate = toLocalDateString(
+      new Date(today.getFullYear(), today.getMonth(), 1),
+    );
+    const toDate = toLocalDateString(today);
+
+    // Show the dates in the form fields
+    formik.setFieldValue('fromDate', fromDate);
+    formik.setFieldValue('toDate', toDate);
+
+    // Search immediately (page 1, since it's a new filter)
+    const v = formik.values;
+    getProduct(1, {
+      productId: v.ProductId || undefined,
+      hasActualImage: v.hasActualImage,
+      hasReferenceImage: v.hasReferenceImage,
+      searchText: v.searchText,
+      fromDate,
+      toDate,
+    });
+  };
+
   const handleSubmit = (values) => {
     const filters = {
       productId: values.ProductId || undefined,
       hasActualImage: values.hasActualImage,
       hasReferenceImage: values.hasReferenceImage,
       searchText: values.searchText,
+      fromDate: values.fromDate || undefined,
+      toDate: values.toDate || undefined,
     };
     getProduct(pagination.currentPage, filters);
   };
@@ -764,53 +798,53 @@ const ViewProduct = () => {
           )}
 
           {/* Full Screen Image Popup */}
-       {/* Full Screen Image Popup */}
-{isFullImageOpen && selectedFullImage && (
-  <div
-    className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm"
-    onClick={handleCloseFullImage}
-  >
-    {/* Close Button */}
-    <button
-      onClick={handleCloseFullImage}
-      className="absolute top-4 right-4 z-[10000] text-white hover:text-gray-300 transition-colors duration-200"
-      aria-label="Close image"
-    >
-      <svg
-        className="w-10 h-10"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          d="M6 18L18 6M6 6l12 12"
-        />
-      </svg>
-    </button>
+          {/* Full Screen Image Popup */}
+          {isFullImageOpen && selectedFullImage && (
+            <div
+              className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 backdrop-blur-sm"
+              onClick={handleCloseFullImage}
+            >
+              {/* Close Button */}
+              <button
+                onClick={handleCloseFullImage}
+                className="absolute top-4 right-4 z-[10000] text-white hover:text-gray-300 transition-colors duration-200"
+                aria-label="Close image"
+              >
+                <svg
+                  className="w-10 h-10"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
 
-    {/* Image Container */}
-    <div
-      className="relative w-full h-full flex items-center justify-center p-4"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <img
-        src={selectedFullImage}
-        alt="Full Screen"
-        className="w-[600px] h-[600px] object-contain"
-        crossOrigin="use-credentials"
-      />
+              {/* Image Container */}
+              <div
+                className="relative w-full h-full flex items-center justify-center p-4"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img
+                  src={selectedFullImage}
+                  alt="Full Screen"
+                  className="w-[600px] h-[600px] object-contain"
+                  crossOrigin="use-credentials"
+                />
 
-      {/* Hint text */}
-      <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full text-sm whitespace-nowrap">
-        Click outside to close • Press ESC to close
-      </div>
-    </div>
-  </div>
-)}
+                {/* Hint text */}
+                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 bg-black/50 text-white px-4 py-2 rounded-full text-sm whitespace-nowrap">
+                  Click outside to close • Press ESC to close
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Upload Modal */}
           {uploadModalOpen && renderUploadModal()}
@@ -896,16 +930,28 @@ const ViewProduct = () => {
           {/* Search Form */}
           <div className="items-center justify-center">
             <Formik
+            innerRef={formikRef}
               initialValues={{
                 ProductId: '',
                 hasActualImage: '',
                 searchText: '',
                 hasReferenceImage: '',
+                fromDate: '',
+                toDate: '',
               }}
               onSubmit={handleSubmit}
             >
               {({ setFieldValue, values }) => (
                 <Form>
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={handleThisMonth}
+                      className="inline-flex items-center gap-2 rounded-md border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 dark:border-blue-800/30 dark:bg-blue-900/20 dark:text-blue-300 dark:hover:bg-blue-900/40"
+                    >
+                     Search By This Month
+                    </button>
+                  </div>
                   <div className="mb-4.5 flex flex-wrap gap-6 mt-12">
                     <div className="flex-1 min-w-[300px]">
                       <label className="mb-2.5 block text-black dark:text-white">
@@ -952,8 +998,6 @@ const ViewProduct = () => {
                         }
                       />
                     </div>
-                  </div>
-                  <div className="mb-4.5 flex flex-wrap gap-6 mt-12">
                     <div className="flex-1 min-w-[300px]">
                       <label className="mb-2.5 block text-black dark:text-white">
                         Has Actual Image
@@ -978,7 +1022,8 @@ const ViewProduct = () => {
                         }
                       />
                     </div>
-
+                  </div>
+                  <div className="mb-4.5 flex flex-wrap gap-6 mt-12">
                     <div className="flex-1 min-w-[300px]">
                       <label className="mb-2.5 block text-black dark:text-white">
                         Description/Barcode/Alias
@@ -988,6 +1033,27 @@ const ViewProduct = () => {
                         type="text"
                         placeholder="Search Description/Barcode/Alias"
                         className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-white dark:border-form-strokedark dark:bg-form-field dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-[300px]">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        From Date
+                      </label>
+                      <Field
+                        name="fromDate"
+                        type="date"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-Field dark:text-white dark:focus:border-primary"
+                      />
+                    </div>
+
+                    <div className="flex-1 min-w-[300px]">
+                      <label className="mb-2.5 block text-black dark:text-white">
+                        To Date
+                      </label>
+                      <Field
+                        name="toDate"
+                        type="date"
+                        className="w-full rounded border-[1.5px] border-stroke bg-transparent py-3 px-5 text-black outline-none transition focus:border-primary active:border-primary dark:border-form-strokedark dark:bg-form-Field dark:text-white dark:focus:border-primary"
                       />
                     </div>
                   </div>

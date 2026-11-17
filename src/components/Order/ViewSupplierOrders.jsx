@@ -75,9 +75,10 @@ const ViewSupplierOrders = () => {
 
     const renderSupplier = (supplier) => {
         const orders = supplier.orders || []
-        const isCollapsed = !!collapsed[supplier.id]
+        const isCollapsed = !collapsed[supplier.id]
 
         return (
+             
             <div
                 key={supplier.id}
                 className="mb-6 shadow-md rounded-lg overflow-hidden border border-gray-200 dark:border-slate-600"

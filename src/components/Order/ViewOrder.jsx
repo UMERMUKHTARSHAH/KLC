@@ -252,6 +252,8 @@ const ViewOrder = () => {
         </td>
         <td className="px-5 py-5 border-b border-gray-200 text-sm">
           <p className="text-gray-900 whitespace-no-wrap">{item.orderDate}</p>
+        </td> <td className="px-5 py-5 border-b border-gray-200 text-sm">
+          <p className="text-gray-900 whitespace-no-wrap">Username:{item.createdBy.split('_').join(' ')}</p>
         </td>
         <td className="px-5 py-5 border-b border-gray-200 text-sm">
           <p className="text-gray-900 whitespace-no-wrap">{item.orderStatus}</p>
@@ -472,6 +474,9 @@ const ViewOrder = () => {
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-[140px]">
                       Order Date
+                    </th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-[140px]">
+                      Created By
                     </th>
                     <th className="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider w-[140px]">
                       Order Status
